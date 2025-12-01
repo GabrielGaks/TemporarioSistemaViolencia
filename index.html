@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Casos - Violência Escolar</title>
+  
+  <!-- TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .field-error {
+      border-color: #ef4444 !important;
+      background-color: #fee2e2 !important;
+    }
+    
+    .alert {
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Estilos para Autocomplete */
+    .autocomplete-wrapper {
+      position: relative;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-top: none;
+      border-radius: 0 0 0.75rem 0.75rem;
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+      display: none;
+    }
+
+    .autocomplete-list.show {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 12px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background-color: #eff6ff;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .autocomplete-badge.cmei {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .autocomplete-badge.emef {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .autocomplete-nome {
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .no-results {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .autocomplete-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .autocomplete-list::-webkit-scrollbar-track {
+      background: #f3f4f6;
+    }
+
+    .autocomplete-list::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+
+    .autocomplete-list::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* Estilos para Select Customizado */
+    .custom-select-wrapper {
+      position: relative;
+    }
+
+    .custom-select-trigger {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    .custom-select-trigger::after {
+      content: '▼';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #6b7280;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .custom-select-trigger.open::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .custom-select-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+      display: none;
+      animation: dropdownSlide 0.2s ease-out;
+    }
+
+    @keyframes dropdownSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .custom-select-dropdown.show {
+      display: block;
+    }
+
+    .custom-select-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .custom-select-option:last-child {
+      border-bottom: none;
+    }
+
+    .custom-select-option:hover {
+      background-color: #f3f4f6;
+    }
+
+    .custom-select-option.selected {
+      background-color: #eff6ff;
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .custom-select-option.selected::before {
+      content: '✓ ';
+      margin-right: 8px;
+    }
+
+    .custom-select-dropdown::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-select-dropdown::-webkit-scrollbar-track {
+      background: #f3f4f6;
+    }
+
+    .custom-select-dropdown::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+
+    .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* Esconder select nativo mas manter funcionalidade */
+    .custom-select-wrapper select {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Estilos para Date Input Customizado */
+    input[type="date"] {
+      position: relative;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 20px;
+      padding-right: 42px;
+      color: #374151;
+      font-family: inherit;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      right: 0;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: auto;
+      height: auto;
+      cursor: pointer;
+      opacity: 0;
+      z-index: 10;
+    }
+
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-clear-button {
+      display: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="date"]::-webkit-datetime-edit {
+      padding: 0;
+      color: #374151;
+    }
+
+    input[type="date"]::-webkit-datetime-edit-text {
+      color: #6b7280;
+      padding: 0 2px;
+    }
+
+    input[type="date"]::-webkit-datetime-edit-month-field,
+    input[type="date"]::-webkit-datetime-edit-day-field,
+    input[type="date"]::-webkit-datetime-edit-year-field {
+      padding: 2px 4px;
+      border-radius: 4px;
+      color: #374151;
+    }
+
+    input[type="date"]::-webkit-datetime-edit-month-field:focus,
+    input[type="date"]::-webkit-datetime-edit-day-field:focus,
+    input[type="date"]::-webkit-datetime-edit-year-field:focus {
+      background-color: #dbeafe;
+      color: #1e40af;
+      outline: none;
+    }
+
+    input[type="date"]:hover {
+      border-color: #9ca3af;
+    }
+
+    input[type="date"]:focus {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    }
+
+    /* Estilização do popup do calendário */
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      cursor: pointer;
+      background: transparent;
+    }
+
+    /* Firefox */
+    input[type="date"]::-moz-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen py-10 px-4">
+  
+  <!-- Container Principal -->
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Menu de Navegação -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-4 mb-6">
+      <nav class="flex flex-wrap gap-4 justify-center">
+        <a href="index.html" class="px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold shadow-md hover:shadow-lg transition">
+          📝 Novo Registro
+        </a>
+        <a href="gerenciar.html" class="px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-400 transition">
+          📋 Gerenciar Registros
+        </a>
+      </nav>
+    </div>
+    
+    <!-- Cabeçalho -->
+    <div class="bg-gradient-to-r from-white to-blue-50/30 rounded-xl sm:rounded-2xl shadow-xl border border-white/60 backdrop-blur-sm p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3">
+        <div class="h-12 w-12 sm:h-14 sm:w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-2xl sm:text-3xl shadow-sm flex-shrink-0">
+          📋
+        </div>
+        <div class="text-center">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 leading-tight">
+            Registro de Casos de Violência Escolar
+          </h1>
+        </div>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <p class="text-center text-gray-600 text-sm sm:text-base px-2">
+          Preencha todos os campos obrigatórios com atenção e cuidado
+        </p>
+        <div class="inline-flex items-center gap-2 bg-blue-100/50 px-3 sm:px-4 py-1.5 rounded-full">
+          <span class="text-xs font-semibold text-blue-700">Sistema Interno</span>
+          <span class="text-blue-400">·</span>
+          <span class="text-xs font-medium text-blue-600">SME Vitória</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Área de Alertas -->
+    <div id="alertContainer"></div>
+    
+    <!-- Formulário -->
+    <form id="registroForm" class="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-white/60 p-4 sm:p-6 md:p-8 lg:p-10 space-y-6 sm:space-y-8">
+      
+      <!-- =============================================== -->
+      <!-- SEÇÃO 1: Dados da Criança/Estudante -->
+      <!-- =============================================== -->
+      <section>
+        <div class="bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 md:p-6 mb-6">
+          <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div class="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-lg sm:rounded-xl bg-blue-100 text-blue-600 text-xl sm:text-2xl flex-shrink-0 shadow-sm">
+              👤
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">
+                Dados da Criança/Estudante
+              </h2>
+              <p class="text-xs sm:text-sm text-gray-600">
+                Preencha as informações básicas da criança ou estudante envolvido no caso
+              </p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            
+            <!-- Criança/Estudante -->
+            <div class="md:col-span-2">
+              <label for="criancaEstudante" class="block text-sm font-semibold text-gray-700 mb-2">
+                Nome da Criança/Estudante <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="criancaEstudante" 
+                name="criancaEstudante" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+                placeholder="Digite o nome completo"
+              >
+            </div>
+            
+            <!-- Data da NT -->
+            <div>
+              <label for="dataNT" class="block text-sm font-semibold text-gray-700 mb-2">
+                Data da Notificação (NT) <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="date" 
+                id="dataNT" 
+                name="dataNT" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+              >
+            </div>
+            
+            <!-- Idade -->
+            <div>
+              <label for="idade" class="block text-sm font-semibold text-gray-700 mb-2">
+                Idade <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="number" 
+                id="idade" 
+                name="idade" 
+                min="0" 
+                max="120"
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+                placeholder="Ex: 10"
+              >
+            </div>
+            
+            <!-- Identidade de Gênero -->
+            <div>
+              <label for="identidadeGenero" class="block text-sm font-semibold text-gray-700 mb-2">
+                Identidade de Gênero <span class="text-red-500">*</span>
+              </label>
+              <select 
+                id="identidadeGenero" 
+                name="identidadeGenero" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+                <option value="Não-binário">Não-binário</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+            
+            <!-- É PCD/tem Transtorno? -->
+            <div>
+              <label for="pcdTranstorno" class="block text-sm font-semibold text-gray-700 mb-2">
+                É PCD/tem Transtorno?
+              </label>
+              <select 
+                id="pcdTranstorno" 
+                name="pcdTranstorno"
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="Não informado">Não informado</option>
+              </select>
+            </div>
+            
+            <!-- Raça/Cor -->
+            <div class="md:col-span-2">
+              <label for="racaCor" class="block text-sm font-semibold text-gray-700 mb-2">
+                Raça/Cor
+              </label>
+              <select 
+                id="racaCor" 
+                name="racaCor"
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione...</option>
+                <option value="Branca">Branca</option>
+                <option value="Preta">Preta</option>
+                <option value="Parda">Parda</option>
+                <option value="Amarela">Amarela</option>
+                <option value="Indígena">Indígena</option>
+                <option value="Não informado">Não informado</option>
+              </select>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+      
+      <!-- =============================================== -->
+      <!-- SEÇÃO 2: Situação da Violência -->
+      <!-- =============================================== -->
+      <section>
+        <div class="bg-gradient-to-r from-red-50/50 to-orange-50/30 rounded-xl sm:rounded-2xl border border-red-200 shadow-sm p-4 sm:p-5 md:p-6 mb-6">
+          <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div class="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-lg sm:rounded-xl bg-red-100 text-red-600 text-xl sm:text-2xl flex-shrink-0 shadow-sm">
+              ⚠️
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">
+                Situação da Violência
+              </h2>
+              <p class="text-xs sm:text-sm text-gray-600">
+                Descreva o tipo de violência ocorrida e os encaminhamentos realizados
+              </p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 gap-4 sm:gap-6">
+            
+            <!-- Tipo de Violência -->
+            <div>
+              <label for="tipoViolencia" class="block text-sm font-semibold text-gray-700 mb-2">
+                Tipo de Violência (escolha apenas uma) <span class="text-red-500">*</span>
+              </label>
+              <select 
+                id="tipoViolencia" 
+                name="tipoViolencia" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione...</option>
+                <option value="Sexual">Sexual</option>
+                <option value="Física">Física</option>
+                <option value="Psicológica">Psicológica</option>
+                <option value="Verbal">Verbal</option>
+                <option value="Bullying">Bullying</option>
+                <option value="Negligência">Negligência</option>
+                <option value="Cyberbullying">Cyberbullying</option>
+                <option value="Patrimonial">Patrimonial</option>
+                <option value="Institucional">Institucional</option>
+                <option value="Outra">Outra</option>
+              </select>
+            </div>
+            
+            <!-- Encaminhamento -->
+            <div>
+              <label for="encaminhamento-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                Encaminhamento
+              </label>
+              
+              <!-- Container de tags -->
+              <div id="encaminhamentos-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
+              
+              <!-- Input com autocomplete -->
+              <div class="relative">
+                <input 
+                  type="text"
+                  id="encaminhamento-input" 
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
+                  placeholder="Digite para adicionar encaminhamento (ex: Conselho Tutelar)"
+                  autocomplete="off"
+                />
+                
+                <!-- Lista de sugestões -->
+                <div id="encaminhamento-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+              </div>
+              
+              <!-- Campo oculto que será enviado -->
+              <input type="hidden" id="encaminhamento" name="encaminhamento" />
+              
+              <p class="text-xs text-gray-500 mt-1.5">
+                Digite e pressione Enter para adicionar. Clique no × para remover.
+              </p>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+      
+      <!-- =============================================== -->
+      <!-- SEÇÃO 3: Unidade e Região -->
+      <!-- =============================================== -->
+      <section>
+        <div class="bg-gradient-to-r from-green-50/50 to-emerald-50/30 rounded-xl sm:rounded-2xl border border-green-200 shadow-sm p-4 sm:p-5 md:p-6 mb-6">
+          <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div class="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-lg sm:rounded-xl bg-green-100 text-green-600 text-xl sm:text-2xl flex-shrink-0 shadow-sm">
+              🏫
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">
+                Unidade e Região
+              </h2>
+              <p class="text-xs sm:text-sm text-gray-600">
+                Identifique a instituição de ensino e região onde o caso foi registrado
+              </p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            
+            <!-- Tipo de Instituição -->
+            <div class="md:col-span-2">
+              <label for="tipoInstituicao" class="block text-sm font-semibold text-gray-700 mb-2">
+                Qual o tipo da instituição de ensino? <span class="text-red-500">*</span>
+              </label>
+              <select 
+                id="tipoInstituicao" 
+                name="tipoInstituicao" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione o tipo...</option>
+                <option value="CMEI">CMEI - Centro Municipal de Educação Infantil</option>
+                <option value="EMEF">EMEF - Escola Municipal de Ensino Fundamental</option>
+              </select>
+            </div>
+            
+            <!-- CMEI/EMEF com Autocomplete -->
+            <div class="md:col-span-2">
+              <label for="cmeiEmef" class="block text-sm font-semibold text-gray-700 mb-2">
+                Instituição de Ensino <span class="text-red-500">*</span>
+              </label>
+              <div class="autocomplete-wrapper">
+                <input 
+                  type="text" 
+                  id="cmeiEmef" 
+                  name="cmeiEmef" 
+                  required
+                  disabled
+                  autocomplete="off"
+                  class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-white shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-500"
+                  placeholder="Primeiro selecione o tipo de instituição"
+                >
+                <div class="autocomplete-list" id="autocompleteList"></div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1.5">Digite para filtrar as instituições disponíveis</p>
+            </div>
+            
+            <!-- Região -->
+            <div>
+              <label for="regiao" class="block text-sm font-semibold text-gray-700 mb-2">
+                Região <span class="text-red-500">*</span>
+              </label>
+              <select 
+                id="regiao" 
+                name="regiao" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione...</option>
+                <!-- Opções carregadas dinamicamente via JavaScript -->
+              </select>
+            </div>
+            
+            <!-- Responsável pelo Registro -->
+            <div class="md:col-span-2">
+              <label for="responsavelRegistro" class="block text-sm font-semibold text-gray-700 mb-2">
+                Responsável pelo Registro <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="responsavelRegistro" 
+                name="responsavelRegistro" 
+                required
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-white shadow-sm"
+                placeholder="Nome do profissional que está registrando"
+              >
+            </div>
+            
+          </div>
+        </div>
+      </section>
+      
+      <!-- =============================================== -->
+      <!-- SEÇÃO 4: Perguntas Complementares (Sim/Não) -->
+      <!-- =============================================== -->
+      <section>
+        <div class="bg-gradient-to-r from-purple-50/50 to-indigo-50/30 rounded-xl sm:rounded-2xl border border-purple-200 shadow-sm p-4 sm:p-5 md:p-6">
+          <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div class="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-lg sm:rounded-xl bg-purple-100 text-purple-600 text-xl sm:text-2xl flex-shrink-0 shadow-sm">
+              ❓
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">
+                Informações Complementares
+              </h2>
+              <p class="text-xs sm:text-sm text-gray-600">
+                Responda às questões adicionais sobre o contexto da violência
+              </p>
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            
+            <!-- Fonte informadores foi a escola? -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                A fonte dos informadores foi a escola?
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="fonteEscola" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="fonteEscola" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="fonteEscola" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Violência identificada pela escola ocorrida na escola -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                Violência identificada pela escola ocorrida na escola?
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaEscolaOcorreu" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaEscolaOcorreu" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaEscolaOcorreu" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Algum profissional da escola foi autor da violência -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                Algum profissional da escola foi autor da violência?
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="profissionalAutor" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="profissionalAutor" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="profissionalAutor" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Algum estudante foi autor da violência? -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                Algum estudante foi autor da violência?
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="estudanteAutor" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="estudanteAutor" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="estudanteAutor" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Violência identificada pela escola não ocorrida na escola -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                Violência identificada pela escola NÃO ocorrida na escola?
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaNaoEscola" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaNaoEscola" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaNaoEscola" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Ocorreu na escola? 1.1 -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                Ocorreu na escola? (1.1)
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="ocorreuEscola" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="ocorreuEscola" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="ocorreuEscola" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Violência informada à escola por qualquer um dos agentes que a compõe 1.2 -->
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                Violência informada à escola por qualquer um dos agentes que a compõe? (1.2)
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaInformada" value="Sim" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaInformada" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="violenciaInformada" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+      
+      <!-- =============================================== -->
+      <!-- BOTÕES DE AÇÃO -->
+      <!-- =============================================== -->
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end pt-6 sm:pt-8 mt-6 sm:mt-8 border-t-2 border-gray-200">
+        <button 
+          type="button" 
+          onclick="limparFormulario()"
+          class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-sm sm:text-base font-semibold rounded-full hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 sm:hover:scale-105"
+        >
+          <span class="text-base sm:text-lg">🔄</span>
+          <span>Limpar Formulário</span>
+        </button>
+        
+        <button 
+          type="submit" 
+          id="btnSalvar"
+          class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm sm:text-base font-bold rounded-full hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 sm:hover:scale-105"
+        >
+          <span class="text-base sm:text-lg">💾</span>
+          <span>Salvar Registro</span>
+        </button>
+      </div>
+      
+    </form>
+    
+    <!-- Rodapé -->
+    <div class="text-center mt-6 sm:mt-8 mb-4">
+      <div class="inline-block bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-md border border-white/60 px-4 sm:px-6 md:px-8 py-4 sm:py-5 max-w-full mx-2">
+        <p class="text-gray-700 font-semibold text-sm sm:text-base mb-1">Sistema de Registro de Casos de Violência Escolar</p>
+        <p class="text-gray-600 text-xs sm:text-sm">Secretaria Municipal de Educação · Vitória/ES</p>
+        <div class="mt-3 pt-3 border-t border-gray-200">
+          <p class="text-xs text-gray-500">© 2025 - Todos os direitos reservados</p>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- =============================================== -->
+  <!-- JAVASCRIPT -->
+  <!-- =============================================== -->
+  <script>
+    // ========================================
+    // CONFIGURAÇÃO DO GOOGLE APPS SCRIPT
+    // ========================================
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyV1mut0mR53BKA3sgGg96MoCjYBbEW5GR5ojoxv6Merx86wfrCIfV0HI_KMUpfkxyo/exec';
+    
+    // ========================================
+    // FUNÇÕES DE FORMATAÇÃO (do backend)
+    // ========================================
+    
+    // Função auxiliar para converter Sim/Não em S/N
+    function converterSimNao(valor) {
+      if (!valor || valor.trim() === '' || valor === 'Não informado') return '';
+      if (valor === 'Sim') return 'S';
+      if (valor === 'Não') return 'N';
+      return valor;
+    }
+    
+    // Função para extrair sigla da escola
+    function extrairSiglaEscola(nomeCompleto) {
+      if (!nomeCompleto) return '';
+      
+      // Remove o prefixo CMEI/EMEF e TI
+      let nome = nomeCompleto.replace(/^(CMEI|EMEF)\s+(TI\s+)?/i, '');
+      
+      // Palavras que devem ser ignoradas ao gerar siglas
+      const ignorar = ['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os'];
+      
+      // Separa as palavras e pega as iniciais das palavras importantes
+      const palavras = nome.split(' ').filter(p => p.length > 0);
+      const sigla = palavras
+        .filter(palavra => !ignorar.includes(palavra.toLowerCase()))
+        .map(palavra => palavra[0].toUpperCase())
+        .join('');
+      
+      return sigla;
+    }
+    
+    // Função para converter data de YYYY-MM-DD para DD/MM/YYYY
+    function formatarData(dataISO) {
+      if (!dataISO) return '';
+      const partes = dataISO.split('-');
+      if (partes.length === 3) {
+        return partes[2] + '/' + partes[1] + '/' + partes[0];
+      }
+      return dataISO;
+    }
+
+    // ========================================
+    // DADOS DAS INSTITUIÇÕES
+    // ========================================
+    
+    // ========================================
+    // SISTEMA DE ENCAMINHAMENTOS COM TAGS
+    // ========================================
+    const encaminhamentosPredefinidos = [
+      'Conselho Tutelar',
+      'Rede de Saúde',
+      'UBS',
+      'Delegacia',
+      'Delegacia da Mulher',
+      'Ministério Público',
+      'CRAS',
+      'CREAS',
+      'CAPS',
+      'Hospital',
+      'Vara da Infância',
+      'ONG',
+      'Assistência Social',
+      'Psicólogo',
+      'Outros'
+    ];
+    
+    let encaminhamentosSelecionados = [];
+    
+    // Renderiza as tags selecionadas
+    function renderizarTags() {
+      const container = document.getElementById('encaminhamentos-tags');
+      const hiddenInput = document.getElementById('encaminhamento');
+      
+      if (encaminhamentosSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhum encaminhamento adicionado</span>';
+        hiddenInput.value = '';
+        return;
+      }
+      
+      container.innerHTML = encaminhamentosSelecionados.map((enc, index) => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-medium border border-red-200 shadow-sm">
+          ${enc}
+          <button 
+            type="button" 
+            onclick="removerEncaminhamento(${index})"
+            class="hover:bg-red-200 rounded-full p-0.5 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </span>
+      `).join('');
+      
+      // Atualiza campo oculto com valores separados por vírgula
+      hiddenInput.value = encaminhamentosSelecionados.join(', ');
+    }
+    
+    // Remove um encaminhamento
+    function removerEncaminhamento(index) {
+      encaminhamentosSelecionados.splice(index, 1);
+      renderizarTags();
+    }
+    
+    // Adiciona um encaminhamento
+    function adicionarEncaminhamento(texto) {
+      const textoTrimmed = texto.trim();
+      if (!textoTrimmed) return;
+      
+      // Evita duplicatas
+      if (!encaminhamentosSelecionados.includes(textoTrimmed)) {
+        encaminhamentosSelecionados.push(textoTrimmed);
+        renderizarTags();
+      }
+      
+      // Limpa input
+      document.getElementById('encaminhamento-input').value = '';
+      document.getElementById('encaminhamento-suggestions').classList.add('hidden');
+    }
+    
+    // Filtra e mostra sugestões
+    function mostrarSugestoes(query) {
+      const suggestionsDiv = document.getElementById('encaminhamento-suggestions');
+      
+      // Se query vazia, mostra todas as opções disponíveis
+      const filtrados = query.trim() === '' 
+        ? encaminhamentosPredefinidos.filter(enc => !encaminhamentosSelecionados.includes(enc))
+        : encaminhamentosPredefinidos.filter(enc => 
+            enc.toLowerCase().includes(query.toLowerCase()) &&
+            !encaminhamentosSelecionados.includes(enc)
+          );
+      
+      if (filtrados.length === 0) {
+        if (query.trim()) {
+          suggestionsDiv.innerHTML = `
+            <div class="p-3 text-sm text-gray-500">
+              Nenhuma sugestão. Pressione Enter para adicionar "${query}"
+            </div>
+          `;
+          suggestionsDiv.classList.remove('hidden');
+        } else {
+          suggestionsDiv.classList.add('hidden');
+        }
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = filtrados.map(enc => `
+        <div 
+          class="px-4 py-2 hover:bg-red-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+          onclick="adicionarEncaminhamento('${enc}')">
+          ${enc}
+        </div>
+      `).join('');
+      
+      suggestionsDiv.classList.remove('hidden');
+    }
+    
+    // Configura eventos do input
+    document.addEventListener('DOMContentLoaded', function() {
+      const input = document.getElementById('encaminhamento-input');
+      
+      // Renderiza estado inicial
+      renderizarTags();
+      
+      // Mostra todas opções ao focar no campo vazio
+      input.addEventListener('focus', function(e) {
+        mostrarSugestoes(e.target.value);
+      });
+      
+      // Filtra sugestões ao digitar
+      input.addEventListener('input', function(e) {
+        mostrarSugestoes(e.target.value);
+      });
+      
+      // Adiciona ao pressionar Enter
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          adicionarEncaminhamento(e.target.value);
+        }
+      });
+      
+      // Esconde sugestões ao clicar fora
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#encaminhamento-input') && !e.target.closest('#encaminhamento-suggestions')) {
+          document.getElementById('encaminhamento-suggestions').classList.add('hidden');
+        }
+      });
+    });
+
+    // ========================================
+    const instituicoes = [
+      // CMEIs (51 unidades)
+      { tipo: "CMEI", nomeOriginal: "CMEI Ana Maria Chaves Colares" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Anisio Spinola Teixeira" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Cecilia Meireles" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Darcy Castello de Mendonca" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Darcy Vargas" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Dr Pedro Feu Rosa" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Ernestina Pessoa" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Georgina da Trindade Faria" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Gilda de Athayde Ramos" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Joao Pedro de Aguiar" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Laurentina Mendonca Correa" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Lidia Rocha Feitosa" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Lizandre Ignes Carpanedo do Carmo" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Marlene Orlande Simonetti" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Nelcy da Silva Braga" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Ocarlina Nunes Andrade" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Odila Simoes" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Professora Sophia Musengny Loureiro" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Reinaldo Ridolfi" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Rubem Braga" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Sinclair Phillips" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Terezinha Vasconcellos Salvador" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Aecio Bispo dos Santos" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Alvaro Fernandes Lima" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Carlita Correa Pereira" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Denizart Santos" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Dom Joao Batista da Motta e Albuquerque" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Dr Thomaz Tommasi" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Eldina Maria Soares Braga" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Geisla da Cruz Militao" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Jacy Alves Fraga" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Jacyntha Ferreira de Souza Simoes" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Luiz Carlos Grecco" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Luiza Pereira Muniz Correa" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Magnolia Dias Miranda Cunha" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Maria Goretti Coutinho Cosme" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Maria Nazareth Menegueli" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Menino Jesus" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Padre Giovanni Bartesaghi" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Professor Carlos Alberto Martinelli de Souza" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Professora Cida Barreto" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Robson Jose Nassur Peixoto" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Rubens Duarte de Albuquerque" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Rubens Jose Vervloet Gomes" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Sebastiao Perovano" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Silvanete da Silva Rosa Rocha" },
+      { tipo: "CMEI", nomeOriginal: "CMEI TI Valdivia da Penha Antunes Rodrigues" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Yolanda Lucas da Silva" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Zelia Vianna de Aguiar" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Zenaide Genoveva Marcarini Cavalcanti" },
+      { tipo: "CMEI", nomeOriginal: "CMEI Zilmar Alves de Melo" },
+      
+      // EMEFs (55 unidades)
+      { tipo: "EMEF", nomeOriginal: "EMEF Adao Benezath" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Adevalni Sysesmundo Ferreira de Azevedo" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Adilson da Silva Castro" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Alberto de Almeida" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Alvaro de Castro Mattos" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Alvimar Silva" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Aristobulo Barbosa Leao" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Arthur da Costa e Silva" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Castelo Branco" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Ceciliano Abel de Almeida" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Custodia Dias de Campos" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Eber Louzada Zippinotti" },
+      { tipo: "EMEF", nomeOriginal: "EMEF EJA Prof Admardo Serafim de Oliveira" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Eliane Rodrigues dos Santos" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Elzira Vivacqua dos Santos" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Experimental de Vitoria - UFES" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Francisco Lacerda de Aguiar" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Heloisa Abreu Judice de Mattos" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Irma Jacinta Soares de Souza Lima" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Juscelino Kubitschek de Oliveira" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Lenir Borlot" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Marechal Mascarenhas de Moraes" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Maria Jose Costa Moraes" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Maria Leonor Pereira da Silva" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Maria Madalena de Oliveira Domingues" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Marieta Escobar" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Mauro Braga" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Neusa Nunes Goncalves" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Octacilio Lomba" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Orlandina D'Almeida Lucas" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Otto Ewald Junior" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Padre Anchieta" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Padre Guido Ceotto" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Prezideu Amorim" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Prof Joao Bandeira" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Prof Maria Stella de Novaes" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Prof Vercenilio da Silva Pascoal" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Professora Regina Maria Silva" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Rita de Cassia Oliveira" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Sao Vicente de Paulo" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Suzete Cuendet" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Tancredo de Almeida Neves" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Amilton Monteiro da Silva" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Anacleta Schneider Lucas" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Edna de Mattos Siqueira Gaudio" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Izaura Marques da Silva" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Jose Aureo Monjardim" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Jose Lemos de Miranda" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Moacyr Avidos" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Paulo Reglus Neves Freire" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Paulo Roberto Vieira Gomes" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Professora Eunice Pereira Silveira" },
+      { tipo: "EMEF", nomeOriginal: "EMEF TI Ronaldo Soares" },
+      { tipo: "EMEF", nomeOriginal: "EMEF Zilda Andrade" }
+    ];
+
+    // ========================================
+    // GERAR SIGLAS AUTOMATICAMENTE
+    // ========================================
+    function gerarSigla(nomeCompleto) {
+      // Remove o prefixo CMEI/EMEF e TI
+      let nome = nomeCompleto.replace(/^(CMEI|EMEF)\s+(TI\s+)?/i, '');
+      
+      // Palavras que devem ser ignoradas ao gerar siglas
+      const ignorar = ['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os'];
+      
+      // Separa as palavras e pega as iniciais das palavras importantes
+      const palavras = nome.split(' ').filter(p => p.length > 0);
+      const sigla = palavras
+        .filter(palavra => !ignorar.includes(palavra.toLowerCase()))
+        .map(palavra => palavra[0].toUpperCase())
+        .join('');
+      
+      return sigla;
+    }
+
+    // Adiciona siglas a cada instituição
+    instituicoes.forEach(inst => {
+      inst.sigla = gerarSigla(inst.nomeOriginal);
+    });
+
+    // ========================================
+    // VARIÁVEIS DE CONTROLE DO AUTOCOMPLETE
+    // ========================================
+    let tipoSelecionado = '';
+    let instituicoesFiltradas = [];
+    let indiceSelecionado = -1;
+
+    // ========================================
+    // ELEMENTOS DO DOM
+    // ========================================
+    const tipoInstituicaoSelect = document.getElementById('tipoInstituicao');
+    const cmeiEmefInput = document.getElementById('cmeiEmef');
+    const autocompleteList = document.getElementById('autocompleteList');
+
+    // ========================================
+    // EVENTO: Mudança no tipo de instituição
+    // ========================================
+    tipoInstituicaoSelect.addEventListener('change', function() {
+      tipoSelecionado = this.value;
+      
+      if (tipoSelecionado) {
+        // Habilita o campo de instituição
+        cmeiEmefInput.disabled = false;
+        cmeiEmefInput.placeholder = 'Digite para buscar...';
+        cmeiEmefInput.value = '';
+        cmeiEmefInput.focus();
+        
+        // Filtra instituições pelo tipo
+        instituicoesFiltradas = instituicoes.filter(inst => inst.tipo === tipoSelecionado);
+      } else {
+        // Desabilita o campo de instituição
+        cmeiEmefInput.disabled = true;
+        cmeiEmefInput.placeholder = 'Primeiro selecione o tipo de instituição';
+        cmeiEmefInput.value = '';
+        autocompleteList.classList.remove('show');
+      }
+    });
+
+    // ========================================
+    // EVENTO: Input no campo de autocomplete
+    // ========================================
+    cmeiEmefInput.addEventListener('input', function() {
+      const termo = this.value.trim();
+      indiceSelecionado = -1;
+      
+      if (termo.length === 0) {
+        autocompleteList.classList.remove('show');
+        return;
+      }
+      
+      // Filtra as instituições com base no termo
+      const resultados = filtrarInstituicoes(termo);
+      
+      // Renderiza as sugestões
+      renderizarSugestoes(resultados);
+    });
+
+    // ========================================
+    // EVENTO: Navegação por teclado
+    // ========================================
+    cmeiEmefInput.addEventListener('keydown', function(e) {
+      const items = autocompleteList.querySelectorAll('.autocomplete-item');
+      
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        indiceSelecionado = Math.min(indiceSelecionado + 1, items.length - 1);
+        atualizarSelecaoVisual(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        indiceSelecionado = Math.max(indiceSelecionado - 1, -1);
+        atualizarSelecaoVisual(items);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (indiceSelecionado >= 0 && items[indiceSelecionado]) {
+          items[indiceSelecionado].click();
+        }
+      } else if (e.key === 'Escape') {
+        autocompleteList.classList.remove('show');
+      }
+    });
+
+    // ========================================
+    // EVENTO: Clique fora fecha autocomplete
+    // ========================================
+    document.addEventListener('click', function(e) {
+      if (!cmeiEmefInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+        autocompleteList.classList.remove('show');
+      }
+    });
+
+    // ========================================
+    // FUNÇÃO: Filtrar instituições
+    // ========================================
+    function filtrarInstituicoes(termo) {
+      const termoLower = removerAcentos(termo.toLowerCase());
+      const termoSemEspacos = termoLower.replace(/\s+/g, '');
+      
+      return instituicoesFiltradas.filter(inst => {
+        const nomeNormalizado = removerAcentos(inst.nomeOriginal.toLowerCase());
+        const siglaNormalizada = removerAcentos(inst.sigla.toLowerCase());
+        
+        // Busca por palavras no nome
+        const palavras = termoLower.split(' ').filter(p => p.length > 0);
+        const matchPorPalavras = palavras.every(palavra => nomeNormalizado.includes(palavra));
+        
+        // Busca pela sigla (sem espaços)
+        const matchPorSigla = siglaNormalizada.includes(termoSemEspacos);
+        
+        // Busca pela sigla com caracteres consecutivos (ex: "ACM" encontra "Ana Chaves Mendes")
+        const matchPorIniciaisConsecutivas = siglaNormalizada.startsWith(termoSemEspacos);
+        
+        return matchPorPalavras || matchPorSigla || matchPorIniciaisConsecutivas;
+      });
+    }
+
+    // ========================================
+    // FUNÇÃO: Remover acentos
+    // ========================================
+    function removerAcentos(texto) {
+      return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    // ========================================
+    // FUNÇÃO: Renderizar sugestões
+    // ========================================
+    function renderizarSugestoes(resultados) {
+      autocompleteList.innerHTML = '';
+      
+      if (resultados.length === 0) {
+        autocompleteList.innerHTML = '<div class="no-results">🔍 Nenhuma instituição encontrada</div>';
+        autocompleteList.classList.add('show');
+        return;
+      }
+      
+      resultados.forEach((inst, index) => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        
+        // Badge do tipo
+        const badge = document.createElement('span');
+        badge.className = `autocomplete-badge ${inst.tipo.toLowerCase()}`;
+        badge.textContent = inst.tipo;
+        
+        // Container para nome e sigla
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'flex flex-col';
+        
+        // Nome sem a redundância da sigla
+        const nomeSemTipo = inst.nomeOriginal.replace(inst.tipo + ' ', '');
+        const nomeSpan = document.createElement('span');
+        nomeSpan.className = 'autocomplete-nome';
+        nomeSpan.textContent = nomeSemTipo;
+        
+        // Sigla (menor e em cinza)
+        const siglaSpan = document.createElement('span');
+        siglaSpan.className = 'text-xs text-gray-500 mt-0.5';
+        siglaSpan.textContent = `Sigla: ${inst.sigla}`;
+        
+        infoContainer.appendChild(nomeSpan);
+        infoContainer.appendChild(siglaSpan);
+        
+        item.appendChild(badge);
+        item.appendChild(infoContainer);
+        
+        // Evento de clique
+        item.addEventListener('click', function() {
+          selecionarInstituicao(inst);
+        });
+        
+        autocompleteList.appendChild(item);
+      });
+      
+      autocompleteList.classList.add('show');
+    }
+
+    // ========================================
+    // FUNÇÃO: Selecionar instituição
+    // ========================================
+    function selecionarInstituicao(inst) {
+      // Define o valor completo original no campo (para envio ao backend)
+      cmeiEmefInput.value = inst.nomeOriginal;
+      
+      // Fecha a lista
+      autocompleteList.classList.remove('show');
+      
+      // Remove classe de erro se houver
+      cmeiEmefInput.classList.remove('field-error');
+    }
+
+    // ========================================
+    // FUNÇÃO: Atualizar seleção visual
+    // ========================================
+    function atualizarSelecaoVisual(items) {
+      items.forEach((item, index) => {
+        if (index === indiceSelecionado) {
+          item.classList.add('active');
+          item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // ========================================
+    // INICIALIZAÇÃO DE REGIÕES
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const regioesDisponiveis = [
+        'Centro', 'Continental', 'São Pedro', 'Santo Antônio',
+        'Praia do Canto', 'Jardim da Penha', 'Jardim Camburi',
+        'Maruípe', 'Bento Ferreira'
+      ];
+      carregarOpcoesRegiao(regioesDisponiveis);
+    });
+    
+    // Função para carregar opções de Região dinamicamente (mantida para compatibilidade)
+    function carregarOpcoesRegiao(regioes) {
+      const select = document.getElementById('regiao');
+      select.innerHTML = '<option value="">Selecione...</option>';
+      
+      regioes.forEach(function(regiao) {
+        const option = document.createElement('option');
+        option.value = regiao;
+        option.textContent = regiao;
+        select.appendChild(option);
+      });
+    }
+    
+    // Função de validação no frontend
+    function validarFormulario() {
+      const form = document.getElementById('registroForm');
+      const camposObrigatorios = form.querySelectorAll('[required]');
+      let valido = true;
+      
+      // Remove classes de erro anteriores
+      camposObrigatorios.forEach(function(campo) {
+        campo.classList.remove('field-error');
+      });
+      
+      // Valida cada campo obrigatório
+      camposObrigatorios.forEach(function(campo) {
+        if (!campo.value || campo.value.trim() === '') {
+          campo.classList.add('field-error');
+          valido = false;
+        }
+      });
+      
+      if (!valido) {
+        mostrarAlerta('Por favor, preencha todos os campos obrigatórios (marcados com *)!', 'error');
+      }
+      
+      return valido;
+    }
+    
+    // Função para coletar dados do formulário
+    function coletarDadosFormulario() {
+      const form = document.getElementById('registroForm');
+      const formData = new FormData(form);
+      const dados = {};
+      
+      // Converte FormData para objeto
+      for (let [key, value] of formData.entries()) {
+        dados[key] = value;
+      }
+      
+      return dados;
+    }
+    
+    // Função de envio do formulário
+    document.getElementById('registroForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Valida antes de enviar
+      if (!validarFormulario()) {
+        return;
+      }
+      
+      // Coleta os dados
+      const dados = coletarDadosFormulario();
+      
+      // Desabilita botão durante envio
+      const btnSalvar = document.getElementById('btnSalvar');
+      btnSalvar.disabled = true;
+      btnSalvar.textContent = '⏳ Salvando...';
+      
+      // Envia para o Apps Script Web App via fetch()
+      enviarParaAppsScript(dados);
+    });
+    
+    // Função para enviar dados ao Apps Script via iframe (contorna CORS)
+    function enviarParaAppsScript(dados) {
+      const btnSalvar = document.getElementById('btnSalvar');
+      
+      // Validação de campos obrigatórios
+      const camposObrigatorios = [
+        'criancaEstudante', 'dataNT', 'idade', 'identidadeGenero',
+        'tipoViolencia', 'cmeiEmef', 'regiao', 'responsavelRegistro'
+      ];
+      
+      for (const campo of camposObrigatorios) {
+        if (!dados[campo] || dados[campo].toString().trim() === '') {
+          btnSalvar.disabled = false;
+          btnSalvar.textContent = '💾 Salvar Registro';
+          mostrarAlerta('❌ Preencha todos os campos obrigatórios!', 'error');
+          return;
+        }
+      }
+      
+      // Cria um form oculto que será submetido via iframe
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = APPS_SCRIPT_URL;
+      form.target = 'hidden_iframe';
+      form.style.display = 'none';
+      
+      // Adiciona um campo com os dados em JSON
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'data';
+      input.value = JSON.stringify(dados);
+      form.appendChild(input);
+      
+      // Cria um iframe oculto para receber a resposta
+      let iframe = document.getElementById('hidden_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.name = 'hidden_iframe';
+        iframe.id = 'hidden_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+      
+      // Listener para quando o iframe carregar (resposta recebida)
+      iframe.onload = function() {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = '💾 Salvar Registro';
+        
+        // Tenta ler a resposta do iframe
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          const responseText = iframeDoc.body.textContent;
+          
+          if (responseText) {
+            const resultado = JSON.parse(responseText);
+            
+            if (resultado.success) {
+              mostrarAlerta('✅ Registro salvo com sucesso na planilha!', 'success');
+              limparFormulario();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              mostrarAlerta('❌ Erro: ' + (resultado.message || 'Falha ao salvar'), 'error');
+            }
+          } else {
+            // Se não conseguir ler a resposta (CORS), assume sucesso
+            mostrarAlerta('✅ Dados enviados! Verifique a planilha.', 'success');
+            limparFormulario();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        } catch (e) {
+          // Erro de CORS ao ler iframe, mas o dado provavelmente foi salvo
+          console.log('Resposta recebida (CORS impediu leitura):', e);
+          mostrarAlerta('✅ Dados enviados! Verifique a planilha.', 'success');
+          limparFormulario();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Remove o form
+        document.body.removeChild(form);
+      };
+      
+      // Adiciona o form ao body e submete
+      document.body.appendChild(form);
+      form.submit();
+    }
+    
+    // Função para mostrar alertas
+    function mostrarAlerta(mensagem, tipo) {
+      const container = document.getElementById('alertContainer');
+      
+      const cores = {
+        success: 'bg-green-100 border-green-500 text-green-700',
+        error: 'bg-red-100 border-red-500 text-red-700',
+        info: 'bg-blue-100 border-blue-500 text-blue-700'
+      };
+      
+      const icones = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+      };
+      
+      const alerta = document.createElement('div');
+      alerta.className = `alert ${cores[tipo]} border-l-4 p-4 mb-4 rounded-md`;
+      alerta.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <span class="text-2xl mr-3">${icones[tipo]}</span>
+            <p class="font-medium">${mensagem}</p>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="text-xl font-bold hover:opacity-70">
+            ×
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(alerta);
+      
+      // Remove automaticamente após 5 segundos
+      setTimeout(function() {
+        alerta.remove();
+      }, 5000);
+    }
+    
+    // Função para limpar formulário
+    function limparFormulario() {
+      const form = document.getElementById('registroForm');
+      form.reset();
+      
+      // Remove classes de erro
+      const campos = form.querySelectorAll('.field-error');
+      campos.forEach(function(campo) {
+        campo.classList.remove('field-error');
+      });
+      
+      // Reseta os selects customizados
+      document.querySelectorAll('.custom-select-trigger').forEach(trigger => {
+        const placeholder = trigger.getAttribute('data-placeholder') || 'Selecione...';
+        trigger.textContent = placeholder;
+      });
+    }
+
+    // ========================================
+    // CUSTOM SELECT FUNCTIONALITY
+    // ========================================
+    function initCustomSelects() {
+      document.querySelectorAll('select:not([data-no-custom])').forEach(select => {
+        if (select.closest('.custom-select-wrapper')) return; // Já foi inicializado
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select-wrapper';
+        
+        const trigger = document.createElement('div');
+        const selectedOption = select.options[select.selectedIndex];
+        const placeholder = selectedOption.textContent;
+        trigger.className = 'custom-select-trigger w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm';
+        trigger.textContent = placeholder;
+        trigger.setAttribute('data-placeholder', placeholder);
+        trigger.setAttribute('tabindex', '0');
+        
+        const dropdown = document.createElement('div');
+        dropdown.className = 'custom-select-dropdown';
+        
+        Array.from(select.options).forEach((option, index) => {
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'custom-select-option';
+          optionDiv.textContent = option.textContent;
+          optionDiv.setAttribute('data-value', option.value);
+          
+          if (option.selected) {
+            optionDiv.classList.add('selected');
+          }
+          
+          optionDiv.addEventListener('click', () => {
+            select.selectedIndex = index;
+            select.value = option.value;
+            trigger.textContent = option.textContent;
+            
+            // Atualiza classes selected
+            dropdown.querySelectorAll('.custom-select-option').forEach(opt => {
+              opt.classList.remove('selected');
+            });
+            optionDiv.classList.add('selected');
+            
+            dropdown.classList.remove('show');
+            trigger.classList.remove('open');
+            
+            // Dispara evento change no select original
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+          
+          dropdown.appendChild(optionDiv);
+        });
+        
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeAllCustomSelects();
+          dropdown.classList.toggle('show');
+          trigger.classList.toggle('open');
+        });
+        
+        trigger.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            trigger.click();
+          }
+        });
+        
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(dropdown);
+        wrapper.appendChild(select);
+      });
+      
+      // Fecha dropdowns ao clicar fora
+      document.addEventListener('click', () => {
+        closeAllCustomSelects();
+      });
+    }
+
+    function closeAllCustomSelects() {
+      document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
+        dropdown.classList.remove('show');
+      });
+      document.querySelectorAll('.custom-select-trigger').forEach(trigger => {
+        trigger.classList.remove('open');
+      });
+    }
+
+    // Observa mudanças dinâmicas no select (para quando opções são adicionadas via JS)
+    function observeSelectChanges() {
+      const observer = new MutationObserver(() => {
+        document.querySelectorAll('select:not([data-no-custom])').forEach(select => {
+          const wrapper = select.closest('.custom-select-wrapper');
+          if (!wrapper) return;
+          
+          const dropdown = wrapper.querySelector('.custom-select-dropdown');
+          const trigger = wrapper.querySelector('.custom-select-trigger');
+          
+          if (dropdown && select.options.length !== dropdown.children.length) {
+            // Reconstruir dropdown
+            dropdown.innerHTML = '';
+            Array.from(select.options).forEach((option, index) => {
+              const optionDiv = document.createElement('div');
+              optionDiv.className = 'custom-select-option';
+              optionDiv.textContent = option.textContent;
+              optionDiv.setAttribute('data-value', option.value);
+              
+              if (option.selected) {
+                optionDiv.classList.add('selected');
+                trigger.textContent = option.textContent;
+              }
+              
+              optionDiv.addEventListener('click', () => {
+                select.selectedIndex = index;
+                select.value = option.value;
+                trigger.textContent = option.textContent;
+                
+                dropdown.querySelectorAll('.custom-select-option').forEach(opt => {
+                  opt.classList.remove('selected');
+                });
+                optionDiv.classList.add('selected');
+                
+                dropdown.classList.remove('show');
+                trigger.classList.remove('open');
+                
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+              });
+              
+              dropdown.appendChild(optionDiv);
+            });
+          }
+        });
+      });
+      
+      document.querySelectorAll('select:not([data-no-custom])').forEach(select => {
+        observer.observe(select, { childList: true, subtree: true });
+      });
+    }
+
+    // Inicializa custom selects após carregamento
+    window.addEventListener('DOMContentLoaded', () => {
+      initCustomSelects();
+      observeSelectChanges();
+    });
+  </script>
+  
+</body>
+</html>

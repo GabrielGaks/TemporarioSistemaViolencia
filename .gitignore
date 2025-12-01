@@ -1,0 +1,19 @@
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.temp
+
+# Dependências
+node_modules/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos do editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
