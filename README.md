@@ -1,18 +1,17 @@
 # 🛡️ Sistema de Registro de Violência Escolar
 
-> Sistema web moderno e completo para registro, gerenciamento e acompanhamento de casos de violência escolar, com integração Google Sheets, painel administrativo avançado e sistema inteligente de tags.
+> Sistema web moderno e completo para registro, gerenciamento e acompanhamento de casos de violência escolar, com integração Google Sheets, Supabase, painel administrativo avançado com gráficos interativos, sistema de autenticação por roles e visualizações de dados em tempo real.
 
 <div align="center">
 
 ![Status](https://img.shields.io/badge/status-ativo-success)
-![Versão](https://img.shields.io/badge/versão-2.1-blue)
+![Versão](https://img.shields.io/badge/versão-2.2-blue)
 ![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-ready-green)
+![Supabase](https://img.shields.io/badge/Supabase-ready-green)
 ![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-ready-blue)
 ![Licença](https://img.shields.io/badge/licença-MIT-lightgrey)
 
-[![🚀 Demo Online](https://img.shields.io/badge/🚀-Demo_Online-success?style=for-the-badge)](https://gabrielgaks.github.io/sistema-registro-violencia/)
-
-**🌐 Sistema em Produção:** [https://gabrielgaks.github.io/sistema-registro-violencia/](https://gabrielgaks.github.io/sistema-registro-violencia/)
+**🌐 Sistema em Produção:** Sistema completo de gestão de casos de violência escolar
 
 </div>
 
@@ -21,63 +20,87 @@
 ## 📋 Índice
 
 - [Sobre o Projeto](#-sobre-o-projeto)
-- [Funcionalidades](#-funcionalidades)
-- [Demonstração Visual](#-demonstração-visual)
+- [Funcionalidades Principais](#-funcionalidades-principais)
 - [Tecnologias Utilizadas](#️-tecnologias-utilizadas)
 - [Arquitetura do Sistema](#️-arquitetura-do-sistema)
-- [Deploy Rápido](#-deploy-rápido)
+- [Instalação e Configuração](#-instalação-e-configuração)
 - [Estrutura de Arquivos](#-estrutura-de-arquivos)
 - [Guia de Uso](#-guia-de-uso)
+- [Sistema de Autenticação e Roles](#-sistema-de-autenticação-e-roles)
+- [Painel de Casos e Gráficos](#-painel-de-casos-e-gráficos)
 - [Formato dos Dados](#-formato-dos-dados)
+- [Segurança e Variáveis de Ambiente](#-segurança-e-variáveis-de-ambiente)
+- [Deploy no GitHub](#-deploy-no-github)
 - [Atualização do Sistema](#-atualização-do-sistema)
-- [Segurança](#-segurança)
 - [FAQ](#-faq)
 - [Suporte](#-suporte)
+- [Changelog](#-changelog)
 
 ---
 
 ## 🎯 Sobre o Projeto
 
-Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES** para registro e acompanhamento de casos de violência escolar na rede municipal de ensino.
+Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES** para registro e acompanhamento de casos de violência escolar na rede municipal de ensino. O sistema oferece uma solução completa e moderna para gestão de dados, com interface intuitiva, gráficos interativos e controle de acesso baseado em roles.
 
 ### 📊 Componentes Principais
 
-**🔗 Acesso Rápido:**
-- 📝 [Formulário de Registro](https://gabrielgaks.github.io/sistema-registro-violencia/index.html)
-- 🔧 [Painel Administrativo](https://gabrielgaks.github.io/sistema-registro-violencia/gerenciar.html)
-
 | Componente | Arquivo | Descrição |
 |------------|---------|-----------|
-| **Formulário Público** | `index.html` | Interface para registro de novos casos |
-| **Painel Administrativo** | `gerenciar.html` | Gestão completa dos registros |
-| **Backend API** | `Code.gs` | API serverless no Google Apps Script |
-| **Banco de Dados** | Google Sheets | Armazenamento de dados |
+| **Login** | `login.html` | Sistema de autenticação com Supabase |
+| **Formulário de Registro** | `registro-novo-caso.html` | Interface para registro de novos casos |
+| **Gerenciamento de Casos** | `gerenciar-casos.html` | Gestão completa dos registros (CRUD) |
+| **Painel de Casos** | `painel-casos.html` | Dashboard com gráficos e visualizações |
+| **Gerenciamento de Usuários** | `gerenciar-usuarios.html` | Gestão de usuários e permissões |
+| **Backend Casos** | `Code.gs` | API serverless no Google Apps Script |
+| **Backend Auth** | `Code-Supabase.gs` | API de autenticação e usuários |
+| **Banco de Dados** | Google Sheets | Armazenamento de casos |
+| **Autenticação** | Supabase | Sistema de usuários e roles |
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Funcionalidades Principais
 
-### 📝 Formulário de Registro
+### 🔐 Sistema de Autenticação
+
+- ✅ **Login seguro** com Supabase
+- ✅ **4 níveis de acesso** (superuser, admin, user, visualizador)
+- ✅ **Controle de permissões** granular por role
+- ✅ **Sessão persistente** com sessionStorage
+- ✅ **Redirecionamento automático** baseado em role
+- ✅ **Gerenciamento de usuários** completo (CRUD)
+
+#### Roles e Permissões
+
+| Role | Permissões |
+|------|------------|
+| **superuser** | Acesso total ao sistema (criar/editar/deletar qualquer usuário e caso) |
+| **admin** | Gerenciar usuários (user e visualizador), criar/editar/deletar casos |
+| **user** | Criar novos casos, editar/deletar próprios casos, visualizar painel |
+| **visualizador** | Apenas visualização (read-only) do painel de casos |
+
+### 📝 Formulário de Registro (`registro-novo-caso.html`)
 
 #### 🎯 Recursos Inteligentes
 - ✅ **Autocomplete para 106 escolas** - CMEIs e EMEFs da rede municipal
 - ✅ **Sistema de tags para encaminhamentos** - Adicione múltiplos órgãos
-- ✅ **Sugestões predefinidas** - Lista com 15 opções comuns
+- ✅ **Sugestões predefinidas** - Lista com 15+ opções comuns
   - Conselho Tutelar, UBS, Delegacia, CRAS, CREAS, CAPS, Hospital, etc.
 - ✅ **Validação em tempo real** - Feedback visual imediato
 - ✅ **Conversão automática** de dados:
   - Datas: YYYY-MM-DD → DD/MM/YYYY
   - Gênero: Menino/Menina → M/F
   - Sim/Não → S/N
-  - Nome escola → Sigla
+  - Nome escola → Sigla (preserva siglas existentes)
+- ✅ **Preservação de siglas** - Não sobrescreve siglas já existentes
 
 #### 🎨 Interface
 - 📱 **100% responsivo** (mobile, tablet, desktop)
-- 🌈 Design moderno com gradientes
-- ⚡ Animações suaves e transições
+- 🌈 Design moderno com gradientes e animações
+- ⚡ Transições suaves entre páginas
 - ♿ Acessível e intuitivo
+- 🎭 Elementos visuais elegantes (glassmorphism, ripple effects, hovers)
 
-### 📊 Painel Administrativo
+### 📊 Painel Administrativo (`gerenciar-casos.html`)
 
 #### 📋 Gestão de Registros
 - ✅ **Listagem completa** de todos os registros em tabela
@@ -92,80 +115,94 @@ Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES*
 
 #### ✏️ Operações CRUD
 - ✅ **Edição inline** com modal moderno
-  - Todos os 18 campos editáveis
+  - Todos os 23 campos editáveis
   - Conversão automática de dados
-  - Auto-atualização após salvar (300ms)
+  - Preservação de siglas existentes
+  - Auto-atualização após salvar (100ms)
 - ✅ **Exclusão com confirmação**
   - Modal de confirmação elegante
   - Feedback visual de sucesso
-- ✅ **Carregamento assíncrono** via postMessage (sem CORS)
+- ✅ **Carregamento otimizado** via iframe postMessage (sem CORS)
+- ✅ **Performance melhorada** - Redução de logs e timeouts otimizados
 
-#### 🎯 Recursos Avançados
-- 🔄 **Auto-reload** após operações
-- 🎯 **Preservação de estado** (página, filtros)
-- ⚡ **Performance otimizada** para milhares de registros
-- 🎨 **Badges coloridos** para status visuais
+### 📈 Painel de Casos (`painel-casos.html`)
 
----
+#### 📊 Gráficos Interativos
+- ✅ **Gráfico de Faixa Etária** - Distribuição por idade (0-5, 6-10, 11-14, 15-17, 18+)
+- ✅ **Linha do Tempo por Mês** - Evolução temporal dos casos
+- ✅ **Gráfico de Encaminhamentos** - Top 15 encaminhamentos mais frequentes
+  - Agrupado por Redes (Assistência Social, Saúde, Educação, Conselho Tutelar, Segurança e Justiça, Outros)
+  - Cores distintas por grupo
+- ✅ **Autor da Violência** - Profissional da Escola, Estudante, Outro Agente
+- ✅ **Ocorreu na Escola?** - Distribuição Sim/Não/Não Informado
+- ✅ **Clique nos gráficos** - Filtra automaticamente a tabela de notificações
 
-## 🎬 Demonstração Visual
+#### 🔍 Sistema de Filtros Avançados
 
-### Formulário de Registro
+**Filtros Rápidos (Cards Clicáveis):**
+- 📍 Região
+- ⚠️ Tipo de Violência
+- 🏫 Tipo de Instituição (CMEI/EMEF)
+- 🏢 Escola específica
+- ⏱️ Tempo Integral (Sim/Não)
+- 📋 Encaminhamento (agrupado por Redes)
+- 👥 Raça/Cor
+- ⚧️ Gênero
+- ♿ Tipo de Deficiência/Transtorno
+- 🌈 Orientação Sexual
+- 🏷️ Classificação da Violência
+- 🎯 Motivação da Violência
 
-```
-┌─────────────────────────────────────────────┐
-│   🛡️ SISTEMA DE REGISTRO DE VIOLÊNCIA      │
-├─────────────────────────────────────────────┤
-│ 👤 DADOS DO ESTUDANTE                       │
-│  Nome: [________________]  Data: [____]     │
-│  Idade: [__]  Gênero: [Menino ▼]           │
-│  PCD: [Sim ▼]  Raça: [_________]           │
-├─────────────────────────────────────────────┤
-│ ⚠️  SITUAÇÃO DA VIOLÊNCIA                   │
-│  Tipo: [Selecione... ▼]                     │
-│  Encaminhamento: (sistema de tags)          │
-│  ┌─────────────────────────────────────┐   │
-│  │ 🏥 UBS  ×   📞 Cons. Tutelar  ×    │   │
-│  └─────────────────────────────────────┘   │
-│  [Digite para adicionar...]                 │
-│  └ Conselho Tutelar                         │
-│  └ Delegacia                                │
-│  └ CRAS                                     │
-├─────────────────────────────────────────────┤
-│ 🏫 UNIDADE E REGIÃO                         │
-│  Escola: [Digite para buscar... ▼]          │
-│  Região: [Centro ▼]                         │
-│  Responsável: [_________________]           │
-├─────────────────────────────────────────────┤
-│ ✅ PERGUNTAS ADICIONAIS                     │
-│  Fonte: Escola? [Sim ▼]                     │
-│  Ocorreu na escola? [Sim ▼]                 │
-│  ...                                        │
-├─────────────────────────────────────────────┤
-│      [💾 Salvar Registro]                   │
-└─────────────────────────────────────────────┘
-```
+**Filtros Adicionais:**
+- É PCD/tem deficiência (Sim/Não)
+- Ocorreu na escola? (Sim/Não)
+- Fonte informada (Sim/Não)
+- Violência identificada pela escola ocorrida nela (Sim/Não)
+- Profissional da escola foi autor (Sim/Não)
+- Estudante foi autor (Sim/Não)
+- Violência não ocorrida na escola (Sim/Não)
+- Violência informada à escola (Sim/Não)
+- **📋 Foi Realizado Estudo de Caso? (Sim/Não)** ⭐ NOVO
+- Idade Mínima/Máxima
+- Data Início/Fim
+- Busca por nome
 
-### Painel Administrativo
+#### 🎯 Recursos do Painel
+- ✅ **Filtros combinados** - Múltiplos filtros simultâneos
+- ✅ **Badges de contagem** - Mostra quantos filtros estão ativos
+- ✅ **Limpar filtros** - Botão para resetar todos os filtros
+- ✅ **Tabela filtrada** - Atualização em tempo real
+- ✅ **Estatísticas dinâmicas** - Atualizadas conforme filtros
+- ✅ **Gráficos dinâmicos** - Atualizados conforme filtros
+- ✅ **Interatividade** - Clique nos gráficos aplica filtros automaticamente
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│   📊 PAINEL ADMINISTRATIVO                                  │
-├─────────────────────────────────────────────────────────────┤
-│ 🔍 [Buscar estudante...]          [🔄 Carregar Registros]  │
-│                                                             │
-│ 📄 Itens por página: [25 ▼]       Total: 338 | Exibindo: 25│
-├─────────────────────────────────────────────────────────────┤
-│ Nome          │Data      │Idade│Gênero│Violência │Ações    │
-├───────────────┼──────────┼─────┼──────┼──────────┼─────────┤
-│ João Silva    │01/12/2025│  12 │  M   │ Verbal   │ [✏️] [🗑️] │
-│ Maria Santos  │30/11/2025│  10 │  F   │ Física   │ [✏️] [🗑️] │
-│ Pedro Costa   │29/11/2025│  13 │  M   │Sexual    │ [✏️] [🗑️] │
-│ ...           │...       │ ... │  ... │ ...      │ [✏️] [🗑️] │
-├─────────────────────────────────────────────────────────────┤
-│          ◀ Anterior  1  2  3  4  5  ...  14  Próximo ▶     │
-└─────────────────────────────────────────────────────────────┘
-```
+### 👥 Gerenciamento de Usuários (`gerenciar-usuarios.html`)
+
+- ✅ **Listagem de usuários** com badges por role
+- ✅ **Criar usuário** - Modal com validação
+- ✅ **Editar usuário** - Atualização de email, senha e role
+- ✅ **Excluir usuário** - Com confirmação
+- ✅ **Filtros por role** - Admin vê apenas user e visualizador
+- ✅ **Validação de permissões** - Admin não pode criar/editar admin ou superuser
+- ✅ **Interface elegante** - Cards, modais e animações
+
+### 🎨 Melhorias Visuais e UX
+
+#### Transições Dinâmicas
+- ✅ **Transições suaves** entre páginas
+- ✅ **Overlay de loading** durante navegação
+- ✅ **Animações de entrada/saída** (fade, blur, scale)
+- ✅ **Sem flash de conteúdo** - Conteúdo oculto até animação iniciar
+
+#### Estilos Elegantes (`styles-elegant.css`)
+- ✅ **Glassmorphism** - Efeitos de vidro fosco
+- ✅ **Ripple effects** - Efeitos de onda em botões
+- ✅ **Hovers animados** - Elevação, shimmer, gradientes
+- ✅ **Cards interativos** - Com sombras e transições
+- ✅ **Badges rotativos** - Animações suaves
+- ✅ **Scrollbar customizada** - Design elegante
+- ✅ **Inputs com foco** - Scale e shadow
+- ✅ **Tabelas responsivas** - Hover com gradiente
 
 ---
 
@@ -178,12 +215,14 @@ Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES*
 | **CSS3** | - | Estilização moderna |
 | **JavaScript** | ES6+ | Lógica e interatividade |
 | **Tailwind CSS** | v3 (CDN) | Framework CSS utility-first |
+| **Chart.js** | v4.4.0 | Gráficos interativos |
 
 ### Backend
 | Tecnologia | Tipo | Descrição |
 |------------|------|-----------|
 | **Google Apps Script** | Serverless | API backend (Node.js-like) |
-| **Google Sheets API** | Database | Banco de dados (18 colunas) |
+| **Google Sheets API** | Database | Armazenamento de casos (23 colunas) |
+| **Supabase** | Database/Auth | Sistema de autenticação e usuários |
 
 ### Hospedagem
 | Serviço | Custo | Capacidade |
@@ -191,6 +230,7 @@ Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES*
 | **GitHub Pages** | 🆓 GRATUITO | Frontend ilimitado |
 | **Google Apps Script** | 🆓 GRATUITO | 20.000 execuções/dia |
 | **Google Sheets** | 🆓 GRATUITO | 10M células (~555k registros) |
+| **Supabase** | 🆓 GRATUITO | 500MB database, 50k usuários |
 
 **💰 Custo Total: R$ 0,00**
 
@@ -202,21 +242,24 @@ Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES*
 
 ```mermaid
 graph TB
-    A[👤 Usuário] -->|1. Preenche formulário| B[📝 index.html]
-    B -->|2. POST - form data| C[☁️ Apps Script - doPost]
-    C -->|3. Valida e processa| D[(📊 Google Sheets)]
+    A[👤 Usuário] -->|1. Login| B[🔐 login.html]
+    B -->|2. POST credentials| C[☁️ Code-Supabase.gs]
+    C -->|3. Valida| D[(🗄️ Supabase)]
+    D -->|4. Retorna role| C
+    C -->|5. SessionStorage| B
+    B -->|6. Redireciona| E[📊 painel-casos.html]
     
-    E[👨‍💼 Admin] -->|1. Solicita dados| F[📊 gerenciar.html]
-    F -->|2. POST - action:list| C
-    C -->|3. SELECT *| D
-    D -->|4. Retorna dados| C
-    C -->|5. postMessage| F
+    E -->|7. Visualiza dados| F[📈 Gráficos e Filtros]
+    F -->|8. Filtra| G[📋 Tabela de Casos]
     
-    F -->|6. Editar - action:update| C
-    C -->|7. UPDATE| D
+    H[📝 registro-novo-caso.html] -->|9. POST caso| I[☁️ Code.gs]
+    I -->|10. Valida e processa| J[(📊 Google Sheets)]
     
-    F -->|8. Excluir - action:delete| C
-    C -->|9. DELETE| D
+    K[🔧 gerenciar-casos.html] -->|11. CRUD| I
+    I -->|12. Operações| J
+    
+    L[👥 gerenciar-usuarios.html] -->|13. CRUD usuários| C
+    C -->|14. Operações| D
 ```
 
 ### Diagrama de Componentes
@@ -224,232 +267,424 @@ graph TB
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                  CAMADA DE APRESENTAÇÃO                 │
-│  ┌──────────────────────┐  ┌───────────────────────┐   │
-│  │   index.html         │  │  gerenciar.html       │   │
-│  │  (Formulário)        │  │  (Admin Panel)        │   │
-│  │  - Autocomplete      │  │  - Tabela paginada    │   │
-│  │  - Sistema de tags   │  │  - Busca real-time    │   │
-│  │  - Validação         │  │  - CRUD completo      │   │
-│  └──────────┬───────────┘  └───────────┬───────────┘   │
-└─────────────┼──────────────────────────┼───────────────┘
-              │ POST (form)              │ POST (JSON)
-              │ multipart/form-data      │ application/json
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │ login.html   │  │ registro-    │  │ gerenciar-    │  │
+│  │ (Auth)       │  │ novo-caso    │  │ casos.html   │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  │
+│         │                  │                  │          │
+│  ┌──────┴───────┐  ┌──────┴───────┐  ┌──────┴───────┐  │
+│  │ painel-      │  │ gerenciar-   │  │ styles-     │  │
+│  │ casos.html   │  │ usuarios     │  │ elegant.css │  │
+│  │ (Dashboard)  │  │ (Admin)      │  │ (Estilos)   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└─────────────┼──────────────────────────┼─────────────────┘
+              │ POST (JSON)              │ POST (JSON)
               ↓                          ↓
 ┌─────────────────────────────────────────────────────────┐
 │                    CAMADA DE APLICAÇÃO                  │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │         Code.gs (Google Apps Script)             │   │
-│  │  ┌────────────────────────────────────────────┐  │   │
-│  │  │ doGet()  - Retorna lista via postMessage  │  │   │
-│  │  │ doPost() - Roteador de ações              │  │   │
-│  │  │   ├─ action: 'save'   → saveRegistro()    │  │   │
-│  │  │   ├─ action: 'list'   → listarRegistros() │  │   │
-│  │  │   ├─ action: 'update' → atualizarRegistro│  │   │
-│  │  │   └─ action: 'delete' → excluirRegistro() │  │   │
-│  │  └────────────────────────────────────────────┘  │   │
-│  │                                                   │   │
-│  │  Funções auxiliares:                             │   │
-│  │  • converterSimNao()  • extrairSiglaEscola()    │   │
-│  │  • formatarData()     • converterIdentidade()    │   │
-│  └─────────────┬─────────────────────────────────────┘   │
+│  │ Code-Supabase.gs (Auth & Users)                 │   │
+│  │  • realizarLogin()                              │   │
+│  │  • listarUsuarios()                             │   │
+│  │  • addUsuario()                                 │   │
+│  │  • updateUsuario()                              │   │
+│  │  • deleteUsuario()                              │   │
+│  └─────────────┬────────────────────────────────────┘   │
+│                │                                         │
+│  ┌─────────────┴────────────────────────────────────┐   │
+│  │ Code.gs (Casos)                                 │   │
+│  │  • doGet()  - Lista registros                   │   │
+│  │  • doPost() - CRUD operations                  │   │
+│  │    ├─ action: 'save'   → saveRegistro()       │   │
+│  │    ├─ action: 'list'   → listarRegistros()    │   │
+│  │    ├─ action: 'update' → atualizarRegistro()  │   │
+│  │    └─ action: 'delete' → excluirRegistro()     │   │
+│  └─────────────┬────────────────────────────────────┘   │
 └────────────────┼─────────────────────────────────────────┘
-                 │ appendRow()
-                 │ getRange().getValues()
-                 │ setValues()
-                 ↓
-┌─────────────────────────────────────────────────────────┐
-│                    CAMADA DE DADOS                      │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │         Google Sheets (Planilha)                 │   │
-│  │  ┌────────────────────────────────────────────┐  │   │
-│  │  │ Página1 (18 colunas: A - R)               │  │   │
-│  │  │                                            │  │   │
-│  │  │ A: Criança/Estudante  │ J: Região         │  │   │
-│  │  │ B: Data NT            │ K: Responsável    │  │   │
-│  │  │ C: Idade              │ L-R: Perguntas S/N│  │   │
-│  │  │ D: Gênero (M/F)       │                   │  │   │
-│  │  │ E: PCD (S/N)          │                   │  │   │
-│  │  │ F: Raça/Cor           │ Total: ~338       │  │   │
-│  │  │ G: Tipo Violência     │ registros         │  │   │
-│  │  │ H: Encaminhamento     │ (exemplo)         │  │   │
-│  │  │ I: CMEI/EMEF (Sigla)  │                   │  │   │
-│  │  └────────────────────────────────────────────┘  │   │
-│  └──────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────┘
+                 │
+                 ├─→ Supabase (Auth & Users)
+                 │
+                 └─→ Google Sheets (Casos)
 ```
 
 ---
 
-## 🚀 Deploy Rápido
+## 🚀 Instalação e Configuração
 
 ### Pré-requisitos
+
 - ✅ Conta Google (Gmail)
 - ✅ Conta GitHub
-- ✅ Navegador moderno (Chrome, Firefox, Edge)
-- ✅ Git instalado (opcional, pode usar interface do GitHub)
+- ✅ Conta Supabase (gratuita)
+- ✅ Navegador moderno (Chrome, Firefox, Edge, Safari)
+- ✅ Git instalado (opcional)
 
-### 🎯 3 Passos Simples
+### 📋 Passo a Passo Completo
 
-#### 1️⃣ Configure o Backend (5 minutos)
+#### 1️⃣ Configurar Supabase (Autenticação)
 
-1. **Acesse**: https://script.google.com
-2. **Novo projeto** → Nome: `Sistema-Violencia-Escolar`
-3. **Cole o código** completo do arquivo `Code.gs`
-4. **Salve** (Ctrl+S)
+1. **Criar projeto no Supabase**
+   - Acesse: https://supabase.com
+   - Crie uma conta gratuita
+   - Crie um novo projeto
+   - Anote a URL e a chave anônima (anon key)
+
+2. **Executar SQL de setup**
+   - No Supabase Dashboard, vá em "SQL Editor"
+   - Execute o conteúdo completo de `supabase-setup.sql`
+   - Isso criará:
+     - Tabela `app_users`
+     - Enum `user_role` (superuser, admin, user, visualizador)
+     - Políticas RLS (Row Level Security)
+     - Funções auxiliares
+
+3. **Criar primeiro usuário superuser**
+   ```sql
+   INSERT INTO app_users (email, password_text, role)
+   VALUES ('seu-email@exemplo.com', 'sua-senha-segura', 'superuser');
+   ```
+
+#### 2️⃣ Configurar Google Apps Script (Backend)
+
+**Projeto 1: Autenticação (`Code-Supabase.gs`)**
+
+1. Acesse: https://script.google.com
+2. Novo projeto → Nome: `Sistema-Auth`
+3. Cole o código completo de `Code-Supabase.gs`
+4. Configure as variáveis:
+   ```javascript
+   const SUPABASE_URL = 'https://seu-projeto.supabase.co';
+   const SUPABASE_ANON_KEY = 'sua-chave-anon-aqui';
+   ```
+5. Salve (Ctrl+S)
+6. **Implantar** → Nova implantação → **App da Web**
+   - Executar como: **Eu**
+   - Quem tem acesso: **Qualquer pessoa**
+7. **📋 COPIE A URL** gerada
+
+**Projeto 2: Casos (`Code.gs`)**
+
+1. Novo projeto → Nome: `Sistema-Casos`
+2. Cole o código completo de `Code.gs`
+3. Configure as variáveis:
+   ```javascript
+   const SHEET_ID = 'ID_DA_SUA_PLANILHA';
+   const SHEET_NAME = 'Página1';
+   ```
+4. Salve (Ctrl+S)
 5. **Implantar** → Nova implantação → **App da Web**
    - Executar como: **Eu**
    - Quem tem acesso: **Qualquer pessoa**
-6. **Autorize** o aplicativo
-7. **📋 COPIE A URL** gerada (salve em local seguro!)
+6. **📋 COPIE A URL** gerada
 
-#### 2️⃣ Configure o Frontend (3 minutos)
+#### 3️⃣ Configurar Google Sheets
 
-**Em `index.html`** (linha ~924):
-```javascript
-const APPS_SCRIPT_URL = 'COLE_SUA_URL_AQUI';
-```
+1. **Criar planilha**
+   - Acesse: https://sheets.google.com
+   - Crie uma nova planilha
+   - Nomeie a aba como "Página1"
+   - Configure as colunas (veja seção "Formato dos Dados")
 
-**Em `gerenciar.html`** (linha ~373):
-```javascript
-const APPS_SCRIPT_URL = 'COLE_SUA_URL_AQUI';
-```
+2. **Compartilhar com Apps Script**
+   - Compartilhe a planilha com o email do Apps Script
+   - Dê permissão de "Editor"
 
-#### 3️⃣ Publique no GitHub (2 minutos)
+3. **Obter ID da planilha**
+   - URL: `https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/edit`
+   - Copie o ID (parte entre `/d/` e `/edit`)
+
+#### 4️⃣ Configurar Frontend
+
+1. **Clone o repositório**
+   ```bash
+   git clone https://github.com/SEU-USUARIO/SEU-REPO.git
+   cd FormularioRegistroV2
+   ```
+
+2. **Configure variáveis de ambiente**
+   - Copie `.env.example` para `config.js` (ou crie `config.local.js`)
+   - Preencha com suas credenciais:
+   ```javascript
+   const CONFIG = {
+     APPS_SCRIPT_AUTH: 'URL_DO_APPS_SCRIPT_AUTH',
+     APPS_SCRIPT_CASOS: 'URL_DO_APPS_SCRIPT_CASOS',
+     SPREADSHEET_ID: 'ID_DA_PLANILHA',
+     SUPABASE_URL: 'URL_DO_SUPABASE',
+     SUPABASE_KEY: 'CHAVE_ANON_DO_SUPABASE'
+   };
+   ```
+
+3. **⚠️ IMPORTANTE: Proteger Credenciais**
+   - **NUNCA** faça commit de `config.js` com credenciais reais
+   - Use `.gitignore` para proteger arquivos sensíveis
+   - Para produção, use variáveis de ambiente ou GitHub Secrets
+
+#### 5️⃣ Publicar no GitHub Pages
 
 ```bash
-# Via Terminal
+# Adicionar arquivos
 git add .
+
+# Commit inicial
 git commit -m "🚀 Deploy inicial do sistema"
-git push
+
+# Push para GitHub
+git push origin main
 
 # Ativar GitHub Pages:
 # Settings > Pages > Branch: main > folder: / (root) > Save
 ```
 
 **🎉 Pronto!** Acesse:
-- **Formulário**: `https://SEU-USUARIO.github.io/SEU-REPO/index.html`
-- **Admin**: `https://SEU-USUARIO.github.io/SEU-REPO/gerenciar.html`
-
-📖 **Guia completo detalhado**: [`DEPLOY-GITHUB.md`](./DEPLOY-GITHUB.md)
+- **Login**: `https://SEU-USUARIO.github.io/SEU-REPO/login.html`
+- **Formulário**: `https://SEU-USUARIO.github.io/SEU-REPO/registro-novo-caso.html`
+- **Painel**: `https://SEU-USUARIO.github.io/SEU-REPO/painel-casos.html`
 
 ---
 
 ## 📁 Estrutura de Arquivos
 
 ```
-sistema-registro-violencia/
+FormularioRegistroV2/
 │
-├── 📄 index.html              # Formulário público (registro de casos)
-│   └── Funcionalidades:
-│       • Autocomplete de escolas (106 unidades)
-│       • Sistema de tags para encaminhamentos
-│       • Validação em tempo real
-│       • Design responsivo com Tailwind CSS
+├── 📄 login.html                    # Página de login
+├── 📄 registro-novo-caso.html      # Formulário de registro
+├── 📄 gerenciar-casos.html          # Gerenciamento de casos (CRUD)
+├── 📄 painel-casos.html             # Dashboard com gráficos
+├── 📄 gerenciar-usuarios.html       # Gerenciamento de usuários
+├── 📄 Index-GoogleSheets.html       # Página inicial (legado)
 │
-├── 📄 gerenciar.html          # Painel administrativo (gestão de registros)
-│   └── Funcionalidades:
-│       • Listagem paginada (10/25/50/100/Todos)
-│       • Busca em tempo real por nome
-│       • Edição inline com modal
-│       • Exclusão com confirmação
-│       • Estatísticas dinâmicas
+├── 📜 Code.gs                       # Backend - Casos (Google Apps Script)
+├── 📜 Code-Supabase.gs              # Backend - Auth (Google Apps Script)
+├── 📜 config.js                     # Configurações centralizadas
 │
-├── 📄 Code.gs                 # Backend (Google Apps Script)
-│   └── Endpoints:
-│       • doGet()  - Lista registros (GET)
-│       • doPost() - CRUD operations (POST)
-│       • Funções auxiliares de conversão
+├── 🎨 styles-elegant.css            # Estilos elegantes compartilhados
+├── 🎨 page-transitions.js           # Sistema de transições entre páginas
 │
-├── 📖 README.md               # Este arquivo (documentação principal)
-├── 📖 DEPLOY-GITHUB.md        # Guia detalhado de deploy
-└── 🚫 .gitignore              # Arquivos ignorados pelo Git
+├── 🗄️ supabase-setup.sql            # SQL para configurar Supabase
+│
+├── 📖 README.md                     # Este arquivo (documentação principal)
+├── 📖 DEPLOY-GITHUB.md             # Guia detalhado de deploy
+├── 📖 .env.example                  # Exemplo de variáveis de ambiente
+├── 🚫 .gitignore                    # Arquivos ignorados pelo Git
+│
+└── 📚 Documentação Adicional/
+    ├── GUIA-IMPLANTACAO.md
+    ├── CONFIG-README.md
+    ├── GRUPOS-ENCAMINHAMENTO-GUIA.md
+    └── TESTE-DEBUG.md
 ```
 
 ---
 
 ## 📖 Guia de Uso
 
-### 📝 Formulário Público (`index.html`)
+### 🔐 Login (`login.html`)
 
-#### Passo a passo para registrar um caso:
+1. **Acesse** a página de login
+2. **Digite** email e senha
+3. **Clique** em "Entrar"
+4. **Redirecionamento automático** baseado no role:
+   - **superuser/admin** → `gerenciar-usuarios.html`
+   - **user** → `gerenciar-casos.html`
+   - **visualizador** → `painel-casos.html`
 
-1. **Acesse** a URL pública do formulário
-2. **Preencha** os dados do estudante:
+### 📝 Registrar Novo Caso (`registro-novo-caso.html`)
+
+1. **Preencha** os dados do estudante:
    - Nome completo
    - Data da notificação
    - Idade, gênero, raça/cor
    - Se é PCD ou tem transtorno
 
-3. **Descreva** a situação de violência:
+2. **Descreva** a situação de violência:
    - Selecione o tipo (física, verbal, sexual, etc.)
-   - **Adicione encaminhamentos**:
-     - Clique no campo
+   - **Adicione encaminhamentos** (sistema de tags):
      - Digite ou selecione da lista
      - Pressione Enter ou clique na sugestão
-     - Adicione quantos precisar (aparecem como tags)
-     - Clique no × para remover
+     - Adicione quantos precisar
 
-4. **Informe** unidade e região:
+3. **Informe** unidade e região:
    - Digite o nome da escola (autocomplete)
    - Selecione a região
    - Nome do responsável pelo registro
 
-5. **Responda** perguntas adicionais (Sim/Não)
+4. **Responda** perguntas adicionais (Sim/Não)
 
-6. **Clique** em "💾 Salvar Registro"
+5. **Clique** em "💾 Salvar Registro"
 
-7. **Confirmação**: "✅ Registro salvo com sucesso!"
+### 📊 Painel de Casos (`painel-casos.html`)
 
-### 📊 Painel Administrativo (`gerenciar.html`)
+#### Visualizar Gráficos
 
-#### Funcionalidades disponíveis:
+1. **Carregue** um arquivo CSV ou conecte à planilha
+2. **Visualize** os gráficos:
+   - Faixa Etária
+   - Linha do Tempo por Mês
+   - Encaminhamentos (agrupados por Redes)
+   - Autor da Violência
+   - Ocorreu na Escola?
 
-**1. Carregar Registros**
-```
-Clique em [🔄 Carregar Registros]
-→ Dados carregam via postMessage (sem CORS)
-→ Aparecem na tabela paginada
+#### Aplicar Filtros
+
+1. **Clique** nos cards de filtros rápidos
+2. **Selecione** as opções desejadas
+3. **Use** filtros adicionais (dropdowns)
+4. **Observe** a tabela atualizar em tempo real
+5. **Clique** em "🔄 Limpar Filtros" para resetar
+
+#### Interagir com Gráficos
+
+1. **Clique** em qualquer segmento do gráfico
+2. **Filtro aplicado automaticamente** na tabela
+3. **Badges atualizados** com contagem
+4. **Rolagem automática** para a tabela
+
+### 🔧 Gerenciar Casos (`gerenciar-casos.html`)
+
+1. **Carregar registros**
+   - Clique em "🔄 Carregar Registros"
+   - Aguarde o carregamento (8s timeout)
+
+2. **Buscar**
+   - Digite no campo de busca
+   - Filtra em tempo real por nome
+
+3. **Editar**
+   - Clique no ícone ✏️
+   - Modal abre com todos os campos
+   - Edite e clique em "💾 Salvar Alterações"
+
+4. **Excluir**
+   - Clique no ícone 🗑️
+   - Confirme a exclusão
+
+### 👥 Gerenciar Usuários (`gerenciar-usuarios.html`)
+
+1. **Criar usuário**
+   - Clique em "➕ Adicionar Usuário"
+   - Preencha email, senha e role
+   - Clique em "💾 Salvar"
+
+2. **Editar usuário**
+   - Clique no ícone ✏️
+   - Edite os campos
+   - Clique em "💾 Salvar Alterações"
+
+3. **Excluir usuário**
+   - Clique no ícone 🗑️
+   - Confirme a exclusão
+
+**⚠️ Restrições:**
+- Admin não pode criar/editar admin ou superuser
+- Admin pode gerenciar apenas user e visualizador
+- Superuser tem acesso total
+
+---
+
+## 🔐 Sistema de Autenticação e Roles
+
+### Estrutura de Roles
+
+```sql
+CREATE TYPE user_role AS ENUM (
+  'superuser',    -- Acesso total
+  'admin',        -- Gerencia users e visualizadores
+  'user',         -- Acesso básico (criar/editar casos)
+  'visualizador'  -- Apenas visualização (read-only)
+);
 ```
 
-**2. Buscar Registros**
-```
-Digite no campo de busca 🔍
-→ Filtra em tempo real por nome do estudante
-→ Atualiza contadores automaticamente
-```
+### Permissões por Role
 
-**3. Paginar Resultados**
-```
-Selecione itens por página: [10 ▼ 25 ▼ 50 ▼ 100 ▼ Todos]
-Navegue: ◀ Anterior  1 2 3 ... 14  Próximo ▶
-→ Estado preservado após editar/excluir
-```
+| Operação | superuser | admin | user | visualizador |
+|----------|-----------|-------|------|--------------|
+| **Criar casos** | ✅ | ✅ | ✅ | ❌ |
+| **Editar casos** | ✅ | ✅ | ✅ (próprios) | ❌ |
+| **Excluir casos** | ✅ | ✅ | ✅ (próprios) | ❌ |
+| **Visualizar painel** | ✅ | ✅ | ✅ | ✅ |
+| **Criar usuários** | ✅ | ✅ (user/visualizador) | ❌ | ❌ |
+| **Editar usuários** | ✅ | ✅ (user/visualizador) | ✅ (próprio) | ❌ |
+| **Excluir usuários** | ✅ | ❌ | ❌ | ❌ |
+| **Gerenciar usuários** | ✅ | ✅ (user/visualizador) | ❌ | ❌ |
 
-**4. Editar Registro**
-```
-Clique no ícone [✏️]
-→ Modal abre com todos os 18 campos
-→ Edite os dados necessários
-→ [💾 Salvar Alterações]
-→ Auto-reload em 300ms
-→ Permanece na mesma página
-```
+### Fluxo de Autenticação
 
-**5. Excluir Registro**
-```
-Clique no ícone [🗑️]
-→ Modal de confirmação aparece
-→ [🗑️ Confirmar Exclusão]
-→ Registro removido permanentemente
-→ Auto-reload em 300ms
-→ Permanece na mesma página
-```
+1. **Login** → Validação no Supabase
+2. **SessionStorage** → Armazena role e email
+3. **Verificação** → Cada página verifica autenticação
+4. **Redirecionamento** → Baseado em role
+5. **Logout** → Limpa sessionStorage e redireciona
+
+---
+
+## 📈 Painel de Casos e Gráficos
+
+### Gráficos Disponíveis
+
+#### 1. Faixa Etária
+- **Tipo**: Pizza (Pie Chart)
+- **Categorias**: 0-5, 6-10, 11-14, 15-17, 18+ anos
+- **Interatividade**: Clique filtra por faixa etária
+
+#### 2. Linha do Tempo por Mês
+- **Tipo**: Linha (Line Chart)
+- **Eixo X**: Meses/Anos
+- **Eixo Y**: Quantidade de casos
+- **Interatividade**: Clique em um ponto filtra por mês
+
+#### 3. Encaminhamentos
+- **Tipo**: Barras Horizontais (Horizontal Bar Chart)
+- **Top 15** encaminhamentos mais frequentes
+- **Agrupamento**: Por Redes
+  - 🏥 Assistência Social (CRAS, CREAS, etc.)
+  - 🏥 Saúde (UBS, CAPS, Hospital, etc.)
+  - 🎓 Educação (Escola, Secretaria, etc.)
+  - 🛡️ Conselho Tutelar
+  - ⚖️ Segurança e Justiça (Delegacia, etc.)
+  - 📋 Outros
+- **Interatividade**: Clique filtra por encaminhamento
+
+#### 4. Autor da Violência
+- **Tipo**: Pizza (Pie Chart)
+- **Categorias**:
+  - Profissional da Escola (coluna R = 'S')
+  - Estudante (coluna S = 'S')
+  - Outro Agente (R = 'N' e S = 'N')
+  - Não Informado
+- **Interatividade**: Clique filtra por autor
+
+#### 5. Ocorreu na Escola?
+- **Tipo**: Pizza (Pie Chart)
+- **Categorias**: Sim, Não, Não Informado
+- **Lógica**: Combina colunas `ocorreu` e `violenciaEscolaOcorreu`
+- **Interatividade**: Clique filtra por ocorrência
+
+### Sistema de Filtros
+
+#### Filtros Rápidos (Cards)
+- Cards clicáveis com ícones
+- Badges de contagem quando ativos
+- Seções expansíveis
+
+#### Filtros Adicionais
+- Dropdowns para Sim/Não
+- Inputs para idade e data
+- Busca por nome
+
+#### Funcionalidades
+- ✅ **Múltiplos filtros simultâneos**
+- ✅ **Badges de contagem** por filtro
+- ✅ **Limpar todos** os filtros
+- ✅ **Atualização em tempo real** da tabela
+- ✅ **Gráficos dinâmicos** conforme filtros
+- ✅ **Clique nos gráficos** aplica filtros
 
 ---
 
 ## 📊 Formato dos Dados
 
-### Estrutura da Planilha (18 colunas)
+### Estrutura da Planilha (23 colunas)
 
 | # | Coluna | Tipo | Formato | Exemplo |
 |---|--------|------|---------|---------|
@@ -458,31 +693,147 @@ Clique no ícone [🗑️]
 | **C** | Idade | Número | Inteiro | 12 |
 | **D** | Identidade de Gênero | Char | M ou F | M |
 | **E** | PCD/Transtorno | Char | S ou N | S |
-| **F** | Raça/Cor | Texto | String | Parda |
-| **G** | Tipo de Violência | Texto | String | Verbal, Física, Sexual |
-| **H** | Encaminhamento | Texto | CSV | Conselho Tutelar, UBS, CRAS |
-| **I** | CMEI/EMEF | Texto | Sigla | AMCC, JBM, PSV |
-| **J** | Região | Texto | String | Centro, São Pedro |
-| **K** | Responsável Registro | Texto | String | Maria Santos |
-| **L** | Fonte: Escola | Char | S ou N | S |
-| **M** | Violência na Escola Ocorreu | Char | S ou N | S |
-| **N** | Profissional Autor | Char | S ou N | N |
-| **O** | Estudante Autor | Char | S ou N | S |
-| **P** | Violência Fora da Escola | Char | S ou N | N |
-| **Q** | Ocorreu na Escola | Char | S ou N | S |
-| **R** | Violência Informada | Char | S ou N | S |
+| **F** | Qual o Transtorno? | Texto | String | TDAH, Autismo |
+| **G** | Raça/Cor | Texto | String | Parda |
+| **H** | Orientação Sexual | Texto | String | Heterossexual |
+| **I** | Classificação da Violência | Texto | String | Física |
+| **J** | Tipo de Violência | Texto | String | Verbal, Física |
+| **K** | Motivação da Violência | Texto | String | Bullying |
+| **L** | Encaminhamento | Texto | CSV | Conselho Tutelar, UBS |
+| **M** | CMEI/EMEF | Texto | Sigla | AMCC |
+| **N** | Região | Texto | String | Centro |
+| **O** | Responsável Registro | Texto | String | Maria Santos |
+| **P** | Fonte: Escola | Char | S ou N | S |
+| **Q** | Violência Escola Ocorreu | Char | S ou N | S |
+| **R** | Profissional Autor | Char | S ou N | N |
+| **S** | Estudante Autor | Char | S ou N | S |
+| **T** | Violência Não Escola | Char | S ou N | N |
+| **U** | Ocorreu na Escola | Char | S ou N | S |
+| **V** | Violência Informada | Char | S ou N | S |
+| **W** | Estudo de Caso | Char | S ou N | S |
 
 ### Conversões Automáticas
-
-O sistema faz conversões entre frontend e backend:
 
 | Campo | Frontend | Backend (Sheets) |
 |-------|----------|------------------|
 | **Gênero** | Menino / Menina | M / F |
 | **Sim/Não** | Sim / Não | S / N |
 | **Data** | YYYY-MM-DD | DD/MM/YYYY |
-| **Escola** | Nome completo | Sigla |
+| **Escola** | Nome completo | Sigla (preservada se já existir) |
 | **Encaminhamento** | Tags separadas | CSV (vírgula) |
+
+---
+
+## 🔒 Segurança e Variáveis de Ambiente
+
+### ⚠️ Proteção de Credenciais
+
+**NUNCA faça commit de credenciais reais no GitHub!**
+
+#### Arquivos Protegidos (`.gitignore`)
+
+```
+config.js              # Configurações com credenciais
+config.local.js        # Configurações locais
+.env                   # Variáveis de ambiente
+.env.local             # Variáveis locais
+Code-Supabase.gs       # Contém URLs e chaves
+*.gs.bak               # Backups do Apps Script
+```
+
+#### Configuração Segura
+
+**Opção 1: Arquivo Local (Desenvolvimento)**
+```javascript
+// Crie config.local.js (adicionado ao .gitignore)
+const CONFIG = {
+  APPS_SCRIPT_AUTH: 'sua-url-aqui',
+  APPS_SCRIPT_CASOS: 'sua-url-aqui',
+  SPREADSHEET_ID: 'seu-id-aqui',
+  SUPABASE_URL: 'sua-url-aqui',
+  SUPABASE_KEY: 'sua-chave-aqui'
+};
+```
+
+**Opção 2: Variáveis de Ambiente (Produção)**
+```javascript
+// Use window.ENV ou process.env
+const CONFIG = {
+  APPS_SCRIPT_AUTH: getEnvVar('APPS_SCRIPT_AUTH_URL', 'default'),
+  // ...
+};
+```
+
+**Opção 3: GitHub Secrets (CI/CD)**
+- Use GitHub Secrets para variáveis sensíveis
+- Configure via Actions ou Pages settings
+
+### Medidas de Segurança Implementadas
+
+✅ **RLS (Row Level Security)** no Supabase  
+✅ **Validação de roles** no backend  
+✅ **SessionStorage** para sessão (não localStorage)  
+✅ **Validação de permissões** em cada operação  
+✅ **Sanitização de dados** antes de salvar  
+✅ **URLs hash aleatórias** do Apps Script  
+✅ **Políticas RLS restritivas** (bloqueio de acesso público)  
+
+### Recomendações Adicionais
+
+1. **Use HTTPS** sempre (GitHub Pages já fornece)
+2. **Rotacione chaves** periodicamente
+3. **Monitore logs** do Supabase e Apps Script
+4. **Backup regular** da planilha e banco
+5. **Auditoria** de alterações (futuro)
+
+---
+
+## 🚀 Deploy no GitHub
+
+### Preparação para Deploy
+
+1. **Verificar `.gitignore`**
+   ```bash
+   # Certifique-se de que arquivos sensíveis estão ignorados
+   cat .gitignore
+   ```
+
+2. **Criar `config.js` de exemplo**
+   ```bash
+   # Use .env.example como base
+   cp .env.example config.example.js
+   ```
+
+3. **Remover credenciais reais**
+   ```bash
+   # Verifique se não há credenciais em:
+   # - config.js
+   # - Code-Supabase.gs
+   # - Qualquer arquivo HTML
+   ```
+
+### Processo de Deploy
+
+```bash
+# 1. Adicionar arquivos
+git add .
+
+# 2. Commit inicial
+git commit -m "🚀 Deploy inicial - Sistema completo"
+
+# 3. Push para GitHub
+git push origin main
+
+# 4. Ativar GitHub Pages:
+#    Settings > Pages > Branch: main > folder: / (root) > Save
+```
+
+### Pós-Deploy
+
+1. **Configurar variáveis** via GitHub Secrets (se usar CI/CD)
+2. **Testar** todas as funcionalidades
+3. **Verificar** logs do Supabase e Apps Script
+4. **Documentar** URLs de produção
 
 ---
 
@@ -494,8 +845,8 @@ O sistema faz conversões entre frontend e backend:
 # 1. Edite os arquivos localmente
 # 2. Commit e push
 
-git add index.html gerenciar.html
-git commit -m "✨ feat: adiciona nova funcionalidade"
+git add .
+git commit -m "✨ feat: descrição da mudança"
 git push origin main
 
 # GitHub Pages atualiza automaticamente em ~1 minuto
@@ -506,13 +857,20 @@ git push origin main
 ```
 1. Acesse https://script.google.com
 2. Abra seu projeto
-3. Edite Code.gs
+3. Edite Code.gs ou Code-Supabase.gs
 4. Salve (Ctrl+S)
 5. Implantar > Gerenciar implantações
 6. Clique no ícone ✏️ (Editar)
 7. Versão: Nova versão
 8. Implantar
-9. Se a URL mudou, atualize nos arquivos HTML
+9. Se a URL mudou, atualize em config.js
+```
+
+### Banco de Dados (Supabase)
+
+```sql
+-- Execute SQL no Supabase Dashboard > SQL Editor
+-- Exemplo: Adicionar nova coluna, atualizar políticas, etc.
 ```
 
 ### Versionamento
@@ -520,75 +878,12 @@ git push origin main
 Seguimos [Semantic Versioning](https://semver.org/):
 
 ```
-v2.1.0
+v2.2.0
 │ │ │
 │ │ └─ PATCH: Correções de bugs
 │ └─── MINOR: Novas funcionalidades (retrocompatíveis)
 └───── MAJOR: Mudanças incompatíveis
 ```
-
----
-
-## 🔐 Segurança
-
-### Medidas Implementadas
-
-✅ **URL hash aleatória** do Apps Script (difícil de adivinhar)  
-✅ **Validação de campos** obrigatórios no backend  
-✅ **Sanitização de dados** antes de salvar  
-✅ **Mode no-cors** para proteger dados sensíveis  
-✅ **Conversão de dados** para formatos seguros  
-
-### ⚠️ Limitações Atuais
-
-❌ **Sem autenticação** - Qualquer pessoa com a URL pode acessar  
-❌ **Sem controle de permissões** - Todos têm acesso total  
-❌ **Sem auditoria** - Não registra quem fez alterações  
-
-### 🔒 Recomendações para Produção
-
-**1. Adicionar Autenticação por Token**
-
-```javascript
-// Em Code.gs
-const TOKEN_SECRETO = 'SEU_TOKEN_SUPER_SECRETO_AQUI';
-
-function doPost(e) {
-  // Verificar token
-  const dados = JSON.parse(e.parameter.data);
-  if (dados.token !== TOKEN_SECRETO) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      message: 'Acesso não autorizado'
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  // ... resto do código
-}
-```
-
-**2. Implementar Sistema de Login**
-
-Use **Google Sign-In** ou **Firebase Authentication** para:
-- Identificar usuários
-- Restringir acesso ao painel admin
-- Registrar log de alterações
-
-**3. Criar Níveis de Permissão**
-
-```javascript
-const PERMISSOES = {
-  'admin@escola.gov.br': ['read', 'write', 'delete'],
-  'professor@escola.gov.br': ['read', 'write'],
-  'visitante@escola.gov.br': ['read']
-};
-```
-
-**4. Backup Automático**
-
-Configure backup diário da planilha:
-- File > Version history > Enable
-- Ou: Apps Script para export automático
 
 ---
 
@@ -602,25 +897,21 @@ Configure backup diário da planilha:
 - GitHub Pages: Gratuito (100GB/mês)
 - Apps Script: Gratuito (20.000 execuções/dia)
 - Google Sheets: Gratuito (10M células)
+- Supabase: Gratuito (500MB database, 50k usuários)
 
 **Sem custos ocultos. Sem cartão de crédito. Sem pegadinhas.**
 
 </details>
 
 <details>
-<summary><b>☁️ Preciso criar projeto no Google Cloud Platform?</b></summary>
+<summary><b>🔐 Como proteger as credenciais no GitHub?</b></summary>
 
-**NÃO!** 
+1. **Use `.gitignore`** para ignorar `config.js`
+2. **Crie `config.example.js`** com valores de exemplo
+3. **Use GitHub Secrets** para produção (se usar CI/CD)
+4. **Nunca faça commit** de credenciais reais
 
-Apenas:
-1. Apps Script (gratuito, sem GCP)
-2. Google Sheets (gratuito)
-
-Não precisa de:
-- ❌ Google Cloud Project
-- ❌ Billing habilitado
-- ❌ APIs específicas habilitadas
-- ❌ Service accounts
+Veja seção [Segurança e Variáveis de Ambiente](#-segurança-e-variáveis-de-ambiente)
 
 </details>
 
@@ -629,7 +920,7 @@ Não precisa de:
 
 **Capacidade do Google Sheets:**
 - 10 milhões de células totais
-- Com 18 colunas: **~555.000 registros**
+- Com 23 colunas: **~434.000 registros**
 
 **Performance:**
 - Até 1.000 registros: Excelente
@@ -654,92 +945,37 @@ Testado em:
 - ✅ Chrome Desktop
 - ✅ Firefox
 - ✅ Edge
+- ✅ Opera
 
 </details>
 
 <details>
-<summary><b>🔒 Como adicionar autenticação?</b></summary>
+<summary><b>🎨 Como personalizar as cores e estilos?</b></summary>
 
-**Opção 1: Token simples (rápido)**
+Edite o arquivo `styles-elegant.css`:
 
-```javascript
-// Frontend
-const TOKEN = 'seu-token-secreto';
-dados.token = TOKEN;
-
-// Backend
-if (dados.token !== 'seu-token-secreto') {
-  return { success: false, message: 'Não autorizado' };
+```css
+/* Cores principais */
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #8b5cf6;
+  /* ... */
 }
+
+/* Ou use Tailwind CSS diretamente nos HTMLs */
 ```
-
-**Opção 2: Google Sign-In (recomendado)**
-
-```html
-<!-- Adicione no HTML -->
-<script src="https://accounts.google.com/gsi/client"></script>
-<div id="g_id_onload" data-client_id="YOUR_CLIENT_ID"></div>
-```
-
-**Opção 3: Firebase Auth (profissional)**
-
-- Email/senha
-- Google, Facebook, GitHub
-- Phone authentication
-- Controle de permissões
 
 </details>
 
 <details>
-<summary><b>📤 Como exportar dados para Excel?</b></summary>
+<summary><b>📈 Como adicionar novos gráficos?</b></summary>
 
-**Método 1: Direto do Google Sheets**
-```
-1. Abra a planilha
-2. Arquivo > Download
-3. Escolha:
-   - Microsoft Excel (.xlsx)
-   - CSV (.csv)
-   - PDF
-```
+1. **Adicione o gráfico** em `painel-casos.html`
+2. **Crie a função** de renderização (ex: `renderPieChart`)
+3. **Adicione onClick** para filtrar
+4. **Atualize** `aplicarFiltroDoGrafico` com a lógica
 
-**Método 2: Via Apps Script (automático)**
-```javascript
-function exportarParaExcel() {
-  const ss = SpreadsheetApp.openById('SEU_ID');
-  const sheet = ss.getSheetByName('Página1');
-  
-  // Converte para blob Excel
-  const blob = ss.getBlob().setName('backup.xlsx');
-  
-  // Envia por email ou salva no Drive
-  DriveApp.createFile(blob);
-}
-```
-
-**Método 3: API externa**
-Use bibliotecas como:
-- **SheetJS** (xlsx.js)
-- **ExcelJS**
-- **Papa Parse** (para CSV)
-
-</details>
-
-<details>
-<summary><b>🌐 Funciona offline?</b></summary>
-
-**Não. O sistema requer internet para:**
-
-- ✅ Salvar dados no Google Sheets
-- ✅ Carregar registros do banco
-- ✅ Executar o Apps Script
-
-**Para funcionar offline, seria necessário:**
-- IndexedDB ou LocalStorage (frontend)
-- Service Worker (PWA)
-- Sincronização quando voltar online
-
-*Planejado para versão futura.*
+Veja exemplos existentes no código.
 
 </details>
 
@@ -756,78 +992,15 @@ Google Sheets > Arquivo > Fazer download > Excel/CSV
 function backupDiario() {
   const ss = SpreadsheetApp.openById('SEU_ID');
   const pasta = DriveApp.getFolderById('ID_PASTA_BACKUP');
-  
   const hoje = Utilities.formatDate(new Date(), 'GMT-3', 'yyyy-MM-dd');
   const copia = ss.copy(`Backup ${hoje}`);
-  
   pasta.addFile(DriveApp.getFileById(copia.getId()));
 }
-
-// Configure gatilho: Editar > Acionadores > Nova
-// backupDiario() > Diariamente > 00:00-01:00
 ```
 
-**Backup na Nuvem:**
-- Google Drive (sincronização automática)
-- Download local semanal
-- Export para AWS S3 / Azure Blob
-
-</details>
-
-<details>
-<summary><b>🐛 O que fazer se encontrar um bug?</b></summary>
-
-**1. Verifique se é problema conhecido (FAQ)**
-
-**2. Debugar localmente:**
-```
-- Console do navegador (F12)
-- Apps Script > Execuções
-- Verificar logs
-```
-
-**3. Abrir issue no GitHub:**
-```
-https://github.com/GabrielGaks/sistema-registro-violencia/issues/new
-
-Inclua:
-- Descrição do problema
-- Passos para reproduzir
-- Screenshots/logs
-- Navegador e versão
-```
-
-**4. Contribuir com correção:**
-```bash
-git checkout -b fix/nome-do-bug
-# Faça suas alterações
-git commit -m "fix: corrige bug X"
-git push origin fix/nome-do-bug
-# Abra Pull Request
-```
-
-</details>
-
-<details>
-<summary><b>🚀 Como contribuir com o projeto?</b></summary>
-
-**Contribuições são bem-vindas!**
-
-1. **Fork** o repositório
-2. **Clone** localmente
-3. **Crie uma branch**: `git checkout -b feature/nova-funcionalidade`
-4. **Faça suas alterações**
-5. **Commit**: `git commit -m "feat: adiciona X"`
-6. **Push**: `git push origin feature/nova-funcionalidade`
-7. **Abra um Pull Request**
-
-**Tipos de contribuições:**
-- 🐛 Correção de bugs
-- ✨ Novas funcionalidades
-- 📝 Melhorias na documentação
-- 🎨 Melhorias de UI/UX
-- ⚡ Otimizações de performance
-- 🔒 Melhorias de segurança
+**Backup Supabase:**
+- Dashboard > Database > Backups
+- Ou export via SQL
 
 </details>
 
@@ -850,12 +1023,20 @@ Seu projeto > Executar > Execuções
 Veja logs detalhados de cada execução
 ```
 
-#### 3. Verificar Configurações
+#### 3. Logs do Supabase
 ```
-✅ URL do Apps Script correta em APPS_SCRIPT_URL?
-✅ ID da planilha correto em SHEET_ID?
-✅ Nome da aba correto em SHEET_NAME?
+Dashboard > Logs > API Logs
+Veja todas as requisições e erros
+```
+
+#### 4. Verificar Configurações
+```
+✅ URL do Apps Script correta em config.js?
+✅ ID da planilha correto?
+✅ Nome da aba correto?
 ✅ Deploy do Apps Script como "Qualquer pessoa"?
+✅ Supabase configurado corretamente?
+✅ Políticas RLS aplicadas?
 ✅ GitHub Pages ativado?
 ```
 
@@ -863,12 +1044,14 @@ Veja logs detalhados de cada execução
 
 | Erro | Causa | Solução |
 |------|-------|---------|
-| `Configure a URL do Apps Script` | URL não configurada | Cole URL em `APPS_SCRIPT_URL` |
+| `Configure a URL do Apps Script` | URL não configurada | Cole URL em `config.js` |
 | `Acesso negado` | Deploy restrito | Apps Script > Implantar > "Qualquer pessoa" |
-| `Dados não aparecem` | ID/aba incorreto | Verifique `SHEET_ID` e `SHEET_NAME` |
+| `Erro 500 ao buscar usuários` | Políticas RLS muito restritivas | Execute `supabase-setup.sql` atualizado |
+| `Dados não aparecem` | ID/aba incorreto | Verifique `SPREADSHEET_ID` e `SHEET_NAME` |
 | `CORS Error` | Normal com no-cors | Ignore, dados foram salvos |
 | `Função não encontrada` | Nome errado | Verifique nome da função no Code.gs |
-| `Timeout` | Muitos dados | Adicione paginação no backend |
+| `Timeout` | Muitos dados | Reduza timeout ou adicione paginação |
+| `Sigla sendo truncada` | Bug na extração | Atualize `extrairSiglaEscola` no Code.gs |
 
 ### 📞 Canais de Suporte
 
@@ -884,8 +1067,53 @@ Veja logs detalhados de cada execução
 - 📖 [Guia completo de deploy](./DEPLOY-GITHUB.md)
 - 🔧 [Apps Script Documentation](https://developers.google.com/apps-script)
 - 📊 [Google Sheets API](https://developers.google.com/sheets/api)
+- 🗄️ [Supabase Documentation](https://supabase.com/docs)
 - 🎨 [Tailwind CSS Docs](https://tailwindcss.com/docs)
+- 📈 [Chart.js Docs](https://www.chartjs.org/docs)
 - 📱 [GitHub Pages Docs](https://docs.github.com/pt/pages)
+
+---
+
+## 📋 Changelog
+
+### Versão 2.2.0 (Atual)
+
+#### ✨ Novas Funcionalidades
+- ✅ **Filtro de Estudo de Caso** no painel de casos
+- ✅ **Sistema de transições dinâmicas** entre páginas
+- ✅ **Estilos elegantes** compartilhados (`styles-elegant.css`)
+- ✅ **Proteção de variáveis sensíveis** (`.gitignore`, `.env.example`)
+- ✅ **README completo** e detalhado
+
+#### 🔧 Melhorias
+- ✅ **Preservação de siglas** - Não sobrescreve siglas existentes
+- ✅ **Performance otimizada** - Redução de logs e timeouts
+- ✅ **Políticas RLS atualizadas** - Suporte a autenticação customizada
+- ✅ **Configuração centralizada** - Arquivo `config.js` melhorado
+
+#### 🐛 Correções
+- ✅ Corrigido bug de sigla sendo truncada
+- ✅ Corrigido erro 500 no Supabase (políticas RLS)
+- ✅ Corrigido flash de conteúdo nas transições
+- ✅ Corrigido filtros de gráficos não aplicando corretamente
+
+### Versão 2.1.0
+
+#### ✨ Novas Funcionalidades
+- ✅ Sistema de autenticação com Supabase
+- ✅ 4 níveis de acesso (superuser, admin, user, visualizador)
+- ✅ Painel de casos com gráficos interativos
+- ✅ Sistema de filtros avançados
+- ✅ Gráfico de Encaminhamentos agrupado por Redes
+
+### Versão 2.0.0
+
+#### ✨ Novas Funcionalidades
+- ✅ Formulário de registro completo
+- ✅ Painel administrativo com CRUD
+- ✅ Sistema de tags para encaminhamentos
+- ✅ Autocomplete de escolas
+- ✅ Paginação inteligente
 
 ---
 
@@ -928,9 +1156,9 @@ Este sistema foi desenvolvido com dedicação para apoiar o combate à violênci
 
 <div align="center">
 
-### 🛡️ Sistema de Registro de Violência Escolar v2.1
+### 🛡️ Sistema de Registro de Violência Escolar v2.2
 
-**Desenvolvido por [Gabriel Gaks](https://github.com/GabrielGaks)**
+**Desenvolvido com ❤️ para educação e segurança de crianças**
 
 *Dezembro de 2025*
 
@@ -945,367 +1173,5 @@ Este sistema foi desenvolvido com dedicação para apoiar o combate à violênci
 **⭐ Se este projeto foi útil, considere dar uma estrela!**
 
 **Made with ❤️ for education and children's safety**
-
-</div>
-
-## 📋 Índice
-
-- [Sobre](#-sobre)
-- [Funcionalidades](#-funcionalidades)
-- [Demonstração](#-demonstração)
-- [Tecnologias](#-tecnologias)
-- [Arquitetura](#-arquitetura)
-- [Deploy Rápido](#-deploy-rápido)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Uso](#-uso)
-- [Atualização](#-atualização)
-- [Segurança](#-segurança)
-- [FAQ](#-faq)
-- [Suporte](#-suporte)
-
-## 🎯 Sobre
-
-Sistema desenvolvido para a Secretaria Municipal de Educação de Vitória/ES para registro e acompanhamento de casos de violência escolar na rede municipal de ensino.
-
-### 📊 Componentes
-
-- **Formulário Público** (`index.html`) - Registro de novos casos
-- **Painel Administrativo** (`gerenciar.html`) - Gestão completa de registros
-- **Backend** (`Code.gs`) - API no Google Apps Script
-- **Banco de Dados** - Google Sheets
-
-## ✨ Funcionalidades
-
-### 📝 Formulário de Registro
-
-- ✅ **Autocomplete inteligente** para 106 escolas (CMEIs e EMEFs)
-- ✅ **Sistema de tags** para múltiplos encaminhamentos
-- ✅ **Sugestões predefinidas** (Conselho Tutelar, UBS, Delegacia, etc.)
-- ✅ **Validação em tempo real** com feedback visual
-- ✅ **Design responsivo** (mobile, tablet, desktop)
-- ✅ **Conversão automática** de dados (S/N, siglas, datas)
-
-### 📊 Painel Administrativo
-
-- ✅ **Listagem completa** de todos os registros
-- ✅ **Paginação inteligente** (10/25/50/100/Todos por página)
-- ✅ **Busca em tempo real** por nome de estudante
-- ✅ **Edição inline** com modal moderno
-- ✅ **Exclusão com confirmação**
-- ✅ **Estatísticas** (total de registros, exibindo)
-- ✅ **Preservação de página** após editar/excluir
-- ✅ **Auto-atualização** após operações (300ms)
-
-### 🎨 Interface
-
-- 🎨 Design moderno com **Tailwind CSS**
-- 🌈 Gradientes e animações suaves
-- 📱 **100% responsivo**
-- ♿ Acessível e intuitivo
-- 🎭 Ícones SVG personalizados
-
-## 🎬 Demonstração
-
-```
-📝 Formulário Público
-┌─────────────────────────────┐
-│ 👤 Dados do Estudante       │
-│ ⚠️  Situação da Violência   │
-│ 🏫 Unidade e Região          │
-│ ✅ Perguntas Adicionais      │
-│ 📋 [Salvar Registro]         │
-└─────────────────────────────┘
-
-📊 Painel Administrativo
-┌─────────────────────────────┐
-│ 🔍 [Buscar...]  [Carregar]  │
-│ Itens: [25 ▼]  Total: 338   │
-├─────────────────────────────┤
-│ Nome    Data    Idade ...   │
-│ João    01/12   12    [✏️][🗑️]│
-│ Maria   30/11   10    [✏️][🗑️]│
-├─────────────────────────────┤
-│ ◀ 1 2 3 4 5 ... 14 ▶        │
-└─────────────────────────────┘
-```
-
-## 🛠️ Tecnologias
-
-### Frontend
-- **HTML5** - Estrutura semântica
-- **CSS3** - Estilização moderna
-- **JavaScript Vanilla** - Lógica e interatividade
-- **Tailwind CSS v3** - Framework CSS (CDN)
-
-### Backend
-- **Google Apps Script** - API serverless
-- **Google Sheets** - Banco de dados
-
-### Hospedagem
-- **GitHub Pages** - Frontend (GRATUITO)
-- **Google Apps Script** - Backend (GRATUITO)
-
-**Custo total: R$ 0,00** 💰
-
-## 🏗️ Arquitetura
-
-```
-┌─────────────────────────────────────────┐
-│         GitHub Pages (Frontend)         │
-│  ┌──────────────┐  ┌─────────────────┐ │
-│  │ index.html   │  │ gerenciar.html  │ │
-│  │ (Formulário) │  │ (Admin Panel)   │ │
-│  └──────┬───────┘  └────────┬────────┘ │
-└─────────┼──────────────────┼───────────┘
-          │ POST              │ POST
-          │ (form data)       │ (JSON)
-          ↓                   ↓
-┌─────────────────────────────────────────┐
-│    Google Apps Script (Backend)         │
-│  ┌──────────────────────────────────┐   │
-│  │ doGet()  - Lista registros       │   │
-│  │ doPost() - CRUD operations       │   │
-│  │   ├─ save (form)                 │   │
-│  │   ├─ list (admin)                │   │
-│  │   ├─ update (admin)              │   │
-│  │   └─ delete (admin)              │   │
-│  └─────────────┬────────────────────┘   │
-└────────────────┼─────────────────────────┘
-                 │ appendRow()
-                 │ getValues()
-                 │ setValues()
-                 ↓
-┌─────────────────────────────────────────┐
-│       Google Sheets (Database)          │
-│  ┌──────────────────────────────────┐   │
-│  │ Página1 (18 colunas)             │   │
-│  │ A-R: Dados do registro           │   │
-│  └──────────────────────────────────┘   │
-└─────────────────────────────────────────┘
-```
-
-## 🚀 Deploy Rápido
-
-### Pré-requisitos
-- Conta Google (Gmail)
-- Conta GitHub
-- Navegador moderno
-
-### 3 Passos Simples
-
-#### 1️⃣ Configure o Backend (Apps Script)
-
-```bash
-1. Acesse: https://script.google.com
-2. Novo projeto → "Sistema-Violencia-Escolar"
-3. Cole o código de Code.gs
-4. Salve (Ctrl+S)
-5. Implantar > App da Web
-   - Executar como: Eu
-   - Acesso: Qualquer pessoa
-6. COPIE A URL gerada
-```
-
-#### 2️⃣ Configure o Frontend
-
-```javascript
-// Em index.html e gerenciar.html, linha ~920:
-const APPS_SCRIPT_URL = 'COLE_SUA_URL_AQUI';
-```
-
-#### 3️⃣ Publique no GitHub
-
-```bash
-git add .
-git commit -m "Deploy inicial"
-git push
-
-# Ative GitHub Pages:
-Settings > Pages > Branch: main > Save
-```
-
-**🎉 Pronto!** Acesse: `https://SEU-USUARIO.github.io/SEU-REPO/`
-
-📖 **Guia completo**: [`DEPLOY-GITHUB.md`](./DEPLOY-GITHUB.md)
-
-## 📁 Estrutura do Projeto
-
-```
-FormularioRegistroV2/
-├── 📄 index.html           # Formulário público
-├── 📄 gerenciar.html       # Painel administrativo  
-├── 📄 Code.gs              # Backend (Apps Script)
-├── 📖 README.md            # Documentação principal
-├── 📖 DEPLOY-GITHUB.md     # Guia de deploy
-└── 🚫 .gitignore           # Arquivos ignorados
-```
-
-## 📖 Uso
-
-### Formulário Público (`index.html`)
-
-```
-1. Acesse a URL pública
-2. Preencha os dados do estudante
-3. Descreva a situação de violência
-4. Adicione encaminhamentos (sistema de tags)
-5. Clique em "Salvar Registro"
-6. Confirmação: "✅ Registro salvo com sucesso!"
-```
-
-### Painel Administrativo (`gerenciar.html`)
-
-```
-1. Acesse gerenciar.html
-2. Clique em "Carregar Registros"
-3. Visualize todos os registros em tabela
-4. Use busca para filtrar por nome
-5. Edite registros (ícone ✏️)
-6. Exclua registros (ícone 🗑️)
-7. Navegue pelas páginas (◀ 1 2 3 ▶)
-```
-
-## 📊 Formato dos Dados
-
-| # | Coluna | Tipo | Exemplo |
-|---|--------|------|---------|
-| A | Criança/Estudante | Texto | João Silva |
-| B | Data da NT | DD/MM/YYYY | 01/12/2025 |
-| C | Idade | Número | 12 |
-| D | Identidade de Gênero | M/F | M |
-| E | PCD/Transtorno | S/N | S |
-| F | Raça/Cor | Texto | Parda |
-| G | Tipo de Violência | Texto | Verbal |
-| H | Encaminhamento | Texto | Conselho Tutelar, UBS |
-| I | CMEI/EMEF | Sigla | AMCC |
-| J | Região | Texto | Centro |
-| K | Responsável | Texto | Maria Santos |
-| L-R | Perguntas S/N | S/N | S, N, S, N, S, N, S |
-
-**Total: 18 colunas (A-R)**
-
-## 🔄 Atualização
-
-### Frontend (GitHub Pages)
-
-```bash
-# Edite os arquivos localmente
-git add .
-git commit -m "feat: descrição da mudança"
-git push
-
-# GitHub Pages atualiza automaticamente
-```
-
-### Backend (Apps Script)
-
-```
-1. Edite Code.gs no Apps Script
-2. Salve (Ctrl+S)
-3. Implantar > Gerenciar implantações
-4. Editar (ícone ✏️) > Nova versão
-5. Implantar
-6. COPIE A NOVA URL (se mudou)
-```
-
-## 🔐 Segurança
-
-- ✅ URL do Apps Script é hash aleatório (difícil de adivinhar)
-- ✅ Validação de campos obrigatórios no backend
-- ✅ Sanitização de dados antes de salvar
-- ✅ Modo `no-cors` para evitar exposição de dados
-- ⚠️ Para acesso restrito, implemente autenticação no `Code.gs`
-
-### Recomendações
-
-```javascript
-// Em Code.gs, adicione verificação de token:
-const TOKEN_SECRETO = 'SEU_TOKEN_AQUI';
-
-function doPost(e) {
-  const token = e.parameter.token;
-  if (token !== TOKEN_SECRETO) {
-    return ContentService.createTextOutput('Acesso negado');
-  }
-  // ... resto do código
-}
-```
-
-## ❓ FAQ
-
-<details>
-<summary><b>O formulário é gratuito?</b></summary>
-Sim! 100% gratuito usando GitHub Pages + Apps Script.
-</details>
-
-<details>
-<summary><b>Precisa criar projeto no Google Cloud?</b></summary>
-NÃO! Apenas Apps Script + Sheets (ambos gratuitos).
-</details>
-
-<details>
-<summary><b>Quantos registros suporta?</b></summary>
-Google Sheets suporta 10 milhões de células. Com 18 colunas = ~555 mil registros.
-</details>
-
-<details>
-<summary><b>Funciona offline?</b></summary>
-Não. Requer conexão com internet para salvar no Google Sheets.
-</details>
-
-<details>
-<summary><b>Posso adicionar autenticação?</b></summary>
-Sim! Implemente verificação de token no Code.gs (veja seção Segurança).
-</details>
-
-<details>
-<summary><b>Como exportar dados?</b></summary>
-Direto do Google Sheets: Arquivo > Download > CSV/Excel.
-</details>
-
-## 🆘 Suporte
-
-### Debug
-
-```
-1. Console do navegador (F12 > Console)
-2. Apps Script > Executar > Execuções (ver logs)
-3. Verifique URL do Apps Script nos arquivos
-4. Verifique ID da planilha no Code.gs
-```
-
-### Erros Comuns
-
-| Erro | Solução |
-|------|---------|
-| `Configure a URL...` | Cole URL do Apps Script em APPS_SCRIPT_URL |
-| `Acesso negado` | No deploy, selecione "Qualquer pessoa" |
-| `Dados não aparecem` | Verifique ID da planilha e nome da aba |
-| `CORS Error` | Normal com no-cors, dados foram salvos |
-
-### Contato
-
-Para problemas técnicos:
-1. Verifique [`DEPLOY-GITHUB.md`](./DEPLOY-GITHUB.md)
-2. Veja logs do Apps Script (Execuções)
-3. Abra issue no GitHub
-
-## 📄 Licença
-
-Este projeto é de uso interno da **Secretaria Municipal de Educação de Vitória/ES**.
-
-## 🙏 Agradecimentos
-
-Desenvolvido com dedicação para apoiar o combate à violência escolar e proteção de crianças e adolescentes da rede municipal de ensino de Vitória/ES.
-
----
-
-<div align="center">
-
-**Sistema de Registro de Violência Escolar** v2.1
-
-Desenvolvido por Gabriel Gaks | Dezembro 2025
-
-[📖 Documentação](./DEPLOY-GITHUB.md) • [🐛 Reportar Bug](https://github.com/GabrielGaks/sistema-registro-violencia/issues) • [✨ Solicitar Funcionalidade](https://github.com/GabrielGaks/sistema-registro-violencia/issues)
 
 </div>

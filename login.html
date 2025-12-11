@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Sistema de Registro</title>
+  
+  <!-- Esconde conteúdo IMEDIATAMENTE para evitar flash -->
+  <style>
+    html:not(.page-ready) {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    html.page-ready {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+  </style>
+  
+  <!-- TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Estilos Elegantes Compartilhados -->
+  <link rel="stylesheet" href="styles-elegant.css">
+  
+  <!-- Sistema de Transições entre Páginas -->
+  <script src="page-transitions.js"></script>
+  
+  <style>
+    /* Animações */
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .card-login {
+      animation: fadeInScale 0.4s ease-out;
+    }
+    
+    .alert {
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    /* Loading spinner */
+    .spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Botão toggle senha */
+    .password-toggle {
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    /* Efeito de pulso no botão */
+    @keyframes pulse-subtle {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+    }
+    
+    .btn-loading {
+      animation: pulse-subtle 1.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen flex items-center justify-center py-10 px-4">
+  
+  <!-- Container Principal -->
+  <div class="w-full max-w-lg">
+    
+    <!-- Cabeçalho -->
+    <div class="bg-gradient-to-r from-white to-blue-50/30 rounded-xl sm:rounded-2xl shadow-xl border border-white/60 backdrop-blur-sm p-6 sm:p-8 mb-6 sm:mb-8">
+      <div class="flex flex-col items-center justify-center gap-3 sm:gap-4 mb-3">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 sm:p-5 rounded-xl sm:rounded-2xl shadow-lg">
+          <span class="text-5xl sm:text-6xl">👤</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 text-center">
+          Bem-vindo
+        </h1>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <p class="text-gray-600 text-center text-sm sm:text-base max-w-md">
+          Sistema de Registro de Violência Escolar
+        </p>
+        <p class="text-gray-500 text-center text-xs sm:text-sm">
+          Faça login para acessar o sistema
+        </p>
+      </div>
+    </div>
+    
+    <!-- Área de Alertas -->
+    <div id="alertContainer" class="mb-4"></div>
+    
+    <!-- Card de Login -->
+    <div class="card-login bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/50 p-6 sm:p-8">
+      
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10">
+        <div class="spinner mb-4"></div>
+        <p class="text-gray-600 font-medium">Autenticando...</p>
+      </div>
+      
+      <!-- Formulário de Login -->
+      <form id="loginForm" onsubmit="return realizarLogin(event)" class="space-y-6">
+        
+        <div class="text-center mb-6">
+          <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+            Entrar no Sistema
+          </h2>
+          <div class="h-1 w-20 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full mx-auto"></div>
+        </div>
+        
+        <!-- Campo E-mail -->
+        <div>
+          <label for="email" class="block text-sm font-bold text-gray-700 mb-2">
+            📧 E-mail <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email"
+            required
+            placeholder="seu@email.com"
+            autocomplete="email"
+            class="input-elegant w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            aria-label="Campo de e-mail">
+        </div>
+        
+        <!-- Campo Senha -->
+        <div>
+          <label for="password" class="block text-sm font-bold text-gray-700 mb-2">
+            🔒 Senha <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="password" 
+              name="password"
+              required
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+              aria-label="Campo de senha">
+            <button 
+              type="button"
+              onclick="toggleMostrarSenha()"
+              class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-100"
+              aria-label="Mostrar/ocultar senha"
+              tabindex="-1">
+              <span id="iconeSenha" class="text-xl">👁️</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Checkbox Mostrar Senha -->
+        <div class="flex items-center">
+          <input 
+            type="checkbox" 
+            id="checkMostrarSenha"
+            onchange="toggleMostrarSenhaCheckbox()"
+            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+          <label for="checkMostrarSenha" class="ml-2 text-sm text-gray-700 cursor-pointer select-none hover:text-gray-900">
+            Mostrar senha
+          </label>
+        </div>
+        
+        <!-- Botão Entrar -->
+        <button 
+          type="submit"
+          id="btnEntrar"
+          class="btn-elegant btn-primary-elegant w-full text-white font-bold py-3 sm:py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-2"
+          aria-label="Entrar no sistema">
+          <span class="text-lg">🔓</span>
+          <span id="btnTexto">Entrar</span>
+        </button>
+        
+      </form>
+      
+      <!-- Informações Adicionais -->
+      <div class="mt-6 pt-6 border-t border-gray-200">
+        <p class="text-xs text-center text-gray-500">
+          🔒 Acesso restrito a usuários autorizados
+        </p>
+      </div>
+      
+    </div>
+    
+    <!-- Rodapé -->
+    <div class="text-center mt-6 sm:mt-8">
+      <div class="inline-block bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-md border border-white/60 px-4 sm:px-6 py-3 sm:py-4">
+        <p class="text-xs sm:text-sm text-gray-600">
+          <span class="font-semibold text-blue-700">Sistema de Registro de Violência Escolar</span>
+          <span class="mx-2 hidden sm:inline">•</span>
+          <br class="sm:hidden">
+          <span class="text-gray-500">v1.0</span>
+        </p>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Hidden iframe para envio de dados (evita CORS) -->
+  <iframe id="hidden_iframe" name="hidden_iframe" style="display:none;"></iframe>
+  
+  <!-- =============================================== -->
+  <!-- JAVASCRIPT -->
+  <!-- =============================================== -->
+  <!-- Configuração Centralizada -->
+  <script src="config.js"></script>
+  
+  <script>
+    // ========================================
+    // CONFIGURAÇÃO DO GOOGLE APPS SCRIPT
+    // ========================================
+    // Usando configuração centralizada (config.js)
+    const APPS_SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.APPS_SCRIPT_AUTH) 
+      ? CONFIG.APPS_SCRIPT_AUTH 
+      : 'https://script.google.com/macros/s/SEU_ID_AQUI/exec';
+    
+    // Validação: Verifica se está configurado
+    if (APPS_SCRIPT_URL.includes('SEU_ID_AQUI')) {
+      console.warn('⚠️ ATENÇÃO: Configure APPS_SCRIPT_AUTH em config.js para usar o sistema de login');
+    }
+    
+    // ========================================
+    // FUNÇÕES DE ALERTA
+    // ========================================
+    function mostrarAlerta(mensagem, tipo) {
+      const container = document.getElementById('alertContainer');
+      
+      // Remove alertas anteriores
+      container.innerHTML = '';
+      
+      const alertDiv = document.createElement('div');
+      
+      const cores = {
+        sucesso: 'from-green-500 to-green-600',
+        erro: 'from-red-500 to-red-600',
+        aviso: 'from-yellow-500 to-yellow-600',
+        info: 'from-blue-500 to-blue-600'
+      };
+      
+      const icones = {
+        sucesso: '✅',
+        erro: '❌',
+        aviso: '⚠️',
+        info: 'ℹ️'
+      };
+      
+      alertDiv.className = `alert bg-gradient-to-r ${cores[tipo]} text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg flex items-center gap-3`;
+      alertDiv.innerHTML = `
+        <span class="text-xl sm:text-2xl">${icones[tipo]}</span>
+        <span class="flex-1 font-medium text-sm sm:text-base">${mensagem}</span>
+        <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-all" aria-label="Fechar alerta">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      `;
+      
+      container.appendChild(alertDiv);
+      
+      // Remove automaticamente após 5 segundos (exceto erros)
+      if (tipo !== 'erro') {
+        setTimeout(() => {
+          alertDiv.style.transition = 'all 0.3s ease-out';
+          alertDiv.style.opacity = '0';
+          alertDiv.style.transform = 'translateY(-20px)';
+          setTimeout(() => alertDiv.remove(), 300);
+        }, 5000);
+      }
+      
+      // Scroll suave para o alerta
+      alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // ========================================
+    // FUNÇÕES DE LOADING
+    // ========================================
+    function mostrarLoading() {
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+      document.getElementById('btnEntrar').disabled = true;
+      document.getElementById('btnEntrar').classList.add('btn-loading', 'opacity-50', 'cursor-not-allowed');
+      document.getElementById('btnTexto').textContent = 'Aguarde...';
+    }
+    
+    function esconderLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      document.getElementById('btnEntrar').disabled = false;
+      document.getElementById('btnEntrar').classList.remove('btn-loading', 'opacity-50', 'cursor-not-allowed');
+      document.getElementById('btnTexto').textContent = 'Entrar';
+    }
+    
+    // ========================================
+    // TOGGLE MOSTRAR/OCULTAR SENHA
+    // ========================================
+    function toggleMostrarSenha() {
+      const senhaInput = document.getElementById('password');
+      const icone = document.getElementById('iconeSenha');
+      const checkbox = document.getElementById('checkMostrarSenha');
+      
+      if (senhaInput.type === 'password') {
+        senhaInput.type = 'text';
+        icone.textContent = '🙈';
+        checkbox.checked = true;
+      } else {
+        senhaInput.type = 'password';
+        icone.textContent = '👁️';
+        checkbox.checked = false;
+      }
+    }
+    
+    function toggleMostrarSenhaCheckbox() {
+      toggleMostrarSenha();
+    }
+    
+    // ========================================
+    // REALIZAR LOGIN
+    // ========================================
+    async function realizarLogin(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      // Coleta dados
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      // Validação básica
+      if (!email || !password) {
+        mostrarAlerta('Por favor, preencha todos os campos.', 'erro');
+        return false;
+      }
+      
+      // Mostra loading
+      mostrarLoading();
+      
+      try {
+        // Prepara dados para envio
+        const dados = {
+          action: 'login',
+          email: email,
+          password: password
+        };
+        
+        // Faz requisição POST simples (sem logs para melhor performance)
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+        
+        // Lê a resposta como JSON diretamente
+        const resultado = await response.json();
+        
+        // Processa o resultado
+        if (resultado.sucesso) {
+          // Salva informações do usuário
+          sessionStorage.setItem('userEmail', resultado.email || email);
+          sessionStorage.setItem('userRole', resultado.role || 'user');
+          sessionStorage.setItem('userId', resultado.id || '');
+          
+          // Redireciona imediatamente baseado no role (sem delay)
+          if (resultado.role === 'admin' || resultado.role === 'superuser') {
+            window.location.href = 'gerenciar-usuarios.html';
+          } else if (resultado.role === 'visualizador') {
+            window.location.href = 'painel-casos.html';
+          } else {
+            window.location.href = 'gerenciar-casos.html';
+          }
+          
+        } else {
+          // Login falhou
+          esconderLoading();
+          mostrarAlerta(resultado.mensagem || 'E-mail ou senha incorretos.', 'erro');
+          document.getElementById('password').value = '';
+          document.getElementById('password').focus();
+        }
+        
+      } catch (erro) {
+        console.error('❌ Erro ao realizar login:', erro);
+        esconderLoading();
+        mostrarAlerta('Erro ao conectar com o servidor. Tente novamente.', 'erro');
+        document.getElementById('password').value = '';
+      }
+      
+      return false;
+    }
+    
+    // ========================================
+    // TECLA ENTER NOS CAMPOS
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      // Focus automático no campo de email
+      document.getElementById('email').focus();
+      
+      // Enter nos campos submete o form
+      document.getElementById('email').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('password').focus();
+        }
+      });
+      
+      document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        }
+      });
+    });
+    
+    // ========================================
+    // PREVINE MÚLTIPLOS SUBMITS
+    // ========================================
+    // A prevenção agora é feita via estado do botão (disabled) na função mostrarLoading()
+  </script>
+  
+</body>
+</html>

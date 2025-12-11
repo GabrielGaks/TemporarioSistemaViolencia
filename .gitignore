@@ -1,19 +1,74 @@
-# Logs e arquivos temporários
-*.log
+# ========================================
+# ARQUIVO .gitignore
+# Sistema de Registro de Violência Escolar
+# ========================================
+
+# Arquivos de configuração com credenciais sensíveis
+config.js
+config.local.js
+.env
+.env.local
+.env.production
+.env.development
+
+# Arquivos do Google Apps Script (contêm IDs e URLs sensíveis)
+Code-Supabase.gs
+*.gs.bak
+
+# Arquivos de backup
+*.bak
+*.backup
+*~
+
+# Arquivos temporários
 *.tmp
 *.temp
-
-# Dependências
-node_modules/
-
-# Arquivos do sistema
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# Arquivos do editor
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# IDEs e editores
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# Node modules (se usar npm no futuro)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build e dist (se usar build tools)
+dist/
+build/
+*.min.js
+*.min.css
+
+# Arquivos de sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Arquivos de teste
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentação temporária
+docs/temp/
+*.md.bak
+
+# Arquivos de deploy
+deploy/
+*.zip
+*.tar.gz

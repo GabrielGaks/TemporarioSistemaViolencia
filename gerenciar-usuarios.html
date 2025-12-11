@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Usuários</title>
+  
+  <!-- Esconde conteúdo IMEDIATAMENTE para evitar flash -->
+  <style>
+    html:not(.page-ready) {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    html.page-ready {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+  </style>
+  
+  <!-- TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Estilos Elegantes Compartilhados -->
+  <link rel="stylesheet" href="styles-elegant.css">
+  
+  <!-- Sistema de Transições entre Páginas -->
+  <script src="page-transitions.js"></script>
+  
+  <style>
+    .alert {
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.show > div {
+      animation: fadeInScale 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 0.5rem;
+    }
+
+    table {
+      min-width: 800px;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-superuser {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-admin {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-user {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-visualizador {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+
+    /* Menu Hamburguer Responsivo */
+    /* Desktop: Mostra menu horizontal, esconde hamburguer */
+    .mobile-menu-button {
+      display: none !important;
+    }
+
+    .desktop-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    /* Apenas Celulares: Esconde menu horizontal, mostra hamburguer */
+    @media (max-width: 768px) {
+      .mobile-menu-button {
+        display: flex !important;
+      }
+      
+      .desktop-menu {
+        display: none !important;
+      }
+      
+      .mobile-menu {
+        display: block !important;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+      }
+
+      .mobile-menu.show {
+        max-height: 500px;
+      }
+
+      table {
+        min-width: 600px;
+      }
+    }
+
+    /* Melhorias de toque para mobile */
+    @media (hover: none) and (pointer: coarse) {
+      button, a, input, select {
+        min-height: 44px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+
+  <!-- ========================================
+       CONTAINER PRINCIPAL
+       ======================================== -->
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    
+    <!-- Menu de Navegação -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
+      <div class="px-4 py-3">
+        <!-- Botão Hamburguer (Mobile) -->
+        <button onclick="toggleMobileMenu()" class="mobile-menu-button w-full flex items-center justify-between text-white font-semibold">
+          <span>📱 Menu</span>
+          <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        
+        <!-- Menu Desktop -->
+        <nav class="desktop-menu flex flex-wrap gap-2 justify-center items-center">
+          <a href="painel-casos.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+            📊 Painel de Casos
+          </a>
+          <a href="registro-novo-caso.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+            📝 Novo Registro
+          </a>
+          <a href="gerenciar-casos.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+            📋 Gerenciar Registros
+          </a>
+          <a href="gerenciar-usuarios.html" class="px-5 py-2.5 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">
+            🔧 Painel Admin
+          </a>
+          <button onclick="sair()" class="btn-elegant btn-danger-elegant px-5 py-2.5 rounded-lg text-sm font-semibold">
+            🚪 Sair
+          </button>
+        </nav>
+        
+        <!-- Menu Mobile (Dropdown) -->
+        <nav id="mobileMenuNav" class="mobile-menu mt-3">
+          <div class="flex flex-col gap-2">
+            <a href="painel-casos.html" class="btn-elegant btn-primary-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
+              📊 Painel de Casos
+            </a>
+            <a href="registro-novo-caso.html" class="btn-elegant btn-primary-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
+              📝 Novo Registro
+            </a>
+            <a href="gerenciar-casos.html" class="btn-elegant btn-primary-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
+              📋 Gerenciar Registros
+            </a>
+            <a href="gerenciar-usuarios.html" class="btn-elegant px-5 py-3 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md text-center border-2 border-blue-500">
+              🔧 Painel Admin
+            </a>
+            <button onclick="sair()" class="btn-elegant btn-danger-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
+              🚪 Sair
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+    
+    <!-- ========================================
+         CABEÇALHO
+         ======================================== -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+      <div class="flex items-center justify-center gap-4">
+        <div class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-3xl shadow-sm">
+          🔧
+        </div>
+        <div class="text-center">
+          <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800">
+            Painel Administrativo
+          </h1>
+          <p class="text-gray-600 mt-1">Gerenciamento de Usuários do Sistema</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ÁREA DE ALERTAS
+         ======================================== -->
+    <div id="alertContainer" class="mb-6"></div>
+
+    <!-- ========================================
+         FILTROS E AÇÕES
+         ======================================== -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+        <!-- Busca -->
+        <div class="flex-1">
+          <label class="block text-sm font-bold text-gray-700 mb-2">🔍 Buscar por e-mail</label>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Digite o e-mail..."
+            oninput="filtrarUsuarios()"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+        
+        <!-- Botão Adicionar -->
+        <div class="md:mt-7">
+          <button 
+            onclick="abrirModalAdicionar()"
+            class="btn-elegant btn-primary-elegant w-full md:w-auto px-6 py-3 font-bold rounded-xl shadow-lg flex items-center justify-center gap-2">
+            <span class="text-xl">➕</span>
+            <span>Adicionar Usuário</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================
+         TABELA DE USUÁRIOS
+         ======================================== -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+        <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
+        <p class="text-gray-600 font-medium">Carregando usuários...</p>
+      </div>
+
+      <!-- Cabeçalho da Tabela -->
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <span>👥</span>
+          <span>Usuários do Sistema</span>
+          <span id="totalUsuarios" class="ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">0</span>
+        </h2>
+      </div>
+
+      <!-- Tabela -->
+      <div class="table-wrapper">
+        <table class="table-elegant w-full">
+          <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                E-mail
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Papel
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Criado em
+              </th>
+              <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                Ações
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tabelaUsuarios" class="bg-white divide-y divide-gray-200 scrollbar-elegant">
+            <!-- Usuários serão inseridos aqui via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mensagem Vazia -->
+      <div id="mensagemVazia" class="hidden p-12 text-center">
+        <div class="text-6xl mb-4">📭</div>
+        <p class="text-gray-500 text-lg font-medium">Nenhum usuário encontrado</p>
+        <p class="text-gray-400 text-sm mt-2">Adicione o primeiro usuário clicando no botão acima</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       MODAL - ADICIONAR/EDITAR USUÁRIO
+       ======================================== -->
+  <div id="modalUsuario" class="modal">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
+      
+      <!-- Cabeçalho -->
+      <div class="flex items-center justify-between mb-6">
+        <h3 id="modalTitulo" class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <span>➕</span>
+          <span>Adicionar Usuário</span>
+        </h3>
+        <button 
+          onclick="fecharModal()"
+          class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-all">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Formulário -->
+      <form onsubmit="salvarUsuario(event)" class="space-y-5">
+        
+        <!-- Campo Hidden ID -->
+        <input type="hidden" id="usuarioId" value="">
+        
+        <!-- E-mail -->
+        <div>
+          <label for="usuarioEmail" class="block text-sm font-bold text-gray-700 mb-2">
+            📧 E-mail <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="email" 
+            id="usuarioEmail" 
+            required
+            placeholder="usuario@email.com"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+
+        <!-- Senha -->
+        <div>
+          <label for="usuarioSenha" class="block text-sm font-bold text-gray-700 mb-2">
+            🔒 Senha <span class="text-red-500" id="senhaObrig">*</span>
+          </label>
+          <input 
+            type="password" 
+            id="usuarioSenha"
+            placeholder="Digite a senha"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          <p class="text-xs text-gray-500 mt-1" id="senhaHint">Deixe em branco para manter a senha atual</p>
+        </div>
+
+        <!-- Papel -->
+        <div>
+          <label for="usuarioPapel" class="block text-sm font-bold text-gray-700 mb-2">
+            🎭 Papel no Sistema <span class="text-red-500">*</span>
+          </label>
+          <select 
+            id="usuarioPapel" 
+            required
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            <option value="">Selecione...</option>
+            <option value="superuser">🔱 Superuser (Acesso Total)</option>
+            <option value="admin">👔 Admin (Gerencia Usuários)</option>
+            <option value="visualizador">👁️ Visualizador (Somente Leitura)</option>
+            <option value="user">👤 User (Acesso Básico)</option>
+          </select>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex gap-3 pt-4">
+          <button 
+            type="button"
+            onclick="fecharModal()"
+            class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
+            Cancelar
+          </button>
+          <button 
+            type="submit"
+            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+            💾 Salvar
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ========================================
+       MODAL - CONFIRMAR EXCLUSÃO
+       ======================================== -->
+  <div id="modalExcluir" class="modal">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
+      
+      <!-- Ícone de Aviso -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+          <span class="text-4xl">⚠️</span>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">Confirmar Exclusão</h3>
+        <p class="text-gray-600">Esta ação não pode ser desfeita</p>
+      </div>
+
+      <!-- Informações do Usuário -->
+      <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+        <p class="text-sm text-gray-600 mb-1">Usuário a ser excluído:</p>
+        <p id="excluirEmail" class="text-lg font-bold text-gray-800"></p>
+        <p id="excluirPapel" class="text-sm text-gray-600 mt-1"></p>
+      </div>
+
+      <!-- Botões -->
+      <div class="flex gap-3">
+        <button 
+          onclick="fecharModalExcluir()"
+          class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
+          Cancelar
+        </button>
+        <button 
+          onclick="confirmarExclusao()"
+          class="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+          🗑️ Excluir
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================
+       JAVASCRIPT
+       ======================================== -->
+  <script>
+    // ========================================
+    // CONFIGURAÇÃO
+    // ========================================
+    // Usando configuração centralizada (config.js)
+    const APPS_SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.APPS_SCRIPT_AUTH) 
+      ? CONFIG.APPS_SCRIPT_AUTH 
+      : 'https://script.google.com/macros/s/SEU_ID_AQUI/exec';
+    
+    // Validação: Verifica se está configurado
+    if (APPS_SCRIPT_URL.includes('SEU_ID_AQUI')) {
+      console.warn('⚠️ ATENÇÃO: Configure APPS_SCRIPT_AUTH em config.js para gerenciar usuários');
+    }
+    
+    // Dados globais
+    let todosUsuarios = [];
+    let usuariosCache = []; // Cache para verificações de permissão
+    let usuarioExcluirId = null;
+    let modoEdicao = false;
+    let meuRole = null; // Role do usuário logado
+
+    // ========================================
+    // FUNÇÕES DE ALERTA
+    // ========================================
+    function mostrarAlerta(mensagem, tipo) {
+      const container = document.getElementById('alertContainer');
+      container.innerHTML = '';
+      
+      const cores = {
+        sucesso: 'from-green-500 to-green-600',
+        erro: 'from-red-500 to-red-600',
+        aviso: 'from-yellow-500 to-yellow-600',
+        info: 'from-blue-500 to-blue-600'
+      };
+      
+      const icones = {
+        sucesso: '✅',
+        erro: '❌',
+        aviso: '⚠️',
+        info: 'ℹ️'
+      };
+      
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert bg-gradient-to-r ${cores[tipo]} text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3`;
+      alertDiv.innerHTML = `
+        <span class="text-2xl">${icones[tipo]}</span>
+        <span class="flex-1 font-medium">${mensagem}</span>
+        <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      `;
+      
+      container.appendChild(alertDiv);
+      
+      if (tipo !== 'erro') {
+        setTimeout(() => {
+          alertDiv.style.transition = 'all 0.3s ease-out';
+          alertDiv.style.opacity = '0';
+          alertDiv.style.transform = 'translateY(-20px)';
+          setTimeout(() => alertDiv.remove(), 300);
+        }, 5000);
+      }
+      
+      alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ========================================
+    // CARREGAR USUÁRIOS
+    // ========================================
+    async function carregarUsuarios() {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + '?action=list_users', {
+          method: 'GET',
+          redirect: 'follow'
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.sucesso) {
+          todosUsuarios = resultado.data || [];
+          usuariosCache = todosUsuarios;
+          renderizarTabela(todosUsuarios);
+        } else {
+          mostrarAlerta(resultado.mensagem || 'Erro ao carregar usuários', 'erro');
+          todosUsuarios = [];
+          usuariosCache = [];
+          renderizarTabela([]);
+        }
+        
+      } catch (erro) {
+        mostrarAlerta('Erro ao conectar com o servidor', 'erro');
+        todosUsuarios = [];
+        renderizarTabela([]);
+      }
+    }
+
+    // ========================================
+    // RENDERIZAR TABELA
+    // ========================================
+    function renderizarTabela(usuarios) {
+      const tbody = document.getElementById('tabelaUsuarios');
+      const mensagemVazia = document.getElementById('mensagemVazia');
+      const totalUsuarios = document.getElementById('totalUsuarios');
+      
+      // Filtrar usuários baseado no role do usuário logado
+      let usuariosFiltrados = usuarios;
+      if (meuRole === 'admin') {
+        // Admin vê apenas users e visualizadores
+        usuariosFiltrados = usuarios.filter(u => u.role === 'user' || u.role === 'visualizador');
+      }
+      // Superuser vê todos
+      
+      // Atualiza contador
+      totalUsuarios.textContent = usuariosFiltrados.length;
+      
+      if (usuariosFiltrados.length === 0) {
+        tbody.innerHTML = '';
+        mensagemVazia.classList.remove('hidden');
+        return;
+      }
+      
+      mensagemVazia.classList.add('hidden');
+      
+      tbody.innerHTML = usuariosFiltrados.map(usuario => {
+        const badgeClass = usuario.role === 'superuser' ? 'badge-superuser' :
+                          usuario.role === 'admin' ? 'badge-admin' :
+                          usuario.role === 'visualizador' ? 'badge-visualizador' :
+                          'badge-user';
+        
+        const badgeIcon = usuario.role === 'superuser' ? '🔱' :
+                         usuario.role === 'admin' ? '👔' :
+                         usuario.role === 'visualizador' ? '👁️' : '👤';
+        
+        const dataFormatada = new Date(usuario.created_at).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        // Controle de permissões
+        const podeEditar = verificarPermissaoEditar(usuario.role);
+        const podeExcluir = verificarPermissaoExcluir(usuario.role);
+        
+        return `
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">📧</span>
+                <span class="font-medium text-gray-900">${usuario.email}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="badge ${badgeClass}">
+                ${badgeIcon} ${usuario.role}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              ${dataFormatada}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+              <div class="flex items-center justify-center gap-2">
+                ${podeEditar ? `
+                  <button 
+                    onclick='editarUsuario(${JSON.stringify(usuario).replace(/'/g, "&#39;")})'
+                    class="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-all"
+                    title="Editar">
+                    ✏️
+                  </button>
+                ` : `
+                  <button 
+                    disabled
+                    class="px-3 py-2 bg-gray-100 text-gray-400 rounded-lg font-medium cursor-not-allowed"
+                    title="Sem permissão">
+                    🔒
+                  </button>
+                `}
+                ${podeExcluir ? `
+                  <button 
+                    onclick='abrirModalExcluir(${JSON.stringify(usuario).replace(/'/g, "&#39;")})'
+                    class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-all"
+                    title="Excluir">
+                    🗑️
+                  </button>
+                ` : `
+                  <button 
+                    disabled
+                    class="px-3 py-2 bg-gray-100 text-gray-400 rounded-lg font-medium cursor-not-allowed"
+                    title="Sem permissão">
+                    🔒
+                  </button>
+                `}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========================================
+    // VERIFICAR PERMISSÕES
+    // ========================================
+    function verificarPermissaoEditar(roleAlvo) {
+      // Superuser pode editar todos
+      if (meuRole === 'superuser') return true;
+      
+      // Admin pode editar users e visualizadores
+      if (meuRole === 'admin' && (roleAlvo === 'user' || roleAlvo === 'visualizador')) return true;
+      
+      // Outros casos: sem permissão
+      return false;
+    }
+
+    function verificarPermissaoExcluir(roleAlvo) {
+      // Superuser pode excluir qualquer um
+      if (meuRole === 'superuser') return true;
+      
+      // Admin pode excluir users e visualizadores
+      if (meuRole === 'admin' && (roleAlvo === 'user' || roleAlvo === 'visualizador')) return true;
+      
+      // Outros casos: sem permissão
+      return false;
+    }
+
+    function verificarPermissaoCriar(roleCriar) {
+      // Superuser pode criar qualquer role
+      if (meuRole === 'superuser') return true;
+      
+      // Admin pode criar users e visualizadores
+      if (meuRole === 'admin' && (roleCriar === 'user' || roleCriar === 'visualizador')) return true;
+      
+      // Outros casos: sem permissão
+      return false;
+    }
+
+    // ========================================
+    // FILTRAR USUÁRIOS
+    // ========================================
+    function filtrarUsuarios() {
+      const busca = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      if (!busca) {
+        renderizarTabela(todosUsuarios);
+        return;
+      }
+      
+      const filtrados = todosUsuarios.filter(usuario => 
+        usuario.email.toLowerCase().includes(busca)
+      );
+      
+      renderizarTabela(filtrados);
+    }
+
+    // ========================================
+    // MODAL - ADICIONAR
+    // ========================================
+    function abrirModalAdicionar() {
+      modoEdicao = false;
+      document.getElementById('modalTitulo').innerHTML = '<span>➕</span><span>Adicionar Usuário</span>';
+      document.getElementById('usuarioId').value = '';
+      document.getElementById('usuarioEmail').value = '';
+      document.getElementById('usuarioSenha').value = '';
+      document.getElementById('usuarioPapel').value = '';
+      
+      // Senha obrigatória ao adicionar
+      document.getElementById('usuarioSenha').required = true;
+      document.getElementById('senhaObrig').classList.remove('hidden');
+      document.getElementById('senhaHint').classList.add('hidden');
+      
+      // Limita opções de papel baseado no role do usuário
+      atualizarOpcoesPapel();
+      
+      document.getElementById('modalUsuario').classList.add('show');
+    }
+
+    // ========================================
+    // ATUALIZAR OPÇÕES DE PAPEL
+    // ========================================
+    function atualizarOpcoesPapel(roleAtual = null) {
+      const selectPapel = document.getElementById('usuarioPapel');
+      
+      if (meuRole === 'superuser') {
+        // Superuser vê todas as opções
+        selectPapel.innerHTML = `
+          <option value="">Selecione...</option>
+          <option value="superuser">🔱 Superuser (Acesso Total)</option>
+          <option value="admin">👔 Admin (Gerencia Usuários)</option>
+          <option value="visualizador">👁️ Visualizador (Somente Leitura)</option>
+          <option value="user">👤 User (Acesso Básico)</option>
+        `;
+      } else if (meuRole === 'admin') {
+        // Admin vê user e visualizador
+        selectPapel.innerHTML = `
+          <option value="">Selecione...</option>
+          <option value="visualizador">👁️ Visualizador (Somente Leitura)</option>
+          <option value="user">👤 User (Acesso Básico)</option>
+        `;
+        
+        // Se está editando um admin ou superuser, mostra mas desabilita
+        if (roleAtual && (roleAtual === 'admin' || roleAtual === 'superuser')) {
+          const badgeIcon = roleAtual === 'superuser' ? '🔱' : '👔';
+          const badgeText = roleAtual === 'superuser' ? 'Superuser' : 'Admin';
+          selectPapel.innerHTML = `
+            <option value="${roleAtual}" selected disabled>${badgeIcon} ${badgeText} (Sem permissão para alterar)</option>
+          `;
+          selectPapel.disabled = true;
+        }
+      }
+      
+      // Restaura valor se fornecido
+      if (roleAtual && !selectPapel.disabled) {
+        selectPapel.value = roleAtual;
+      }
+    }
+
+    // ========================================
+    // MODAL - EDITAR
+    // ========================================
+    function editarUsuario(usuario) {
+      // Verifica se tem permissão para editar este usuário
+      if (!verificarPermissaoEditar(usuario.role)) {
+        mostrarAlerta('Você não tem permissão para editar este usuário', 'erro');
+        return;
+      }
+      
+      modoEdicao = true;
+      document.getElementById('modalTitulo').innerHTML = '<span>✏️</span><span>Editar Usuário</span>';
+      document.getElementById('usuarioId').value = usuario.id;
+      document.getElementById('usuarioEmail').value = usuario.email;
+      document.getElementById('usuarioSenha').value = '';
+      
+      // Senha opcional ao editar
+      document.getElementById('usuarioSenha').required = false;
+      document.getElementById('senhaObrig').classList.add('hidden');
+      document.getElementById('senhaHint').classList.remove('hidden');
+      
+      // Atualiza opções de papel com restrições baseadas no role
+      atualizarOpcoesPapel(usuario.role);
+      
+      document.getElementById('modalUsuario').classList.add('show');
+    }
+
+    // ========================================
+    // FECHAR MODAL
+    // ========================================
+    function fecharModal() {
+      document.getElementById('modalUsuario').classList.remove('show');
+    }
+
+    // ========================================
+    // SALVAR USUÁRIO
+    // ========================================
+    async function salvarUsuario(event) {
+      event.preventDefault();
+      
+      const id = document.getElementById('usuarioId').value;
+      const email = document.getElementById('usuarioEmail').value.trim();
+      const senha = document.getElementById('usuarioSenha').value;
+      const papel = document.getElementById('usuarioPapel').value;
+      
+      // Validações
+      if (!email || !papel) {
+        mostrarAlerta('Preencha todos os campos obrigatórios', 'erro');
+        return;
+      }
+      
+      if (!modoEdicao && !senha) {
+        mostrarAlerta('Senha é obrigatória ao criar usuário', 'erro');
+        return;
+      }
+      
+      // Verifica permissão antes de salvar
+      if (modoEdicao) {
+        // Encontra o usuário sendo editado
+        const usuarioEditado = usuariosCache.find(u => u.id === id);
+        if (usuarioEditado && !verificarPermissaoEditar(usuarioEditado.role)) {
+          mostrarAlerta('Você não tem permissão para editar este usuário', 'erro');
+          return;
+        }
+      } else {
+        // Verifica permissão para criar com este papel
+        if (!verificarPermissaoCriar(papel)) {
+          mostrarAlerta('Você não tem permissão para criar usuário com este papel', 'erro');
+          return;
+        }
+      }
+      
+      try {
+        const dados = {
+          action: modoEdicao ? 'update_user' : 'create_user',
+          email: email,
+          password: senha,
+          role: papel,
+          caller_role: meuRole // Envia o role do usuário logado para validação backend
+        };
+        
+        if (modoEdicao) {
+          dados.id = id;
+        }
+        
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.sucesso) {
+          mostrarAlerta(
+            modoEdicao ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!',
+            'sucesso'
+          );
+          fecharModal();
+          carregarUsuarios();
+        } else {
+          mostrarAlerta(resultado.mensagem || 'Erro ao salvar usuário', 'erro');
+        }
+        
+      } catch (erro) {
+        mostrarAlerta('Erro ao conectar com o servidor', 'erro');
+      }
+    }
+
+    // ========================================
+    // MODAL - EXCLUIR
+    // ========================================
+    function abrirModalExcluir(usuario) {
+      usuarioExcluirId = usuario.id;
+      document.getElementById('excluirEmail').textContent = usuario.email;
+      
+      const badgeIcon = usuario.role === 'superuser' ? '🔱' :
+                       usuario.role === 'admin' ? '👔' : '👤';
+      document.getElementById('excluirPapel').textContent = `${badgeIcon} ${usuario.role}`;
+      
+      document.getElementById('modalExcluir').classList.add('show');
+    }
+
+    function fecharModalExcluir() {
+      document.getElementById('modalExcluir').classList.remove('show');
+      usuarioExcluirId = null;
+    }
+
+    // ========================================
+    // CONFIRMAR EXCLUSÃO
+    // ========================================
+    async function confirmarExclusao() {
+      if (!usuarioExcluirId) return;
+      
+      try {
+      const dados = {
+        action: 'delete_user',
+        id: usuarioExcluirId,
+        caller_role: meuRole
+      };
+        
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.sucesso) {
+          mostrarAlerta('Usuário excluído com sucesso!', 'sucesso');
+          fecharModalExcluir();
+          carregarUsuarios();
+        } else {
+          mostrarAlerta(resultado.mensagem || 'Erro ao excluir usuário', 'erro');
+        }
+        
+      } catch (erro) {
+        mostrarAlerta('Erro ao conectar com o servidor', 'erro');
+      }
+    }
+
+    // ========================================
+    // MENU MOBILE TOGGLE
+    // ========================================
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenuNav');
+      const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+      if (mobileMenu) {
+        mobileMenu.classList.toggle('show');
+        if (menuIcon) {
+          menuIcon.style.transform = mobileMenu.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+      }
+    }
+    
+    // Fecha o menu ao redimensionar para desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        const mobileMenu = document.getElementById('mobileMenuNav');
+        const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+        if (mobileMenu && mobileMenu.classList.contains('show')) {
+          mobileMenu.classList.remove('show');
+          if (menuIcon) {
+            menuIcon.style.transform = 'rotate(0deg)';
+          }
+        }
+      }
+    });
+
+    // ========================================
+    // SAIR
+    // ========================================
+    function sair() {
+      if (confirm('Deseja realmente sair do sistema?')) {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      }
+    }
+
+    // ========================================
+    // FECHAR MENU MOBILE AO CLICAR EM LINK
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuLinks = document.querySelectorAll('#mobileMenuNav a');
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          const mobileMenu = document.getElementById('mobileMenuNav');
+          const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+          if (mobileMenu) {
+            mobileMenu.classList.remove('show');
+            if (menuIcon) {
+              menuIcon.style.transform = 'rotate(0deg)';
+            }
+          }
+        });
+      });
+    });
+
+    // ========================================
+    // VERIFICAR AUTENTICAÇÃO
+    // ========================================
+    function verificarAuth() {
+      const userRole = sessionStorage.getItem('userRole');
+      
+      if (!userRole) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (userRole !== 'admin' && userRole !== 'superuser') {
+        alert('Acesso negado! Apenas administradores podem acessar esta página.');
+        window.location.href = 'registro-novo-caso.html';
+        return;
+      }
+      
+      // Armazena o role do usuário logado para controle de permissões
+      meuRole = userRole;
+    }
+
+    // ========================================
+    // INICIALIZAÇÃO
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      verificarAuth();
+      carregarUsuarios();
+    });
+
+  </script>
+
+</body>
+</html>

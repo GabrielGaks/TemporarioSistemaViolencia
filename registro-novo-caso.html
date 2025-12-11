@@ -5,8 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro de Casos - Violência Escolar</title>
   
+  <!-- Esconde conteúdo IMEDIATAMENTE para evitar flash -->
+  <style>
+    html:not(.page-ready) {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    html.page-ready {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+  </style>
+  
   <!-- TailwindCSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Estilos Elegantes Compartilhados -->
+  <link rel="stylesheet" href="styles-elegant.css">
+  
+  <!-- Sistema de Transições entre Páginas -->
+  <script src="page-transitions.js"></script>
+  
+  <!-- Configuração Centralizada -->
+  <script src="config.js"></script>
+  <script>
+    // Bloqueia acesso de visualizadores a esta página
+    document.addEventListener('DOMContentLoaded', function() {
+      const role = sessionStorage.getItem('userRole');
+      if (!role) {
+        window.location.href = 'login.html';
+        return;
+      }
+      if (role === 'visualizador') {
+        alert('Acesso permitido apenas para leitura. Redirecionando para o painel.');
+        window.location.href = 'painel-casos.html';
+      }
+    });
+  </script>
   
   <style>
     .field-error {
@@ -311,6 +347,50 @@
       cursor: pointer;
       opacity: 0;
     }
+
+    /* Menu Hamburguer Responsivo */
+    /* Desktop: Mostra menu horizontal, esconde hamburguer */
+    .mobile-menu-button {
+      display: none !important;
+    }
+
+    .desktop-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    /* Apenas Celulares: Esconde menu horizontal, mostra hamburguer */
+    @media (max-width: 768px) {
+      .mobile-menu-button {
+        display: flex !important;
+      }
+      
+      .desktop-menu {
+        display: none !important;
+      }
+      
+      .mobile-menu {
+        display: block !important;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+      }
+
+      .mobile-menu.show {
+        max-height: 500px;
+      }
+    }
+
+    /* Melhorias de toque para mobile */
+    @media (hover: none) and (pointer: coarse) {
+      button, a, input, select, textarea {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen py-10 px-4">
@@ -319,15 +399,56 @@
   <div class="max-w-5xl mx-auto">
     
     <!-- Menu de Navegação -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-4 mb-6">
-      <nav class="flex flex-wrap gap-4 justify-center">
-        <a href="index.html" class="px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold shadow-md hover:shadow-lg transition">
-          📝 Novo Registro
-        </a>
-        <a href="gerenciar.html" class="px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-400 transition">
-          📋 Gerenciar Registros
-        </a>
-      </nav>
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
+      <div class="px-4 py-3">
+        <!-- Botão Hamburguer (Mobile) -->
+        <button onclick="toggleMobileMenu()" class="mobile-menu-button w-full flex items-center justify-between text-white font-semibold">
+          <span>📱 Menu</span>
+          <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        
+        <!-- Menu Desktop -->
+        <nav class="desktop-menu flex flex-wrap gap-2 justify-center items-center">
+          <a href="painel-casos.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+            📊 Painel de Casos
+          </a>
+          <a href="registro-novo-caso.html" class="px-5 py-2.5 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">
+            📝 Novo Registro
+          </a>
+          <a href="gerenciar-casos.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+            📋 Gerenciar Registros
+          </a>
+          <a id="menuAdmin" href="gerenciar-usuarios.html" class="hidden px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+            🔧 Painel Admin
+          </a>
+          <button id="btnSair" onclick="sair()" class="hidden px-5 py-2.5 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600 transition-all">
+            🚪 Sair
+          </button>
+        </nav>
+        
+        <!-- Menu Mobile (Dropdown) -->
+        <nav id="mobileMenuNav" class="mobile-menu mt-3">
+          <div class="flex flex-col gap-2">
+            <a href="painel-casos.html" class="px-5 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all text-center">
+              📊 Painel de Casos
+            </a>
+            <a href="registro-novo-caso.html" class="px-5 py-3 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all text-center">
+              📝 Novo Registro
+            </a>
+            <a href="gerenciar-casos.html" class="px-5 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all text-center">
+              📋 Gerenciar Registros
+            </a>
+            <a id="menuAdminMobile" href="gerenciar-usuarios.html" class="hidden px-5 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all text-center">
+              🔧 Painel Admin
+            </a>
+            <button id="btnSairMobile" onclick="sair()" class="hidden px-5 py-3 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600 transition-all text-center">
+              🚪 Sair
+            </button>
+          </div>
+        </nav>
+      </div>
     </div>
     
     <!-- Cabeçalho -->
@@ -463,6 +584,35 @@
               </select>
             </div>
             
+            <!-- Detalhes da deficiência/transtorno (condicional) -->
+            <div id="pcdDetalhesContainer" class="md:col-span-2 hidden">
+              <label for="pcdDetalhes-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                Se for PCD/tem transtorno, descreva quais (diagnósticos, laudos, observações): <span class="text-red-500">*</span>
+              </label>
+              
+              <!-- Container de tags -->
+              <div id="pcdDetalhes-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
+              
+              <!-- Input com autocomplete -->
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="pcdDetalhes-input"
+                  class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+                  placeholder="Digite ou selecione um transtorno/deficiência..."
+                  autocomplete="off"
+                />
+                <div id="pcdDetalhes-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50 hidden"></div>
+              </div>
+              
+              <!-- Campo oculto que será enviado -->
+              <input type="hidden" id="pcdDetalhes" name="pcdDetalhes" />
+              
+              <p class="text-xs text-gray-500 mt-1.5">
+                Digite para buscar ou adicione um novo transtorno/deficiência. Pressione Enter para adicionar.
+              </p>
+            </div>
+            
             <!-- Raça/Cor -->
             <div class="md:col-span-2">
               <label for="racaCor" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -479,6 +629,25 @@
                 <option value="Parda">Parda</option>
                 <option value="Amarela">Amarela</option>
                 <option value="Indígena">Indígena</option>
+                <option value="Não informado">Não informado</option>
+              </select>
+            </div>
+            
+            <!-- Orientação Sexual -->
+            <div class="md:col-span-2">
+              <label for="orientacaoSexual" class="block text-sm font-semibold text-gray-700 mb-2">
+                Qual a Orientação Sexual?
+              </label>
+              <select 
+                id="orientacaoSexual" 
+                name="orientacaoSexual"
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+              >
+                <option value="">Selecione...</option>
+                <option value="Heterossexual">Heterossexual</option>
+                <option value="Homossexual">Homossexual</option>
+                <option value="Bissexual">Bissexual</option>
+                <option value="Outro">Assexual</option>
                 <option value="Não informado">Não informado</option>
               </select>
             </div>
@@ -510,27 +679,95 @@
             
             <!-- Tipo de Violência -->
             <div>
-              <label for="tipoViolencia" class="block text-sm font-semibold text-gray-700 mb-2">
-                Tipo de Violência (escolha apenas uma) <span class="text-red-500">*</span>
+              <label for="tipoViolencia-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                Tipo de Violência <span class="text-red-500">*</span>
               </label>
-              <select 
-                id="tipoViolencia" 
-                name="tipoViolencia" 
-                required
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="">Selecione...</option>
-                <option value="Sexual">Sexual</option>
-                <option value="Física">Física</option>
-                <option value="Psicológica">Psicológica</option>
-                <option value="Verbal">Verbal</option>
-                <option value="Bullying">Bullying</option>
-                <option value="Negligência">Negligência</option>
-                <option value="Cyberbullying">Cyberbullying</option>
-                <option value="Patrimonial">Patrimonial</option>
-                <option value="Institucional">Institucional</option>
-                <option value="Outra">Outra</option>
-              </select>
+              
+              <!-- Container de tags -->
+              <div id="tipoViolencia-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
+              
+              <!-- Input com autocomplete -->
+              <div class="relative">
+                <input 
+                  type="text"
+                  id="tipoViolencia-input" 
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
+                  placeholder="Digite para adicionar tipo de violência (ex: Física)"
+                  autocomplete="off"
+                />
+                
+                <!-- Lista de sugestões -->
+                <div id="tipoViolencia-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+              </div>
+              
+              <!-- Campo oculto que será enviado -->
+              <input type="hidden" id="tipoViolencia" name="tipoViolencia" required />
+              
+              <p class="text-xs text-gray-500 mt-1.5">
+                Digite e pressione Enter para adicionar. Pode adicionar múltiplos tipos (ex: Física, Psicológica).
+              </p>
+            </div>
+            
+            <!-- Classificação da Violência -->
+            <div>
+              <label for="classificacaoViolencia-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                Qual a Classificação da Violência?
+              </label>
+              
+              <!-- Container de tags -->
+              <div id="classificacaoViolencia-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
+              
+              <!-- Input com autocomplete -->
+              <div class="relative">
+                <input 
+                  type="text"
+                  id="classificacaoViolencia-input" 
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
+                  placeholder="Digite para adicionar classificação (ex: Intrafamiliar)"
+                  autocomplete="off"
+                />
+                
+                <!-- Lista de sugestões -->
+                <div id="classificacaoViolencia-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+              </div>
+              
+              <!-- Campo oculto que será enviado -->
+              <input type="hidden" id="classificacaoViolencia" name="classificacaoViolencia" />
+              
+              <p class="text-xs text-gray-500 mt-1.5">
+                Digite e pressione Enter para adicionar. Clique no × para remover.
+              </p>
+            </div>
+            
+            <!-- Motivação da Violência -->
+            <div>
+              <label for="motivacaoViolencia-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                Qual a Motivação da Violência?
+              </label>
+              
+              <!-- Container de tags -->
+              <div id="motivacaoViolencia-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
+              
+              <!-- Input com autocomplete -->
+              <div class="relative">
+                <input 
+                  type="text"
+                  id="motivacaoViolencia-input" 
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
+                  placeholder="Digite para adicionar motivação (ex: Conflito Escolar)"
+                  autocomplete="off"
+                />
+                
+                <!-- Lista de sugestões -->
+                <div id="motivacaoViolencia-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+              </div>
+              
+              <!-- Campo oculto que será enviado -->
+              <input type="hidden" id="motivacaoViolencia" name="motivacaoViolencia" />
+              
+              <p class="text-xs text-gray-500 mt-1.5">
+                Digite e pressione Enter para adicionar. Clique no × para remover.
+              </p>
             </div>
             
             <!-- Encaminhamento -->
@@ -873,6 +1110,36 @@
             </div>
             
           </div>
+          
+          <!-- Foi Realizado Estudo de Caso? -->
+          <div class="md:col-span-2">
+            <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+              <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                📋 Foi Realizado Estudo de Caso?
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="estudoCaso" value="Sim" required class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✓ Sim
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="estudoCaso" value="Não" class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                    ✗ Não
+                  </div>
+                </label>
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="radio" name="estudoCaso" value="" checked class="peer sr-only">
+                  <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                    ⊘ Não informado
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       
@@ -892,7 +1159,7 @@
         <button 
           type="submit" 
           id="btnSalvar"
-          class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm sm:text-base font-bold rounded-full hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 sm:hover:scale-105"
+          class="btn-elegant btn-primary-elegant inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 text-white text-sm sm:text-base font-bold rounded-full shadow-lg"
         >
           <span class="text-base sm:text-lg">💾</span>
           <span>Salvar Registro</span>
@@ -921,7 +1188,15 @@
     // ========================================
     // CONFIGURAÇÃO DO GOOGLE APPS SCRIPT
     // ========================================
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyV1mut0mR53BKA3sgGg96MoCjYBbEW5GR5ojoxv6Merx86wfrCIfV0HI_KMUpfkxyo/exec';
+    // Usando configuração centralizada (config.js)
+    const APPS_SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.APPS_SCRIPT_CASOS) 
+      ? CONFIG.APPS_SCRIPT_CASOS 
+      : 'https://script.google.com/macros/s/SEU_ID_AQUI/exec';
+    
+    // Validação: Verifica se está configurado
+    if (APPS_SCRIPT_URL.includes('SEU_ID_AQUI')) {
+      console.warn('⚠️ ATENÇÃO: Configure APPS_SCRIPT_CASOS em config.js para salvar registros');
+    }
     
     // ========================================
     // FUNÇÕES DE FORMATAÇÃO (do backend)
@@ -970,21 +1245,160 @@
     // ========================================
     
     // ========================================
+    // LISTA DE TRANSTORNOS/DEFICIÊNCIAS PREDEFINIDOS
+    // ========================================
+    const transtornosPredefinidos = [
+      'Autismo (TEA)',
+      'TDAH (Transtorno de Déficit de Atenção e Hiperatividade)',
+      'Síndrome de Down',
+      'Deficiência Intelectual',
+      'Deficiência Visual',
+      'Deficiência Auditiva',
+      'Deficiência Física',
+      'Deficiência Múltipla',
+      'Dislexia',
+      'Discalculia',
+      'Transtorno do Espectro Autista',
+      'Paralisia Cerebral',
+      'TOD (Transtorno Opositor Desafiador)',
+      'Transtorno de Ansiedade',
+      'Depressão Infantil',
+      'Síndrome de Asperger',
+      'Transtorno Bipolar',
+      'Esquizofrenia',
+      'Transtorno de Conduta',
+      'Altas Habilidades/Superdotação',
+      'Baixa Visão',
+      'Cegueira',
+      'Surdez',
+      'Surdocegueira',
+      'Nanismo',
+      'Hidrocefalia',
+      'Microcefalia',
+      'Epilepsia',
+      'Outros'
+    ];
+    
+    let transtornosSelecionados = [];
+    
+    // Renderiza as tags de transtornos selecionados
+    function renderizarTagsTranstornos() {
+      const container = document.getElementById('pcdDetalhes-tags');
+      const hiddenInput = document.getElementById('pcdDetalhes');
+      
+      if (transtornosSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhum transtorno/deficiência adicionado</span>';
+        hiddenInput.value = '';
+        return;
+      }
+      
+      container.innerHTML = transtornosSelecionados.map((trans, index) => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium border border-blue-200 shadow-sm">
+          ${trans}
+          <button 
+            type="button" 
+            onclick="removerTranstorno(${index})"
+            class="hover:bg-blue-200 rounded-full p-0.5 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </span>
+      `).join('');
+      
+      // Atualiza campo oculto com valores separados por vírgula
+      hiddenInput.value = transtornosSelecionados.join(', ');
+    }
+    
+    // Remove um transtorno
+    function removerTranstorno(index) {
+      transtornosSelecionados.splice(index, 1);
+      renderizarTagsTranstornos();
+    }
+    
+    // Adiciona um transtorno
+    function adicionarTranstorno(texto) {
+      const textoTrimmed = texto.trim();
+      if (!textoTrimmed) return;
+      
+      // Separa por barra (/) para considerar múltiplos transtornos
+      const transtornos = textoTrimmed.split('/').map(t => t.trim()).filter(t => t.length > 0);
+      
+      // Adiciona cada transtorno separadamente
+      transtornos.forEach(transtorno => {
+        // Evita duplicatas
+        if (!transtornosSelecionados.includes(transtorno)) {
+          transtornosSelecionados.push(transtorno);
+        }
+      });
+      
+      renderizarTagsTranstornos();
+      
+      // Limpa input
+      document.getElementById('pcdDetalhes-input').value = '';
+      document.getElementById('pcdDetalhes-suggestions').classList.add('hidden');
+    }
+    
+    // Filtra e mostra sugestões de transtornos
+    function mostrarSugestoesTranstornos(query) {
+      const suggestionsDiv = document.getElementById('pcdDetalhes-suggestions');
+      
+      // Se query vazia, mostra todas as opções disponíveis
+      const filtrados = query.trim() === '' 
+        ? transtornosPredefinidos.filter(trans => !transtornosSelecionados.includes(trans))
+        : transtornosPredefinidos.filter(trans => 
+            trans.toLowerCase().includes(query.toLowerCase()) &&
+            !transtornosSelecionados.includes(trans)
+          );
+      
+      if (filtrados.length === 0) {
+        if (query.trim()) {
+          suggestionsDiv.innerHTML = `
+            <div class="p-3 text-sm text-gray-500">
+              Nenhum transtorno encontrado. Pressione <kbd class="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> para adicionar "${query}"
+            </div>
+          `;
+          suggestionsDiv.classList.remove('hidden');
+        } else {
+          suggestionsDiv.classList.add('hidden');
+        }
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = filtrados.map(trans => `
+        <div 
+          class="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+          onclick="adicionarTranstorno('${trans.replace(/'/g, "\\'")}')"
+        >
+          ${trans}
+        </div>
+      `).join('');
+      
+      suggestionsDiv.classList.remove('hidden');
+    }
+
+    // ========================================
     // SISTEMA DE ENCAMINHAMENTOS COM TAGS
     // ========================================
     const encaminhamentosPredefinidos = [
-      'Conselho Tutelar',
-      'Rede de Saúde',
+      'CT',
+      'Saúde',
       'UBS',
-      'Delegacia',
-      'Delegacia da Mulher',
+      'US',
+      'NAAM',
+      'Educação',
+      'Escola',
+      'DEAM',
+      'DACLE',
+      'DPCA',
+      'Defensoria Pública',
+      'DEPI',
       'Ministério Público',
       'CRAS',
       'CREAS',
-      'CAPS',
-      'Hospital',
+      'CAPSIN',
+      'Casa Rosa',
       'Vara da Infância',
-      'ONG',
       'Assistência Social',
       'Psicólogo',
       'Outros'
@@ -1080,6 +1494,511 @@
       suggestionsDiv.classList.remove('hidden');
     }
     
+    // ========================================
+    // SISTEMA DE TAGS - RAÇA/COR
+    // ========================================
+    const racasCorPredefinidas = [
+      'Branca',
+      'Preta',
+      'Parda',
+      'Amarela',
+      'Indígena',
+      'Não informado'
+    ];
+    
+    // ========================================
+    // SISTEMA DE TAGS - TIPO DE VIOLÊNCIA
+    // ========================================
+    const tiposViolenciaPredefinidos = [
+      'Autoprovocada',
+      'Bullying',
+      'Tortura',
+      'Cyberbullying',
+      'Financeira/Econômica',
+      'Física',
+      'Institucional',
+      'Institucional/física',
+      'Negligência',
+      'Psicológica',
+      'Sexual',
+      'Suposto Uso de Substâncias Ilícitas',
+      'Suspeita de envenenamento',
+      'Trabalho Infantil',
+      'Verbal',
+      'Ideação suicida',
+      'Patrimonial',
+      'Outra'
+    ];
+    
+    let tiposViolenciaSelecionados = [];
+    
+    // Renderiza as tags de tipo de violência
+    function renderizarTagsTipoViolencia() {
+      const container = document.getElementById('tipoViolencia-tags');
+      const hiddenInput = document.getElementById('tipoViolencia');
+      
+      if (tiposViolenciaSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhum tipo de violência adicionado</span>';
+        hiddenInput.value = '';
+        return;
+      }
+      
+      container.innerHTML = tiposViolenciaSelecionados.map((tipo, index) => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-medium border border-red-200 shadow-sm">
+          ${tipo}
+          <button 
+            type="button" 
+            onclick="removerTipoViolencia(${index})"
+            class="hover:bg-red-200 rounded-full p-0.5 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </span>
+      `).join('');
+      
+      // Atualiza campo oculto com valores separados por vírgula
+      hiddenInput.value = tiposViolenciaSelecionados.join(', ');
+    }
+    
+    // Remove um tipo de violência
+    function removerTipoViolencia(index) {
+      tiposViolenciaSelecionados.splice(index, 1);
+      renderizarTagsTipoViolencia();
+    }
+    
+    // Adiciona um tipo de violência
+    function adicionarTipoViolencia(texto) {
+      const textoTrimmed = texto.trim();
+      if (!textoTrimmed) return;
+      
+      // Evita duplicatas
+      if (!tiposViolenciaSelecionados.includes(textoTrimmed)) {
+        tiposViolenciaSelecionados.push(textoTrimmed);
+        renderizarTagsTipoViolencia();
+      }
+      
+      // Limpa input
+      document.getElementById('tipoViolencia-input').value = '';
+      document.getElementById('tipoViolencia-suggestions').classList.add('hidden');
+    }
+    
+    // Filtra e mostra sugestões de tipo de violência
+    function mostrarSuggestoesTipoViolencia(query) {
+      const suggestionsDiv = document.getElementById('tipoViolencia-suggestions');
+      
+      // Se query vazia, mostra todas as opções disponíveis
+      const filtrados = query.trim() === '' 
+        ? tiposViolenciaPredefinidos.filter(tipo => !tiposViolenciaSelecionados.includes(tipo))
+        : tiposViolenciaPredefinidos.filter(tipo => 
+            tipo.toLowerCase().includes(query.toLowerCase()) &&
+            !tiposViolenciaSelecionados.includes(tipo)
+          );
+      
+      if (filtrados.length === 0) {
+        if (query.trim()) {
+          suggestionsDiv.innerHTML = `
+            <div class="p-3 text-sm text-gray-500">
+              Nenhuma sugestão. Pressione Enter para adicionar "${query}"
+            </div>
+          `;
+          suggestionsDiv.classList.remove('hidden');
+        } else {
+          suggestionsDiv.classList.add('hidden');
+        }
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = filtrados.map(tipo => `
+        <div 
+          class="px-4 py-2 hover:bg-red-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+          onclick="adicionarTipoViolencia('${tipo.replace(/'/g, "\\'")}')">
+          ${tipo}
+        </div>
+      `).join('');
+      
+      suggestionsDiv.classList.remove('hidden');
+    }
+    
+    // ========================================
+    // SISTEMA DE TAGS - CLASSIFICAÇÃO DA VIOLÊNCIA
+    // ========================================
+    // IMPORTANTE: Valores devem coincidir com a validação da planilha
+    const classificacoesViolenciaPredefinidas = [
+      'Autoprovocada',
+      'Intrafamiliar/Doméstica',
+      'Extrafamiliar/Comunitária/Urbana',
+      'Coletiva',
+      'Institucional',
+      'Virtual'
+    ];
+    
+    let classificacoesViolenciaSelecionadas = [];
+    
+    // Renderiza as tags de classificação da violência
+    function renderizarTagsClassificacaoViolencia() {
+      const container = document.getElementById('classificacaoViolencia-tags');
+      const hiddenInput = document.getElementById('classificacaoViolencia');
+      
+      if (classificacoesViolenciaSelecionadas.length === 0) {
+        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhuma classificação adicionada</span>';
+        hiddenInput.value = '';
+        return;
+      }
+      
+      container.innerHTML = classificacoesViolenciaSelecionadas.map((classif, index) => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium border border-orange-200 shadow-sm">
+          ${classif}
+          <button 
+            type="button" 
+            onclick="removerClassificacaoViolencia(${index})"
+            class="hover:bg-orange-200 rounded-full p-0.5 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </span>
+      `).join('');
+      
+      hiddenInput.value = classificacoesViolenciaSelecionadas.join(', ');
+    }
+    
+    // Remove uma classificação da violência
+    function removerClassificacaoViolencia(index) {
+      classificacoesViolenciaSelecionadas.splice(index, 1);
+      renderizarTagsClassificacaoViolencia();
+    }
+    
+    // Adiciona uma classificação da violência
+    function adicionarClassificacaoViolencia(texto) {
+      const textoTrimmed = texto.trim();
+      if (!textoTrimmed) return;
+      
+      if (!classificacoesViolenciaSelecionadas.includes(textoTrimmed)) {
+        classificacoesViolenciaSelecionadas.push(textoTrimmed);
+        renderizarTagsClassificacaoViolencia();
+      }
+      
+      document.getElementById('classificacaoViolencia-input').value = '';
+      document.getElementById('classificacaoViolencia-suggestions').classList.add('hidden');
+    }
+    
+    // Filtra e mostra sugestões de classificação da violência
+    function mostrarSugestoesClassificacaoViolencia(query) {
+      const suggestionsDiv = document.getElementById('classificacaoViolencia-suggestions');
+      
+      const filtrados = query.trim() === '' 
+        ? classificacoesViolenciaPredefinidas.filter(classif => !classificacoesViolenciaSelecionadas.includes(classif))
+        : classificacoesViolenciaPredefinidas.filter(classif => 
+            classif.toLowerCase().includes(query.toLowerCase()) &&
+            !classificacoesViolenciaSelecionadas.includes(classif)
+          );
+      
+      if (filtrados.length === 0) {
+        if (query.trim()) {
+          suggestionsDiv.innerHTML = `
+            <div class="p-3 text-sm text-gray-500">
+              Nenhuma sugestão. Pressione Enter para adicionar "${query}"
+            </div>
+          `;
+          suggestionsDiv.classList.remove('hidden');
+        } else {
+          suggestionsDiv.classList.add('hidden');
+        }
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = filtrados.map(classif => `
+        <div 
+          class="px-4 py-2 hover:bg-orange-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+          onclick="adicionarClassificacaoViolencia('${classif.replace(/'/g, "\\'")}')">
+          ${classif}
+        </div>
+      `).join('');
+      
+      suggestionsDiv.classList.remove('hidden');
+    }
+    
+    // ========================================
+    // SISTEMA DE TAGS - MOTIVAÇÃO DA VIOLÊNCIA
+    // ========================================
+    // IMPORTANTE: Valores devem coincidir EXATAMENTE com a validação da planilha
+    const motivacoesViolenciaPredefinidas = [
+      'Discriminação',
+      'Racismo',
+      'Gênero',
+      'LGBTQIAPN+fobia',
+      'Intolerância religiosa',
+      'Gordofobia',
+      'Bullying'
+    ];
+    
+    let motivacoesViolenciaSelecionadas = [];
+    
+    // Renderiza as tags de motivação da violência
+    function renderizarTagsMotivacaoViolencia() {
+      const container = document.getElementById('motivacaoViolencia-tags');
+      const hiddenInput = document.getElementById('motivacaoViolencia');
+      
+      if (motivacoesViolenciaSelecionadas.length === 0) {
+        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhuma motivação adicionada</span>';
+        hiddenInput.value = '';
+        return;
+      }
+      
+      container.innerHTML = motivacoesViolenciaSelecionadas.map((motiv, index) => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium border border-purple-200 shadow-sm">
+          ${motiv}
+          <button 
+            type="button" 
+            onclick="removerMotivacaoViolencia(${index})"
+            class="hover:bg-purple-200 rounded-full p-0.5 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </span>
+      `).join('');
+      
+      hiddenInput.value = motivacoesViolenciaSelecionadas.join(', ');
+    }
+    
+    // Remove uma motivação da violência
+    function removerMotivacaoViolencia(index) {
+      motivacoesViolenciaSelecionadas.splice(index, 1);
+      renderizarTagsMotivacaoViolencia();
+    }
+    
+    // Adiciona uma motivação da violência
+    function adicionarMotivacaoViolencia(texto) {
+      const textoTrimmed = texto.trim();
+      if (!textoTrimmed) return;
+      
+      if (!motivacoesViolenciaSelecionadas.includes(textoTrimmed)) {
+        motivacoesViolenciaSelecionadas.push(textoTrimmed);
+        renderizarTagsMotivacaoViolencia();
+      }
+      
+      document.getElementById('motivacaoViolencia-input').value = '';
+      document.getElementById('motivacaoViolencia-suggestions').classList.add('hidden');
+    }
+    
+    // Filtra e mostra sugestões de motivação da violência
+    function mostrarSugestoesMotivacaoViolencia(query) {
+      const suggestionsDiv = document.getElementById('motivacaoViolencia-suggestions');
+      
+      const filtrados = query.trim() === '' 
+        ? motivacoesViolenciaPredefinidas.filter(motiv => !motivacoesViolenciaSelecionadas.includes(motiv))
+        : motivacoesViolenciaPredefinidas.filter(motiv => 
+            motiv.toLowerCase().includes(query.toLowerCase()) &&
+            !motivacoesViolenciaSelecionadas.includes(motiv)
+          );
+      
+      if (filtrados.length === 0) {
+        if (query.trim()) {
+          suggestionsDiv.innerHTML = `
+            <div class="p-3 text-sm text-gray-500">
+              Nenhuma sugestão. Pressione Enter para adicionar "${query}"
+            </div>
+          `;
+          suggestionsDiv.classList.remove('hidden');
+        } else {
+          suggestionsDiv.classList.add('hidden');
+        }
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = filtrados.map(motiv => `
+        <div 
+          class="px-4 py-2 hover:bg-purple-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+          onclick="adicionarMotivacaoViolencia('${motiv.replace(/'/g, "\\'")}')">
+          ${motiv}
+        </div>
+      `).join('');
+      
+      suggestionsDiv.classList.remove('hidden');
+    }
+    
+    // ========================================
+    // MENU MOBILE TOGGLE
+    // ========================================
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenuNav');
+      const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+      if (mobileMenu) {
+        mobileMenu.classList.toggle('show');
+        if (menuIcon) {
+          menuIcon.style.transform = mobileMenu.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+      }
+    }
+    
+    // Fecha o menu mobile ao clicar em qualquer link
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuLinks = document.querySelectorAll('#mobileMenuNav a');
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          const mobileMenu = document.getElementById('mobileMenuNav');
+          const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+          if (mobileMenu) {
+            mobileMenu.classList.remove('show');
+            if (menuIcon) {
+              menuIcon.style.transform = 'rotate(0deg)';
+            }
+          }
+        });
+      });
+    });
+    
+    // Fecha o menu ao redimensionar para desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        const mobileMenu = document.getElementById('mobileMenuNav');
+        const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+        if (mobileMenu && mobileMenu.classList.contains('show')) {
+          mobileMenu.classList.remove('show');
+          if (menuIcon) {
+            menuIcon.style.transform = 'rotate(0deg)';
+          }
+        }
+      }
+    });
+    
+    // ========================================
+    // CONTROLE CONDICIONAL DO CAMPO PCD DETALHES
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const pcdTranstornoSelect = document.getElementById('pcdTranstorno');
+      const pcdDetalhesContainer = document.getElementById('pcdDetalhesContainer');
+      const pcdDetalhesInput = document.getElementById('pcdDetalhes-input');
+      const pcdDetalhesHidden = document.getElementById('pcdDetalhes');
+      
+      // Renderiza estado inicial das tags
+      renderizarTagsTranstornos();
+      renderizarTagsTipoViolencia();
+      renderizarTagsClassificacaoViolencia();
+      renderizarTagsMotivacaoViolencia();
+      
+      // Listener para mostrar/ocultar campo de detalhes
+      pcdTranstornoSelect.addEventListener('change', function() {
+        if (this.value === 'Sim') {
+          // Mostra o campo de detalhes
+          pcdDetalhesContainer.classList.remove('hidden');
+          // Adiciona animação suave
+          pcdDetalhesContainer.style.animation = 'slideDown 0.3s ease-out';
+        } else {
+          // Esconde o campo de detalhes
+          pcdDetalhesContainer.classList.add('hidden');
+          // Limpa os transtornos selecionados
+          transtornosSelecionados = [];
+          renderizarTagsTranstornos();
+          // Limpa input
+          pcdDetalhesInput.value = '';
+          // Remove classe de erro se houver
+          pcdDetalhesInput.classList.remove('field-error');
+          document.getElementById('pcdDetalhes-tags').classList.remove('field-error');
+        }
+      });
+      
+      // Configura eventos do input de transtornos
+      // Mostra todas opções ao focar no campo vazio
+      pcdDetalhesInput.addEventListener('focus', function(e) {
+        mostrarSugestoesTranstornos(e.target.value);
+      });
+      
+      // Filtra sugestões ao digitar
+      pcdDetalhesInput.addEventListener('input', function(e) {
+        mostrarSugestoesTranstornos(e.target.value);
+      });
+      
+      // Adiciona ao pressionar Enter
+      pcdDetalhesInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          adicionarTranstorno(e.target.value);
+        }
+      });
+      
+      // Esconde sugestões ao clicar fora
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#pcdDetalhes-input') && !e.target.closest('#pcdDetalhes-suggestions')) {
+          document.getElementById('pcdDetalhes-suggestions').classList.add('hidden');
+        }
+      });
+      
+      // === Eventos para Tipo de Violência ===
+      const tipoViolenciaInput = document.getElementById('tipoViolencia-input');
+      
+      tipoViolenciaInput.addEventListener('focus', function(e) {
+        mostrarSuggestoesTipoViolencia(e.target.value);
+      });
+      
+      tipoViolenciaInput.addEventListener('input', function(e) {
+        mostrarSuggestoesTipoViolencia(e.target.value);
+      });
+      
+      tipoViolenciaInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          adicionarTipoViolencia(e.target.value);
+        }
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#tipoViolencia-input') && !e.target.closest('#tipoViolencia-suggestions')) {
+          document.getElementById('tipoViolencia-suggestions').classList.add('hidden');
+        }
+      });
+      
+      // === Eventos para Classificação da Violência ===
+      const classificacaoViolenciaInput = document.getElementById('classificacaoViolencia-input');
+      
+      classificacaoViolenciaInput.addEventListener('focus', function(e) {
+        mostrarSugestoesClassificacaoViolencia(e.target.value);
+      });
+      
+      classificacaoViolenciaInput.addEventListener('input', function(e) {
+        mostrarSugestoesClassificacaoViolencia(e.target.value);
+      });
+      
+      classificacaoViolenciaInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          adicionarClassificacaoViolencia(e.target.value);
+        }
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#classificacaoViolencia-input') && !e.target.closest('#classificacaoViolencia-suggestions')) {
+          document.getElementById('classificacaoViolencia-suggestions').classList.add('hidden');
+        }
+      });
+      
+      // === Eventos para Motivação da Violência ===
+      const motivacaoViolenciaInput = document.getElementById('motivacaoViolencia-input');
+      
+      motivacaoViolenciaInput.addEventListener('focus', function(e) {
+        mostrarSugestoesMotivacaoViolencia(e.target.value);
+      });
+      
+      motivacaoViolenciaInput.addEventListener('input', function(e) {
+        mostrarSugestoesMotivacaoViolencia(e.target.value);
+      });
+      
+      motivacaoViolenciaInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          adicionarMotivacaoViolencia(e.target.value);
+        }
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#motivacaoViolencia-input') && !e.target.closest('#motivacaoViolencia-suggestions')) {
+          document.getElementById('motivacaoViolencia-suggestions').classList.add('hidden');
+        }
+      });
+    });
+
     // Configura eventos do input
     document.addEventListener('DOMContentLoaded', function() {
       const input = document.getElementById('encaminhamento-input');
@@ -1497,6 +2416,27 @@
         }
       });
       
+      // Validação condicional: se PCD = Sim, então deve ter pelo menos um transtorno selecionado
+      const pcdTranstorno = document.getElementById('pcdTranstorno').value;
+      const pcdDetalhesHidden = document.getElementById('pcdDetalhes');
+      const pcdDetalhesTagsContainer = document.getElementById('pcdDetalhes-tags');
+      
+      if (pcdTranstorno === 'Sim') {
+        if (transtornosSelecionados.length === 0) {
+          if (pcdDetalhesTagsContainer) {
+            pcdDetalhesTagsContainer.classList.add('field-error');
+          }
+          valido = false;
+          mostrarAlerta('Por favor, adicione pelo menos um transtorno/deficiência quando marcar "Sim".', 'error');
+          return valido;
+        } else {
+          // Remove classe de erro se estava presente
+          if (pcdDetalhesTagsContainer) {
+            pcdDetalhesTagsContainer.classList.remove('field-error');
+          }
+        }
+      }
+      
       if (!valido) {
         mostrarAlerta('Por favor, preencha todos os campos obrigatórios (marcados com *)!', 'error');
       }
@@ -1558,71 +2498,42 @@
         }
       }
       
-      // Cria um form oculto que será submetido via iframe
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = APPS_SCRIPT_URL;
-      form.target = 'hidden_iframe';
-      form.style.display = 'none';
-      
-      // Adiciona um campo com os dados em JSON
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'data';
-      input.value = JSON.stringify(dados);
-      form.appendChild(input);
-      
-      // Cria um iframe oculto para receber a resposta
-      let iframe = document.getElementById('hidden_iframe');
-      if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.name = 'hidden_iframe';
-        iframe.id = 'hidden_iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-      }
-      
-      // Listener para quando o iframe carregar (resposta recebida)
-      iframe.onload = function() {
+      // Cria callback global para receber resposta do Apps Script
+      const callbackName = 'handleScriptResponse_' + Date.now();
+      window[callbackName] = function(resultado) {
         btnSalvar.disabled = false;
         btnSalvar.textContent = '💾 Salvar Registro';
         
-        // Tenta ler a resposta do iframe
-        try {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          const responseText = iframeDoc.body.textContent;
-          
-          if (responseText) {
-            const resultado = JSON.parse(responseText);
-            
-            if (resultado.success) {
-              mostrarAlerta('✅ Registro salvo com sucesso na planilha!', 'success');
-              limparFormulario();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-              mostrarAlerta('❌ Erro: ' + (resultado.message || 'Falha ao salvar'), 'error');
-            }
-          } else {
-            // Se não conseguir ler a resposta (CORS), assume sucesso
-            mostrarAlerta('✅ Dados enviados! Verifique a planilha.', 'success');
-            limparFormulario();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        } catch (e) {
-          // Erro de CORS ao ler iframe, mas o dado provavelmente foi salvo
-          console.log('Resposta recebida (CORS impediu leitura):', e);
-          mostrarAlerta('✅ Dados enviados! Verifique a planilha.', 'success');
+        if (resultado.success) {
+          mostrarAlerta('✅ Registro salvo com sucesso na planilha!', 'success');
           limparFormulario();
           window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          mostrarAlerta('❌ Erro: ' + (resultado.message || 'Falha ao salvar'), 'error');
         }
         
-        // Remove o form
-        document.body.removeChild(form);
+        // Limpa o callback
+        delete window[callbackName];
       };
       
-      // Adiciona o form ao body e submete
-      document.body.appendChild(form);
-      form.submit();
+      // Envia dados via JSONP (método oficial do Apps Script)
+      const script = document.createElement('script');
+      const params = new URLSearchParams();
+      params.append('action', 'saveRegistro');
+      params.append('data', JSON.stringify(dados));
+      params.append('callback', callbackName);
+      
+      script.src = APPS_SCRIPT_URL + '?' + params.toString();
+      script.onerror = function() {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = '💾 Salvar Registro';
+        mostrarAlerta('❌ Erro ao conectar com o servidor. Verifique sua conexão.', 'error');
+        delete window[callbackName];
+      };
+      
+      document.body.appendChild(script);
+      // Remove o script após 5 segundos
+      setTimeout(() => script.remove(), 5000);
     }
     
     // Função para mostrar alertas
@@ -1679,6 +2590,20 @@
         const placeholder = trigger.getAttribute('data-placeholder') || 'Selecione...';
         trigger.textContent = placeholder;
       });
+      
+      // Esconde o campo pcdDetalhes
+      const pcdDetalhesContainer = document.getElementById('pcdDetalhesContainer');
+      if (pcdDetalhesContainer) {
+        pcdDetalhesContainer.classList.add('hidden');
+      }
+      
+      // Limpa transtornos selecionados
+      transtornosSelecionados = [];
+      renderizarTagsTranstornos();
+      
+      // Limpa encaminhamentos selecionados
+      encaminhamentosSelecionados = [];
+      renderizarTags();
     }
 
     // ========================================
@@ -1821,9 +2746,62 @@
 
     // Inicializa custom selects após carregamento
     window.addEventListener('DOMContentLoaded', () => {
+      verificarAutenticacao();
       initCustomSelects();
       observeSelectChanges();
+      verificarMenuAdmin();
     });
+
+    // ========================================
+    // VERIFICAR AUTENTICAÇÃO
+    // ========================================
+    function verificarAutenticacao() {
+      const userRole = sessionStorage.getItem('userRole');
+      const userEmail = sessionStorage.getItem('userEmail');
+      
+      // Se não estiver autenticado, redireciona para login
+      if (!userRole || !userEmail) {
+        alert('Acesso negado! Faça login para acessar o sistema.');
+        window.location.href = 'login.html';
+        return;
+      }
+    }
+
+    // ========================================
+    // VERIFICAR E MOSTRAR MENU ADMIN
+    // ========================================
+    function verificarMenuAdmin() {
+      const userRole = sessionStorage.getItem('userRole');
+      const menuAdmin = document.getElementById('menuAdmin');
+      const btnSair = document.getElementById('btnSair');
+      const menuAdminMobile = document.getElementById('menuAdminMobile');
+      const btnSairMobile = document.getElementById('btnSairMobile');
+      
+      if (userRole === 'admin' || userRole === 'superuser') {
+        if (menuAdmin) {
+          menuAdmin.classList.remove('hidden');
+        }
+        if (btnSair) {
+          btnSair.classList.remove('hidden');
+        }
+        if (menuAdminMobile) {
+          menuAdminMobile.classList.remove('hidden');
+        }
+        if (btnSairMobile) {
+          btnSairMobile.classList.remove('hidden');
+        }
+      }
+    }
+
+    // ========================================
+    // FUNÇÃO SAIR
+    // ========================================
+    function sair() {
+      if (confirm('Deseja realmente sair do sistema?')) {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      }
+    }
   </script>
   
 </body>

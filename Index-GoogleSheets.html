@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Painel de Casos de Violência Escolar</title>
+  
+  <!-- TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Biblioteca para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <style>
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Animação suave para linhas da tabela */
+    .record-row {
+      animation: slideInRow 0.3s ease-out backwards;
+    }
+    
+    @keyframes slideInRow {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Delay escalonado para cada linha */
+    .record-row:nth-child(1) { animation-delay: 0.05s; }
+    .record-row:nth-child(2) { animation-delay: 0.1s; }
+    .record-row:nth-child(3) { animation-delay: 0.15s; }
+    .record-row:nth-child(4) { animation-delay: 0.2s; }
+    .record-row:nth-child(5) { animation-delay: 0.25s; }
+    .record-row:nth-child(6) { animation-delay: 0.3s; }
+    .record-row:nth-child(7) { animation-delay: 0.35s; }
+    .record-row:nth-child(8) { animation-delay: 0.4s; }
+    .record-row:nth-child(9) { animation-delay: 0.45s; }
+    .record-row:nth-child(10) { animation-delay: 0.5s; }
+    
+    /* Checkboxes personalizados elegantes */
+    .custom-checkbox {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #cbd5e1;
+      border-radius: 5px;
+      background-color: white;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+    }
+    
+    .custom-checkbox:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .custom-checkbox:checked {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-color: #2563eb;
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+    
+    .custom-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      animation: checkPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes checkPop {
+      0% { transform: translate(-50%, -50%) scale(0); }
+      50% { transform: translate(-50%, -50%) scale(1.2); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    
+    .checkbox-label {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease;
+      font-size: 0.875rem;
+    }
+    
+    .checkbox-container:hover .checkbox-label {
+      color: #1e40af;
+    }
+    
+    /* Painel avançado colapsável */
+    .advanced-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+      opacity: 0;
+    }
+    
+    .advanced-panel.open {
+      max-height: 2000px;
+      opacity: 1;
+    }
+    
+    .filter-section.show {
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .toggle-icon {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .toggle-icon.open {
+      transform: rotate(180deg);
+    }
+    
+    .checkbox-container {
+      transition: all 0.2s ease;
+    }
+    
+    .checkbox-container:hover {
+      background-color: #f8fafc;
+      transform: translateY(-1px);
+    }
+    
+    /* Cards de filtros clicáveis */
+    .filter-card {
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .filter-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .filter-card:hover::before {
+      left: 100%;
+    }
+    
+    .filter-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    }
+    
+    .filter-card.active {
+      border-color: #2563eb;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    
+    .filter-card-icon {
+      transition: transform 0.3s ease;
+    }
+    
+    .filter-card:hover .filter-card-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+    
+    .filter-card.active .filter-card-icon {
+      transform: scale(1.15);
+    }
+    
+    .badge-count {
+      animation: badgePop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes badgePop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Menu Hamburguer Responsivo */
+    /* Desktop: Mostra menu horizontal, esconde hamburguer */
+    .mobile-menu-button {
+      display: none !important;
+    }
+
+    .desktop-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    /* Apenas Celulares: Esconde menu horizontal, mostra hamburguer */
+    @media (max-width: 768px) {
+      .mobile-menu-button {
+        display: flex !important;
+      }
+      
+      .desktop-menu {
+        display: none !important;
+      }
+      
+      .mobile-menu {
+        display: block !important;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+      }
+
+      .mobile-menu.show {
+        max-height: 500px;
+      }
+    }
+
+    /* Melhorias de toque para mobile */
+    @media (hover: none) and (pointer: coarse) {
+      button, a {
+        min-height: 44px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+  
+  <!-- Container Principal -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+  
+  <!-- Menu de Navegação -->
+  <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
+    <div class="px-4 py-3">
+      <!-- Botão Hamburguer (Mobile) -->
+      <button onclick="toggleMobileMenu()" class="mobile-menu-button w-full flex items-center justify-between text-white font-semibold">
+        <span>📱 Menu</span>
+        <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      
+      <!-- Menu Desktop -->
+      <nav class="desktop-menu flex flex-wrap gap-2 justify-center items-center">
+        <a href="Index-GoogleSheets.html" class="px-5 py-2.5 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">
+          📊 Painel de Casos
+        </a>
+        <a href="index.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+          📝 Novo Registro
+        </a>
+        <a href="gerenciar.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+          📋 Gerenciar Registros
+        </a>
+        <a id="menuAdmin" href="admin.html" class="hidden px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
+          🔧 Painel Admin
+        </a>
+        <button id="btnSair" onclick="sair()" class="hidden px-5 py-2.5 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600 transition-all">
+          🚪 Sair
+        </button>
+      </nav>
+      
+      <!-- Menu Mobile (Dropdown) -->
+      <nav id="mobileMenuNav" class="mobile-menu mt-3">
+        <div class="flex flex-col gap-2">
+          <a href="Index-GoogleSheets.html" class="px-5 py-3 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all text-center">
+            📊 Painel de Casos
+          </a>
+          <a href="index.html" class="px-5 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all text-center">
+            📝 Novo Registro
+          </a>
+          <a href="gerenciar.html" class="px-5 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all text-center">
+            📋 Gerenciar Registros
+          </a>
+          <a id="menuAdminMobile" href="admin.html" class="hidden px-5 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all text-center">
+            🔧 Painel Admin
+          </a>
+          <button id="btnSairMobile" onclick="sair()" class="hidden px-5 py-3 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600 transition-all text-center">
+            🚪 Sair
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- CABEÇALHO -->
+  <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <div class="flex items-center justify-center gap-4 mb-3">
+      <div class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-3xl shadow-sm">
+        📊
+      </div>
+      <div class="text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800">
+          Painel de Casos de Violência Escolar
+        </h1>
+      </div>
+    </div>
+    <p class="text-center text-gray-600">Sistema de visualização e análise de dados conectado ao Google Sheets</p>
+    <p class="text-center text-gray-500 text-sm mt-2">✅ Dados carregados automaticamente da planilha oficial</p>
+  </div>
+    
+    <!-- CONEXÃO COM PLANILHA -->
+    <section class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">🔗 Conexão com Planilha</h2>
+      
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <p class="text-slate-700 font-medium mb-1">Planilha conectada:</p>
+          <p class="text-slate-500 text-sm">Os dados são carregados automaticamente da planilha configurada no Google Sheets</p>
+        </div>
+        <button id="btnAtualizar" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors">
+          🔄 Atualizar Dados
+        </button>
+      </div>
+      
+      <div id="uploadStatus" class="p-4 rounded-md bg-blue-50 text-blue-700">⏳ Carregando dados da planilha...</div>
+    </section>
+
+    <!-- FILTROS -->
+    <section id="filtersSection" class="bg-white rounded-2xl shadow-xl p-6 mb-6 hidden fade-in">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">🔍 Filtros</h2>
+      
+      <!-- Cards de Filtros Clicáveis -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">🎯 Filtros Rápidos</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="regiao" onclick="openFilterSection('regiao')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">📍</span>
+                <span class="text-sm font-medium text-gray-700">Região</span>
+              </div>
+              <span id="badge-regiao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="tipoViolencia" onclick="openFilterSection('tipoViolencia')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">⚠️</span>
+                <span class="text-sm font-medium text-gray-700">Tipo Violência</span>
+              </div>
+              <span id="badge-tipoViolencia" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="tipoInstituicao" onclick="openFilterSection('tipoInstituicao')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">🏫</span>
+                <span class="text-sm font-medium text-gray-700">Tipo Instituição</span>
+              </div>
+              <span id="badge-tipoInstituicao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="escola" onclick="openFilterSection('escola')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">🏢</span>
+                <span class="text-sm font-medium text-gray-700">Escola Específica</span>
+              </div>
+              <span id="badge-escola" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <!-- NOVO CARD: Tempo Integral -->
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="ti" onclick="openFilterSection('ti')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">⏱️</span>
+                <span class="text-sm font-medium text-gray-700">Tempo Integral</span>
+              </div>
+              <span id="badge-ti" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="encaminhamento" onclick="openFilterSection('encaminhamento')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">📋</span>
+                <span class="text-sm font-medium text-gray-700">Encaminhamento</span>
+              </div>
+              <span id="badge-encaminhamento" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="raca" onclick="openFilterSection('raca')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">👥</span>
+                <span class="text-sm font-medium text-gray-700">Raça/Cor</span>
+              </div>
+              <span id="badge-raca" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="genero" onclick="openFilterSection('genero')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">⚧️</span>
+                <span class="text-sm font-medium text-gray-700">Gênero (M/F)</span>
+              </div>
+              <span id="badge-genero" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <!-- NOVO CARD: Tipo de deficiência/transtorno -->
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="tipoDeficiencia" onclick="openFilterSection('tipoDeficiencia')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">♿</span>
+                <span class="text-sm font-medium text-gray-700">Tipo de deficiência</span>
+              </div>
+              <span id="badge-tipoDeficiencia" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <!-- NOVO CARD: Orientação Sexual -->
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="orientacao" onclick="openFilterSection('orientacao')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">🌈</span>
+                <span class="text-sm font-medium text-gray-700">Orientação Sexual</span>
+              </div>
+              <span id="badge-orientacao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <!-- NOVO CARD: Classificação da Violência -->
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="classificacao" onclick="openFilterSection('classificacao')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">🏷️</span>
+                <span class="text-sm font-medium text-gray-700">Classificação</span>
+              </div>
+              <span id="badge-classificacao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+          <!-- NOVO CARD: Motivação da Violência -->
+          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="motivacao" onclick="openFilterSection('motivacao')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="filter-card-icon text-2xl">🎯</span>
+                <span class="text-sm font-medium text-gray-700">Motivação</span>
+              </div>
+              <span id="badge-motivacao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Outros Filtros -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        
+        <!-- Filtro: É PCD -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">É PCD/tem deficiência:</label>
+          <select id="filterPCD" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Ocorreu na escola -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Ocorreu na escola?</label>
+          <select id="filterOcorreuEscola" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Fonte informada -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Fonte informada:</label>
+          <select id="filterFonteInformada" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Profissional autor -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Profissional da escola foi autor:</label>
+          <select id="filterProfissionalAutor" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Estudante autor -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Estudante foi autor:</label>
+          <select id="filterEstudanteAutor" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Violência não ocorrida na escola -->
+        <div>
+          <label class="block text-gray-700 font-medium text-sm" style="margin-bottom: 6px;">Violência identificada não ocorrida na escola:</label>
+          <select id="filterViolenciaNaoEscola" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" style="margin-top: 2px;">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Violência informada à escola -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Violência informada à escola:</label>
+          <select id="filterViolenciaInformada" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="S">Sim</option>
+            <option value="N">Não</option>
+          </select>
+        </div>
+        
+        <!-- Filtro: Idade Mínima -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Idade Mínima:</label>
+          <input type="number" id="filterIdadeMin" placeholder="Ex: 5" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        
+        <!-- Filtro: Idade Máxima -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Idade Máxima:</label>
+          <input type="number" id="filterIdadeMax" placeholder="Ex: 18" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+
+        <!-- Filtro: Data Início -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Data Início:</label>
+          <input type="date" id="filterDataInicio"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+
+        <!-- Filtro: Data Fim -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Data Fim:</label>
+          <input type="date" id="filterDataFim"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        
+        <!-- Filtro: Busca por nome -->
+        <div class="md:col-span-2 lg:col-span-3 xl:col-span-4">
+          <label class="block text-gray-700 font-medium mb-2">Buscar por nome da criança/estudante:</label>
+          <input type="text" id="filterNome" placeholder="Digite parte do nome..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        
+      </div>
+      
+      <!-- Painel Avançado -->
+      <div id="advancedPanel" class="advanced-panel mt-6">
+        <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-700 mb-6 flex items-center gap-2">
+            <span class="text-2xl">🔍</span>
+            <span>Filtros Avançados</span>
+          </h3>
+          
+          <!-- Região -->
+          <div id="section-regiao" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">📍 Região</h4>
+            <div id="filterRegiaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- Tipo de Violência -->
+          <div id="section-tipoViolencia" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">⚠️ Tipo de Violência</h4>
+            <div id="filterTipoViolenciaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- Tipo de Instituição (CMEI/EMEF) -->
+          <div id="section-tipoInstituicao" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🏫 Tipo de Instituição</h4>
+            <div id="filterTipoInstituicaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- Escola Específica -->
+          <div id="section-escola" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🏢 Escola Específica</h4>
+            <div id="filterEscolaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- NOVA SEÇÃO: Tempo Integral -->
+          <div id="section-ti" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">⏱️ Tempo Integral</h4>
+            <div class="flex gap-3 items-center">
+              <label class="text-sm font-medium text-gray-700">Filtrar por:</label>
+              <select id="filterTI" class="px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                <option value="">Todos</option>
+                <option value="TI">Tempo Integral (TI)</option>
+                <option value="Regular">Tempo Regular (não TI)</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Encaminhamento -->
+          <div id="section-encaminhamento" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">📋 Encaminhamento</h4>
+            <div id="filterEncaminhamentoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- Raça/Cor -->
+          <div id="section-raca" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">👥 Raça/Cor</h4>
+            <div id="filterRacaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- Identidade de Gênero -->
+          <div id="section-genero" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">⚧️ Gênero (M/F)</h4>
+            <div id="filterGeneroContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- NOVA SEÇÃO: Tipo de deficiência/transtorno -->
+          <div id="section-tipoDeficiencia" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">♿ Tipo de deficiência / transtorno</h4>
+            <div id="filterTipoDeficienciaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- NOVA SEÇÃO: Orientação Sexual -->
+          <div id="section-orientacao" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🌈 Orientação Sexual</h4>
+            <div id="filterOrientacaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- NOVA SEÇÃO: Classificação da Violência -->
+          <div id="section-classificacao" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🏷️ Classificação da Violência</h4>
+            <div id="filterClassificacaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+          
+          <!-- NOVA SEÇÃO: Motivação da Violência -->
+          <div id="section-motivacao" class="filter-section mb-0 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🎯 Motivação da Violência</h4>
+            <div id="filterMotivacaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4 flex gap-2 flex-wrap">
+        <button id="btnLimparFiltros" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium">
+          🔄 Limpar Filtros
+        </button>
+        <button id="btnExportarFiltrados" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium">
+          📥 Exportar Filtrados (CSV)
+        </button>
+      </div>
+    </section>
+
+    <!-- ESTATÍSTICAS -->
+    <section id="statsSection" class="bg-white rounded-2xl shadow-xl p-6 mb-6 hidden fade-in">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">📈 Estatísticas</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-blue-50 rounded-lg p-4">
+          <div class="text-gray-600 text-sm font-medium">Total de Registros</div>
+          <div id="statTotal" class="text-3xl font-bold text-blue-700">0</div>
+        </div>
+        
+        <div class="bg-green-50 rounded-lg p-4">
+          <div class="text-gray-600 text-sm font-medium">Registros Filtrados</div>
+          <div id="statFiltrados" class="text-3xl font-bold text-green-700">0</div>
+        </div>
+        
+        <div class="bg-amber-50 rounded-lg p-4">
+          <div class="text-gray-600 text-sm font-medium">Ocorreram na Escola</div>
+          <div id="statEscola" class="text-3xl font-bold text-amber-700">0</div>
+        </div>
+        
+        <div class="bg-purple-50 rounded-lg p-4">
+          <div class="text-gray-600 text-sm font-medium">Tipos de Violência</div>
+          <div id="statTipos" class="text-sm text-purple-700 mt-1 max-h-20 overflow-y-auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRÁFICOS -->
+    <section id="chartsSection" class="bg-white rounded-2xl shadow-xl p-6 mb-6 hidden fade-in">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6">📊 Gráficos Dinâmicos</h2>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Gráfico: Tipos de Violência -->
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-700 mb-4">Tipos de Violência</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartTipoViolencia"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Por Região -->
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-700 mb-4">Casos por Região</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartRegiao"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Por Escola -->
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-700 mb-4">Top 10 Escolas</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartEscola"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Por Faixa Etária -->
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-700 mb-4">Faixa Etária</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartIdade"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Por Gênero -->
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-700 mb-4">Gênero (M/F)</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartGenero"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Por Raça/Cor -->
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-700 mb-4">Raça/Cor</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartRaca"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Linha do Tempo -->
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 lg:col-span-2">
+          <h3 class="text-lg font-semibold text-slate-700 mb-4">Linha do Tempo (Por Mês)</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartTemporal"></canvas>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+
+    <!-- RESULTADOS -->
+    <section id="resultsSection" class="bg-white rounded-2xl shadow-xl p-6 hidden fade-in">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-200">
+        <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+          <span class="text-4xl">📋</span>
+          <span>Registros</span>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+            <span id="recordCount">0</span>
+          </span>
+        </h2>
+      </div>
+      
+      <div id="noResultsMessage" class="hidden p-6 text-center text-gray-500">⚠️ Nenhum registro encontrado com os filtros atuais.</div>
+      
+      <div id="tableContainer" class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <table class="min-w-full border-collapse text-sm">
+          <thead class="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 sticky top-0 shadow-sm">
+            <tr>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-blue-200">👤 Criança/Estudante</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-indigo-200">📅 Idade</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-purple-200">🗓️ Data</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-blue-200">⚠️ Tipo de Violência</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-indigo-200">🏫 CMEI/EMEF</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-purple-200">📍 Região</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-blue-200">📋 Encaminhamento</th>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-700 border-b-2 border-indigo-200">✓ Na Escola?</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="bg-white divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+      
+      <!-- Controles de Paginação Modernos -->
+      <div id="paginacao" class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 shadow-sm">
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-gray-700">📄 Exibir:</span>
+          <select id="registrosPorPaginaSelect" class="px-3 py-2 bg-white border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-gray-400 cursor-pointer shadow-sm">
+            <option value="5">5 registros</option>
+            <option value="10" selected>10 registros</option>
+            <option value="25">25 registros</option>
+            <option value="50">50 registros</option>
+            <option value="100">100 registros</option>
+          </select>
+        </div>
+        
+        <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-slate-200">
+          <span class="text-xs font-medium text-slate-500 uppercase tracking-wide">Página</span>
+          <span id="paginacaoInfo" class="text-sm font-bold text-slate-700 px-2">1 de 1</span>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+          <button id="btnPrimeiraPagina" class="group px-3 py-2 text-sm font-medium text-slate-600 bg-white border-2 border-slate-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-slate-300 disabled:hover:text-slate-600 transition-all duration-200 shadow-sm hover:shadow-md" disabled title="Primeira página">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <button id="btnPaginaAnterior" class="group px-4 py-2 text-sm font-medium text-gray-600 bg-white border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-600 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-1.5" disabled title="Página anterior">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span class="hidden sm:inline">Anterior</span>
+          </button>
+          <button id="btnProximaPagina" class="group px-4 py-2 text-sm font-medium text-slate-600 bg-white border-2 border-slate-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-slate-300 disabled:hover:text-slate-600 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-1.5" title="Próxima página">
+            <span class="hidden sm:inline">Próxima</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <button id="btnUltimaPagina" class="group px-3 py-2 text-sm font-medium text-slate-600 bg-white border-2 border-slate-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-slate-300 disabled:hover:text-slate-600 transition-all duration-200 shadow-sm hover:shadow-md" title="Última página">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL -->
+  <div id="recordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+        <h3 class="text-xl font-semibold text-slate-800">Detalhes Completos do Registro</h3>
+        <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
+      </div>
+      <div id="modalContent" class="px-6 py-4"></div>
+    </div>
+  </div>
+
+  <script>
+    // ==============================
+    // Variáveis globais
+    // ==============================
+    let originalData = [];
+    let filteredData = [];
+    let columnNames = {};
+    let charts = {}; // Armazena instâncias dos gráficos
+    
+    // Variáveis de paginação (frontend-only)
+    let paginaAtual = 1;
+    let registrosPorPagina = 10;
+    let totalPaginas = 1;
+    
+    // Dados CSV inline das listas de CMEIs e EMEFs
+    const CSV_CMEIS = `Nome,Sigla
+Adácio Bispo dos Santos TI,ABS
+Álvaro Fernandes Lima TI,AFL
+Ana Maria Chaves Colares,AMCC
+Anízio Spínola Teixeira,AST
+Carlos Alberto Martinelli de Souza TI,EAMS
+Carlita Corrêa Pereira TI,CCP
+Carlos Mendes,CM
+Darcy Castello de Mendonça,DCM
+Dom. João Batista da Motta e Albuquerque TI,JBMA
+Dr. Denizart Santos TI,DS
+Darcy Vargas,DV
+Edlma Maria Soares Braga TTI,EMSB
+Ernestina Pessoa,EP
+Gilda de Athayde Ramos,GAR
+Gisela da Cruz Militão,GCM
+Georgiana da Trindade Faria,GTF
+Hecy Alves Fraga TI,HAF
+Jacivinha Ferreira de Souza Simões TI,JFSS
+Juízo Pedro de Aguiar,JPA
+Luiz Carlos Grecco TI,LCG
+Laurentina Mendonça Corrêa,LMC
+Luíza Pereira Muniz Corrêa TI,LPMC
+Lidia Rocha Feitosa,LRF
+Lisandra Ignes Carpanedo do Carmo,LICC
+Magnólia Dias Miranda Cunha TTI,MUMC
+Maria Goretti Coutinho Cosme TI,MGCC
+Menino Jesus TI,MJ
+Maria Nazareth Menegueli TTI,MNM
+Marlene Dilande Simonetti,MDS
+Nalcyrley Silva Braga,NSB
+Oscalina Nunes Andrade,ONA
+Odila Simões,OS
+Professora Cida Barreto,PCB
+Dr. Pedro Feu Rosa,PFR
+Padre Giovanni Bartesaghi TTI,PGB
+Rubem Braga,RB
+Rubens Duarte de Albuquerque TTI,RDA
+Robson José Nassur Peçoto TI,RJNP
+Rubens José Vervloet Gomes TI,RJVG
+Reinaldo Ridolfi,RR
+Professora Sophia Musengiyvi Loureiro,SML
+Sinclair Phillips,SP
+Silvanete da Silva Rosa Rocha TI,SSRR
+Thomas Tommasi TTI,TT
+Terezinha Vasconcellos Salvador,TVS
+Valdivia de Penna Antunes Rodrigues TI,VPAR
+Yolanda Lucas da Silva,VLS
+Zilmar Alves de Melo,ZAM
+Zulmira Gomes Martins Marcarini Cavalcanti,ZGMC
+Zélia Viana de Aguiar,ZVA`;
+
+    const CSV_EMEFS = `Nome,Sigla
+Alberto de Almeida,AA
+Adão Benezath,AB
+Aristóbulo Barbosa Leão,ABL
+Álvaro de Castro Mattos,ACM
+Arthur da Costa e Silva,ACS
+Amilton Monteiro da Silva,AMS
+Alvimar Silva,AS
+Adilson da Silva Castro,ASC
+Adevalni Sysesmundo Ferreira de Azevedo,ASFA
+Anacleta Schneider Lucas TI,ASLC
+Ceciliano Abel de Almeida,CAA
+Castelo Branco,CB
+Custódia Dias de Campos,CDC
+CEJA Prof. Admardo Serafim de Oliveira,EJA ASO
+Éber Louzada Zippinotti,ELZ
+Edna de Mattos Siqueira Gaudio TI,EMSG
+Eunice Perreira Silveira TI,EPS
+Eliane Rodrigues dos Santos,ERS
+Escola Experimental de Vitória-UFES,UFES
+Elzira Vivacqua dos Santos,EVS
+Francisco Lacerda de Aguiar,FLA
+Heloisa Abreu Júdice de Mattos,HAJM
+Irmã Jacinta Soares de Souza Lima,IJSSL
+Izaura Marques da Silva TI,IMS
+José Áureo Monjardim TI,JAM
+João Bandeira,JB
+Juscelino Kubitschek de Oliveira,JKO
+José Lemos de Miranda TI,JLM
+Lenir Borlot,LB
+Moacyr Avidos TI,MA
+Mauro Braga,MB
+Marieta Escobar,ME
+Maria José Costa Moraes,MJCM
+Maria Leonor Pereira da Silva,MLPS
+Marechal Mascarenhas de Moraes,MMM
+Maria Madalena Oliveira Domingues,MMOD
+Maria Stella de Novaes,MSN
+Neusa Nunes Gonçalves,NNG
+Orlandina D'Almeida Lucas,ODAL
+Otto Ewald Júnior,OEJ
+Octacílio Lomba,OL
+Prezideu Amorim,PA
+Padre Anchieta,PAN
+Padre Guido Ceotto,PGC
+Paulo Reglus Neves Freire TI,PRNF
+Paulo Roberto Vieira Gomes,PRVG
+Rita de Cássia Oliveira,RCO
+Regina Maria Silva,RMS
+Ronaldo Soares,RS
+Suzete Cuendet,SC
+São Vicente de Paulo,SVP
+Tancredo de Almeida Neves,TAN
+Vercenílio da Silva Pascoal,VSP
+Zilda Andrade,ZA`;
+    
+    // Função para processar os CSVs e criar os mapeamentos
+    function processarCSVs() {
+      const linhasCMEI = CSV_CMEIS.split('\n').slice(1); // Remove header
+      const linhasEMEF = CSV_EMEFS.split('\n').slice(1); // Remove header
+      
+      const cmeiSiglas = {};
+      const emefSiglas = {};
+      
+      linhasCMEI.forEach(linha => {
+        const partes = linha.split(',');
+        if (partes.length >= 2) {
+          const sigla = partes[1].trim();
+          const nome = partes[0].trim();
+          if (sigla && nome) {
+            cmeiSiglas[sigla] = nome;
+          }
+        }
+      });
+      
+      linhasEMEF.forEach(linha => {
+        const partes = linha.split(',');
+        if (partes.length >= 2) {
+          const sigla = partes[1].trim();
+          const nome = partes[0].trim();
+          if (sigla && nome) {
+            emefSiglas[sigla] = nome;
+          }
+        }
+      });
+      
+      return { cmeiSiglas, emefSiglas };
+    }
+    
+    // Processa os CSVs e cria os mapeamentos
+    const { cmeiSiglas: CMEI_SIGLAS, emefSiglas: EMEF_SIGLAS } = processarCSVs();
+
+    // ==============================
+    // Função auxiliar: Detecta se escola é Tempo Integral
+    // ==============================
+    function isTempoIntegral(escolaValor) {
+      if (!escolaValor) return false;
+      
+      const sigla = String(escolaValor).trim().toUpperCase();
+      let nomeCompleto = null;
+
+      // Tenta achar nas listas de siglas
+      if (CMEI_SIGLAS[sigla]) {
+        nomeCompleto = CMEI_SIGLAS[sigla];
+      } else if (EMEF_SIGLAS[sigla]) {
+        nomeCompleto = EMEF_SIGLAS[sigla];
+      } else {
+        // Fallback: usa o próprio valor caso a planilha um dia venha com nome em vez de sigla
+        nomeCompleto = String(escolaValor).trim();
+      }
+
+      const nomeUpper = nomeCompleto.toUpperCase();
+
+      // Tempo Integral: nome completo termina com " TI" ou " TTI"
+      return nomeUpper.endsWith(' TI') || nomeUpper.endsWith(' TTI');
+    }
+
+    // ==============================
+    // Utilitários de texto / listas
+    // ==============================
+
+    // Normalização para reduzir erro de digitação: tira acento, pontuação, caixa
+    // IMPORTANTE: Preserva a barra (/) para tipos compostos como "Financeira/Econômica"
+    function normalizeText(str) {
+      return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s\/]/g, ' ') // ← Preserva / além de letras, números e espaços
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Identifica se uma escola é EMEF ou CMEI baseado no nome/sigla
+    function getTipoInstituicao(nomeEscola) {
+      if (!nomeEscola) return null;
+      
+      const nome = String(nomeEscola).trim().toUpperCase();
+      
+      // Verifica se é uma sigla exata de EMEF
+      if (EMEF_SIGLAS[nome]) {
+        return 'EMEF';
+      }
+      
+      // Verifica se é uma sigla exata de CMEI
+      if (CMEI_SIGLAS[nome]) {
+        return 'CMEI';
+      }
+      
+      // Verifica se o nome contém a sigla como palavra isolada (EMEF)
+      for (const sigla in EMEF_SIGLAS) {
+        const regex = new RegExp('\\b' + sigla + '\\b', 'i');
+        if (regex.test(nome)) {
+          return 'EMEF';
+        }
+      }
+      
+      // Verifica se o nome contém a sigla como palavra isolada (CMEI)
+      for (const sigla in CMEI_SIGLAS) {
+        const regex = new RegExp('\\b' + sigla + '\\b', 'i');
+        if (regex.test(nome)) {
+          return 'CMEI';
+        }
+      }
+      
+      // Verifica se contém "EMEF" no nome
+      if (nome.includes('EMEF')) {
+        return 'EMEF';
+      }
+      
+      // Verifica se contém "CMEI" no nome
+      if (nome.includes('CMEI')) {
+        return 'CMEI';
+      }
+      
+      // Se não identificou, retorna null
+      return null;
+    }
+    
+    // Converte sigla para nome completo (se for uma EMEF ou CMEI conhecida)
+    function getDisplayName(nomeEscola) {
+      if (!nomeEscola) return '';
+      
+      const nome = String(nomeEscola).trim().toUpperCase();
+      
+      // Se for uma sigla exata de EMEF, retorna "EMEF Sigla"
+      if (EMEF_SIGLAS[nome]) {
+        return `EMEF ${nome}`;
+      }
+      
+      // Se for uma sigla exata de CMEI, retorna "CMEI Sigla"
+      if (CMEI_SIGLAS[nome]) {
+        return `CMEI ${nome}`;
+      }
+      
+      return nomeEscola;
+    }
+
+    // Gera opções "agrupadas" por texto normalizado (com suporte a multi-valor)
+    function buildNormalizedOptions(colKey, data) {
+      const map = new Map(); // norm -> rótulo original mais comum
+      data.forEach(row => {
+        const raw = row[colKey];
+        if (!raw) return;
+        
+        // Suporta valores múltiplos separados por vírgula E por barra (/)
+        // Primeiro separa por vírgula, depois cada parte por barra
+        const valores = String(raw)
+          .split(',')
+          .flatMap(v => v.split('/'))
+          .map(v => v.trim())
+          .filter(v => v);
+        
+        valores.forEach(val => {
+          const norm = normalizeText(val);
+          if (!norm) return;
+          
+          // Guarda o label original mais completo (maior length)
+          if (!map.has(norm) || val.length > map.get(norm).length) {
+            map.set(norm, val);
+          }
+        });
+      });
+      return Array.from(map.values()).sort();
+    }
+    
+    // Gera opções para TIPO DE VIOLÊNCIA (NÃO separa por barra - "Financeira/Econômica" fica junto)
+    function buildNormalizedOptionsTipoViolencia(colKey, data) {
+      const map = new Map(); // norm -> rótulo original mais comum
+      data.forEach(row => {
+        const raw = row[colKey];
+        if (!raw) return;
+        
+        // Suporta valores múltiplos separados APENAS por vírgula
+        // NÃO separa por barra (/) para manter "Financeira/Econômica" como uma única categoria
+        const valores = String(raw)
+          .split(',')
+          .map(v => v.trim())
+          .filter(v => v);
+        
+        valores.forEach(val => {
+          const norm = normalizeText(val);
+          if (!norm) return;
+          
+          // Guarda o label original mais completo (maior length)
+          if (!map.has(norm) || val.length > map.get(norm).length) {
+            map.set(norm, val);
+          }
+        });
+      });
+      return Array.from(map.values()).sort();
+    }
+    
+    // ========================================
+    // NORMALIZAÇÃO DE TRANSTORNOS (UNIFICAÇÃO)
+    // ========================================
+    // Unifica variações de transtornos em rótulos padronizados
+    function normalizarTranstorno(label) {
+      if (!label) return label;
+      
+      const norm = normalizeText(label);
+      
+      // Equivalências para TDAH
+      const equivalenciasTDAH = [
+        'tdah',
+        'tdh',
+        'tda h',
+        't d a h',
+        'deficit de atencao',
+        'deficit atencao',
+        'deficitdeatencao',
+        'deficit hiperatividade',
+        'transtorno de deficit',
+        'transtorno deficit',
+        'transtorno de deficit de atencao',
+        'transtorno deficit atencao',
+        'deficit de atencao e hiperatividade',
+        'deficit de atencao hiperatividade'
+      ];
+      
+      if (equivalenciasTDAH.some(e => norm.includes(e) || e.includes(norm))) {
+        return 'TDAH (Déficit de Atenção e Hiperatividade)';
+      }
+      
+      // Equivalências para TEA (Autismo)
+      const equivalenciasTEA = [
+        'tea',
+        't e a',
+        'autismo',
+        'autista',
+        'transtorno do espectro autista',
+        'espectro autista',
+        'transtorno autista'
+      ];
+      
+      if (equivalenciasTEA.some(e => norm.includes(e) || e.includes(norm))) {
+        return 'TEA (Transtorno do Espectro Autista)';
+      }
+      
+      // Equivalências para DI (Deficiência Intelectual)
+      const equivalenciasDI = [
+        'di ',
+        ' di',
+        'd i',
+        'deficiencia intelectual',
+        'deficiencia mental'
+      ];
+      
+      if (equivalenciasDI.some(e => norm === e || norm.includes(e))) {
+        return 'DI (Deficiência Intelectual)';
+      }
+      
+      // Equivalências para TOD (Transtorno Opositor Desafiador)
+      const equivalenciasTOD = [
+        'tod',
+        't o d',
+        'transtorno opositor',
+        'opositor desafiador',
+        'transtorno opositor desafiador'
+      ];
+      
+      if (equivalenciasTOD.some(e => norm.includes(e) || e.includes(norm))) {
+        return 'TOD (Transtorno Opositor Desafiador)';
+      }
+      
+      // Retorna o label original se não encontrou equivalência
+      return label;
+    }
+    
+    // Aplica normalização a uma lista de opções
+    function normalizarListaTranstornos(opcoes) {
+      const map = new Map(); // Usa Map para evitar duplicatas após normalização
+      
+      opcoes.forEach(opt => {
+        const normalizado = normalizarTranstorno(opt);
+        // Guarda apenas uma vez (a primeira ocorrência)
+        if (!map.has(normalizado)) {
+          map.set(normalizado, true);
+        }
+      });
+      
+      return Array.from(map.keys()).sort();
+    }
+    
+    // Gera opções para coluna de Gênero (apenas M ou F)
+    function buildGeneroOptions(data) {
+      const valores = new Set();
+      data.forEach(row => {
+        const genero = row[columnNames.genero];
+        if (genero) {
+          const val = String(genero).trim().toUpperCase();
+          if (val === 'M' || val === 'F') {
+            valores.add(val);
+          }
+        }
+      });
+      return Array.from(valores).sort();
+    }
+    
+    // Cria checkboxes elegantes para filtros
+    function createCheckboxes(containerId, options, filterName) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      
+      options.forEach((opt, index) => {
+        const id = `${filterName}_${index}`;
+        const div = document.createElement('div');
+        div.className = 'checkbox-container flex items-center gap-2.5 p-3 bg-white rounded-lg border border-gray-200 shadow-sm';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = id;
+        checkbox.className = 'custom-checkbox';
+        checkbox.dataset.value = opt;
+        checkbox.dataset.filter = filterName;
+        checkbox.addEventListener('change', function() {
+          updateBadge(filterName);
+          applyFilters();
+        });
+        
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.className = 'checkbox-label flex-1 text-gray-700';
+        label.textContent = opt;
+        
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        container.appendChild(div);
+      });
+    }
+    
+    // Obtém valores selecionados dos checkboxes
+    function getCheckedValues(filterName) {
+      const checkboxes = document.querySelectorAll(`input[data-filter="${filterName}"]:checked`);
+      return Array.from(checkboxes).map(cb => cb.dataset.value);
+    }
+    
+    // Atualiza o badge de contagem
+    function updateBadge(filterName) {
+      const count = getCheckedValues(filterName).length;
+      const badge = document.getElementById(`badge-${filterName}`);
+      
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+    
+    // Atualiza badge para filtro TI (select ao invés de checkboxes)
+    function updateBadgeTI() {
+      const selectTI = document.getElementById('filterTI');
+      const badge = document.getElementById('badge-ti');
+      
+      if (selectTI && selectTI.value && selectTI.value !== '') {
+        badge.textContent = '1';
+        badge.classList.remove('hidden');
+      } else if (badge) {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // Formata data para exibição (dd/mm/aaaa)
+    function formatDate(value) {
+      if (!value || value === '') return null; // Retorna null para valores vazios
+      const date = parseDateCell(value);
+      if (!date) return value; // Se não conseguir parsear, retorna o valor original
+      
+      const dia = String(date.getDate()).padStart(2, '0');
+      const mes = String(date.getMonth() + 1).padStart(2, '0');
+      const ano = date.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    // Converte célula de data (dd/mm/aaaa, número serial do Excel, etc.) em Date
+    function parseDateCell(value) {
+      const str = String(value || '').trim();
+      if (!str) return null;
+
+      // IMPORTANTE: Formato Date(YYYY,M,D) do Google Sheets
+      // O mês já vem base-0 (0=janeiro, 11=dezembro)
+      const dateMatch = str.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})\)$/);
+      if (dateMatch) {
+        const ano = parseInt(dateMatch[1], 10);
+        const mes = parseInt(dateMatch[2], 10); // Já está em base-0
+        const dia = parseInt(dateMatch[3], 10);
+        return new Date(ano, mes, dia);
+      }
+
+      // Tenta formato dd/mm/aaaa ou dd-mm-aaaa (brasileiro)
+      const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+      if (m) {
+        let dia = parseInt(m[1], 10);
+        let mes = parseInt(m[2], 10) - 1;
+        let ano = parseInt(m[3], 10);
+        if (ano < 100) ano += 2000;
+        
+        // Valida se a data é válida
+        const d = new Date(ano, mes, dia);
+        if (d.getFullYear() === ano && d.getMonth() === mes && d.getDate() === dia) {
+          return d;
+        }
+        return null;
+      }
+
+      // Tenta como número serial do Excel (ex: 45803)
+      const num = parseFloat(str);
+      if (!isNaN(num) && num > 1 && num < 100000) {
+        // Excel conta dias desde 01/01/1900
+        // Mas Excel tem um bug: considera 1900 como ano bissexto (não é)
+        // Então para datas >= 01/03/1900, subtraímos 1 dia extra
+        const excelEpoch = new Date(1899, 11, 30); // 30/12/1899
+        const days = num >= 60 ? num - 1 : num; // Corrige bug do Excel
+        const date = new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
+        return date;
+      }
+
+      // Tenta parse direto (formato ISO ou outros)
+      const d = new Date(str);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // ==============================
+    // Inicialização da página
+    // ==============================
+    window.addEventListener('load', function() {
+      document.getElementById('closeModal').addEventListener('click', closeModal);
+      document.getElementById('recordModal').addEventListener('click', (e) => {
+        if (e.target.id === 'recordModal') closeModal();
+      });
+      document.getElementById('btnAtualizar').addEventListener('click', carregarDadosPlanilha);
+      
+      // Event listeners de paginação
+      document.getElementById('btnPrimeiraPagina').addEventListener('click', () => irParaPagina(1));
+      document.getElementById('btnPaginaAnterior').addEventListener('click', () => irParaPagina(paginaAtual - 1));
+      document.getElementById('btnProximaPagina').addEventListener('click', () => irParaPagina(paginaAtual + 1));
+      document.getElementById('btnUltimaPagina').addEventListener('click', () => irParaPagina(totalPaginas));
+      document.getElementById('registrosPorPaginaSelect').addEventListener('change', alterarRegistrosPorPagina);
+      
+      // Carrega os dados automaticamente ao iniciar
+      carregarDadosPlanilha();
+    });
+    
+    // Abre seção específica do filtro
+    function openFilterSection(filterName) {
+      const panel = document.getElementById('advancedPanel');
+      const section = document.getElementById(`section-${filterName}`);
+      const card = document.querySelector(`[data-filter="${filterName}"]`);
+      
+      // Se a seção já está visível, esconde
+      if (section.classList.contains('show')) {
+        section.classList.remove('show');
+        section.classList.add('hidden');
+        card.classList.remove('active');
+        
+        // Se todas as seções estão escondidas, fecha o painel
+        const visibleSections = document.querySelectorAll('.filter-section.show');
+        if (visibleSections.length === 0) {
+          panel.classList.remove('open');
+        }
+      } else {
+        // Abre o painel se estiver fechado
+        if (!panel.classList.contains('open')) {
+          panel.classList.add('open');
+        }
+        
+        // Mostra a seção
+        section.classList.remove('hidden');
+        section.classList.add('show');
+        card.classList.add('active');
+        
+        // Scroll suave até a seção
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    }
+
+    // Busca nome de coluna
+    function findColumn(data, possibleNames) {
+      if (!data || data.length === 0) return null;
+      const keys = Object.keys(data[0]);
+      
+      for (const possible of possibleNames) {
+        const found = keys.find(k => {
+          const kLower = k.toLowerCase().trim();
+          const pLower = possible.toLowerCase().trim();
+          // Busca exata ou que contenha (mas não ao contrário para evitar "Idade" pegar "Identidade")
+          return kLower === pLower || kLower.includes(pLower);
+        });
+        if (found) return found;
+      }
+      return null;
+    }
+
+    // ==============================
+    // Carregamento de dados do Google Sheets via JSONP
+    // ==============================
+    
+    // ID da planilha original (não publicada)
+    // ID da planilha (extraído do link de edição)
+    // Link: https://docs.google.com/spreadsheets/d/1A6a2ZLiHegPJBDpE3YLPGsa8RXVRLjpkXmKdauSlb9Y/edit
+    const SPREADSHEET_ID = '1A6a2ZLiHegPJBDpE3YLPGsa8RXVRLjpkXmKdauSlb9Y';
+    
+    function carregarDadosPlanilha() {
+      updateUploadStatus('loading', '⏳ Carregando dados da planilha...');
+      
+      console.log('🔄 Buscando dados via JSONP...', new Date().toLocaleTimeString());
+      
+      // Remove script antigo se existir
+      const oldScript = document.getElementById('jsonp-script');
+      if (oldScript) {
+        oldScript.remove();
+      }
+      
+      // Timestamp para evitar cache
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 15);
+      
+      // Cria objeto global google.visualization para interceptar a resposta
+      if (!window.google) {
+        window.google = {};
+      }
+      if (!window.google.visualization) {
+        window.google.visualization = {};
+      }
+      if (!window.google.visualization.Query) {
+        window.google.visualization.Query = {};
+      }
+      
+      // Define função que receberá os dados
+      window.google.visualization.Query.setResponse = function(response) {
+        try {
+          console.log('✅ Dados recebidos via JSONP');
+          
+          if (!response || !response.table || !response.table.rows) {
+            updateUploadStatus('error', '❌ Formato de resposta inválido');
+            return;
+          }
+          
+          // Extrai cabeçalhos
+          const headers = response.table.cols.map(col => col.label || '');
+          
+          // Converte linhas para objetos
+          const data = response.table.rows.map(row => {
+            const obj = {};
+            row.c.forEach((cell, index) => {
+              const header = headers[index];
+              if (header) {
+                obj[header] = cell && cell.v !== null && cell.v !== undefined ? cell.v : '';
+              }
+            });
+            return obj;
+          });
+          
+          console.log('📊 Total de registros:', data.length);
+          console.log('🕐 Horário:', new Date().toLocaleTimeString());
+          
+          // Limpa dados anteriores
+          originalData = [];
+          filteredData = [];
+          
+          processLoadedData(data);
+          
+        } catch (error) {
+          console.error('❌ Erro ao processar:', error);
+          updateUploadStatus('error', '❌ Erro ao processar dados: ' + error.message);
+        }
+      };
+      
+      // Cria script tag para JSONP (não usa fetch, não precisa de proxy)
+      const script = document.createElement('script');
+      script.id = 'jsonp-script';
+      script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&_=${timestamp}&r=${random}`;
+      
+      script.onerror = function() {
+        console.error('❌ Erro ao carregar script');
+        updateUploadStatus('error', '❌ Erro ao conectar com Google Sheets. Verifique se a planilha está compartilhada como "Qualquer pessoa com o link pode visualizar"');
+      };
+      
+      document.head.appendChild(script);
+    }
+
+    function processLoadedData(data) {
+      if (!data || data.length === 0) {
+        updateUploadStatus('error', '❌ Arquivo vazio ou sem dados válidos');
+        return;
+      }
+      
+      originalData = data;
+      filteredData = [...data];
+      
+      // Mapeia colunas - Atualizado para novo cabeçalho
+      columnNames = {
+        // Criança/Estudante
+        crianca: findColumn(data, ['criança/ estudante', 'crianca/ estudante', 'criança/estudante', 'crianca/estudante', 'criança', 'crianca', 'estud']),
+        
+        // Data da NT
+        data: findColumn(data, ['data da nt', 'data nt', 'data da', 'data', 'dt']),
+        
+        // Idade
+        idade: findColumn(data, ['idade']),
+        
+        // Identidade de Gênero
+        genero: findColumn(data, ['identidade de gênero', 'identidade de genero', 'gênero', 'genero', 'sexo']),
+        
+        // É PCD/tem Transtorno?
+        pcd: findColumn(data, ['é pcd/tem transtorno', 'e pcd/tem transtorno', 'pcd/tem transtorno', 'pcd', 'deficiência', 'deficiencia', 'transtorno']),
+        
+        // Qual o Transtorno?
+        detalhePCD: findColumn(data, [
+          'qual o transtorno',
+          'qual transtorno',
+          'transtorno',
+          'detalhamento',
+          'detalhamento pcd',
+          'detalhamento transtorno',
+          'tipo de deficiencia',
+          'tipo de deficiência',
+          'tipo de transtorno',
+          'detalhamento de pcd',
+          'detalhamento de transtorno'
+        ]),
+        
+        // Raça/Cor
+        raca: findColumn(data, ['raça/cor', 'raca/cor', 'raça', 'raca', 'cor']),
+        
+        // Qual a Orientação Sexual?
+        orientacaoSexual: findColumn(data, ['qual a orientação sexual', 'qual a orientacao sexual', 'orientação sexual', 'orientacao sexual', 'orientação', 'orientacao']),
+        
+        // Qual a classificação da Violencia?
+        classificacaoViolencia: findColumn(data, ['qual a classificação da violencia', 'qual a classificacao da violencia', 'classificação da violencia', 'classificacao da violencia', 'classificação', 'classificacao']),
+        
+        // Tipo de Violência
+        tipo: findColumn(data, ['tipo de violência', 'tipo de violencia', 'tipo']),
+        
+        // Qual a Motivação da Violencia?
+        motivacaoViolencia: findColumn(data, ['qual a motivação da violencia', 'qual a motivacao da violencia', 'motivação da violencia', 'motivacao da violencia', 'motivação', 'motivacao']),
+        
+        // Encaminhamento
+        encaminhamento: findColumn(data, ['encaminhamento']),
+        
+        // CMEI/EMEF
+        escola: findColumn(data, ['cmei/emef', 'cmei / emef', 'cmei', 'emef', 'escola']),
+        
+        // Região
+        regiao: findColumn(data, ['região', 'regiao']),
+        
+        // Responsável pelo Registro
+        responsavel: findColumn(data, ['responsável pelo registro', 'responsavel pelo registro', 'responsável', 'responsavel']),
+        
+        // fonte informadores foi a escola?
+        fonteInformada: findColumn(data, ['fonte informadores foi a escola', 'fonte informadora foi a escola', 'fonte informada', 'fonte']),
+        
+        // violência identificada pela escola ocorrida na escola
+        violenciaEscolaOcorreu: findColumn(data, ['violência identificada pela escola ocorrida na escola', 'violencia identificada pela escola ocorrida na escola', 'violencia identificada pela escola ocorrida']),
+        
+        // Algum profissional da escola foi autor da violência
+        profissionalAutor: findColumn(data, ['algum profissional da escola foi autor da violência', 'algum profissional da escola foi autor', 'profissional da escola foi autor', 'profissional autor']),
+        
+        // Album estudante foi autor da violência?? (Algum)
+        estudanteAutor: findColumn(data, ['album estudante foi autor da violência', 'algum estudante foi autor da violência', 'algum estudante foi autor', 'estudante foi autor', 'estudante autor']),
+        
+        // violência identificada pela escola não ocorrida na escola
+        violenciaNaoEscola: findColumn(data, ['violência identificada pela escola não ocorrida na escola', 'violencia identificada pela escola nao ocorrida na escola', 'violência identificada pela escola não ocorrida', 'violencia nao ocorrida']),
+        
+        // ocorreu na escola? 1.1
+        ocorreu: findColumn(data, ['ocorreu na escola? 1.1', 'ocorreu na escola', 'ocorreu']),
+        
+        // violência informada a escola por qualquer um dos agentes que a compõe 1.2
+        violenciaInformada: findColumn(data, ['violência informada a escola por qualquer um dos agentes que a compõe', 'violencia informada a escola', 'violência informada à escola', 'violencia informada', 'violência informada'])
+      };
+      
+      // Debug: verificar se as colunas foram encontradas
+      console.log('=== DEBUG COLUNAS ===');
+      console.log('Coluna de criança/estudante encontrada:', columnNames.crianca);
+      console.log('Coluna de data encontrada:', columnNames.data);
+      console.log('Coluna de idade encontrada:', columnNames.idade);
+      console.log('Coluna de gênero encontrada:', columnNames.genero);
+      console.log('Coluna de PCD encontrada:', columnNames.pcd);
+      console.log('Coluna de detalhePCD encontrada:', columnNames.detalhePCD);
+      console.log('Coluna de raça/cor encontrada:', columnNames.raca);
+      console.log('Coluna de orientação sexual encontrada:', columnNames.orientacaoSexual);
+      console.log('Coluna de classificação da violência encontrada:', columnNames.classificacaoViolencia);
+      console.log('Coluna de tipo de violência encontrada:', columnNames.tipo);
+      console.log('Coluna de motivação da violência encontrada:', columnNames.motivacaoViolencia);
+      console.log('Coluna de encaminhamento encontrada:', columnNames.encaminhamento);
+      console.log('Coluna de escola encontrada:', columnNames.escola);
+      console.log('Coluna de região encontrada:', columnNames.regiao);
+      console.log('Todas as colunas do primeiro registro:', Object.keys(data[0]));
+      
+      if (columnNames.data && data.length > 0) {
+        console.log('Exemplo de data:', data[0][columnNames.data]);
+        console.log('Data parseada:', parseDateCell(data[0][columnNames.data]));
+      }
+      if (columnNames.genero && data.length > 0) {
+        console.log('Exemplo de gênero (primeiro registro):', data[0][columnNames.genero]);
+        console.log('Exemplo de gênero (segundo registro):', data[1] ? data[1][columnNames.genero] : 'N/A');
+        console.log('Exemplo de gênero (terceiro registro):', data[2] ? data[2][columnNames.genero] : 'N/A');
+      }
+      if (columnNames.detalhePCD && data.length > 0) {
+        console.log('Exemplo de detalhePCD (primeiro registro):', data[0][columnNames.detalhePCD]);
+        console.log('Exemplo de detalhePCD (segundo registro):', data[1] ? data[1][columnNames.detalhePCD] : 'N/A');
+        console.log('Exemplo de detalhePCD (terceiro registro):', data[2] ? data[2][columnNames.detalhePCD] : 'N/A');
+      }
+      
+      // Verifica se está pegando a coluna errada
+      if (columnNames.genero === 'Idade') {
+        console.warn('⚠️ ERRO: Gênero está mapeado para coluna Idade!');
+        // Tenta encontrar pela letra da coluna
+        const primeiroRegistro = data[0];
+        const colunas = Object.keys(primeiroRegistro);
+        console.log('Colunas disponíveis:', colunas);
+        
+        // Procura coluna que contenha apenas M ou F
+        for (const col of colunas) {
+          const valores = data.slice(0, 10).map(row => String(row[col] || '').trim().toUpperCase());
+          const todosMouF = valores.every(v => v === '' || v === 'M' || v === 'F');
+          if (todosMouF && valores.some(v => v === 'M' || v === 'F')) {
+            console.log(`✓ Coluna candidata para gênero: "${col}" - valores:`, valores);
+          }
+        }
+      }
+      
+      console.log('=== FIM DEBUG ===');
+      
+      updateUploadStatus('success', `✅ Arquivo carregado – ${data.length} registros`);
+      
+      initializeFilters(data);
+      
+      document.getElementById('filtersSection').classList.remove('hidden');
+      document.getElementById('statsSection').classList.remove('hidden');
+      document.getElementById('chartsSection').classList.remove('hidden');
+      document.getElementById('resultsSection').classList.remove('hidden');
+      
+      // Resetar para primeira página ao carregar dados
+      paginaAtual = 1;
+      
+      renderStats(filteredData);
+      renderCharts(filteredData);
+      renderTable(filteredData);
+    }
+
+    function updateUploadStatus(type, message) {
+      const statusDiv = document.getElementById('uploadStatus');
+      statusDiv.textContent = message;
+      statusDiv.className = 'p-4 rounded-md';
+      
+      if (type === 'loading') {
+        statusDiv.classList.add('bg-blue-50', 'text-blue-700');
+      } else if (type === 'success') {
+        statusDiv.classList.add('bg-green-50', 'text-green-700');
+      } else if (type === 'error') {
+        statusDiv.classList.add('bg-red-50', 'text-red-700');
+      } else {
+        statusDiv.classList.add('bg-gray-50', 'text-gray-600');
+      }
+    }
+
+    // ==============================
+    // Filtros
+    // ==============================
+    function initializeFilters(data) {
+      if (columnNames.regiao) {
+        const valores = buildNormalizedOptions(columnNames.regiao, data);
+        createCheckboxes('filterRegiaoContainer', valores, 'regiao');
+      }
+      if (columnNames.tipo) {
+        // Usa função específica que NÃO separa por barra (mantém "Financeira/Econômica" junto)
+        const valores = buildNormalizedOptionsTipoViolencia(columnNames.tipo, data);
+        createCheckboxes('filterTipoViolenciaContainer', valores, 'tipoViolencia');
+      }
+      if (columnNames.escola) {
+        // Filtro por tipo de instituição (CMEI/EMEF/Não Encontrada)
+        const tiposSet = new Set();
+        data.forEach(row => {
+          const tipo = getTipoInstituicao(row[columnNames.escola]);
+          if (tipo) {
+            tiposSet.add(tipo);
+          } else if (row[columnNames.escola]) {
+            tiposSet.add('Não Encontrada');
+          }
+        });
+        const tiposInstituicao = Array.from(tiposSet).sort();
+        createCheckboxes('filterTipoInstituicaoContainer', tiposInstituicao, 'tipoInstituicao');
+        
+        // Filtro por escola específica
+        const valores = buildNormalizedOptions(columnNames.escola, data);
+        createCheckboxes('filterEscolaContainer', valores, 'escola');
+      }
+      if (columnNames.encaminhamento) {
+        const valores = buildNormalizedOptions(columnNames.encaminhamento, data);
+        createCheckboxes('filterEncaminhamentoContainer', valores, 'encaminhamento');
+      }
+      if (columnNames.raca) {
+        const valores = buildNormalizedOptions(columnNames.raca, data);
+        createCheckboxes('filterRacaContainer', valores, 'raca');
+      }
+      if (columnNames.genero) {
+        const valores = buildGeneroOptions(data); // Função específica para gênero
+        createCheckboxes('filterGeneroContainer', valores, 'genero');
+      }
+      
+      // NOVO FILTRO: Tipo de deficiência/transtorno
+      // Gera automaticamente as opções a partir da coluna detalhePCD
+      // Suporta valores múltiplos separados por vírgula
+      // APLICA NORMALIZAÇÃO para unificar variações (TDAH/TDH/tdh, etc.)
+      if (columnNames.detalhePCD) {
+        const valoresBrutos = buildNormalizedOptions(columnNames.detalhePCD, data);
+        const valoresNormalizados = normalizarListaTranstornos(valoresBrutos);
+        createCheckboxes('filterTipoDeficienciaContainer', valoresNormalizados, 'tipoDeficiencia');
+      }
+      
+      // NOVO FILTRO: Orientação Sexual
+      if (columnNames.orientacaoSexual) {
+        const valores = buildNormalizedOptions(columnNames.orientacaoSexual, data);
+        createCheckboxes('filterOrientacaoContainer', valores, 'orientacao');
+      }
+      
+      // NOVO FILTRO: Classificação da Violência
+      if (columnNames.classificacaoViolencia) {
+        const valores = buildNormalizedOptions(columnNames.classificacaoViolencia, data);
+        createCheckboxes('filterClassificacaoContainer', valores, 'classificacao');
+      }
+      
+      // NOVO FILTRO: Motivação da Violência
+      if (columnNames.motivacaoViolencia) {
+        const valores = buildNormalizedOptions(columnNames.motivacaoViolencia, data);
+        createCheckboxes('filterMotivacaoContainer', valores, 'motivacao');
+      }
+      
+      const filterIds = [
+        'filterPCD', 'filterOcorreuEscola',
+        'filterFonteInformada', 'filterViolenciaEscolaOcorreu', 'filterProfissionalAutor',
+        'filterEstudanteAutor', 'filterViolenciaNaoEscola', 'filterViolenciaInformada',
+        'filterIdadeMin', 'filterIdadeMax', 'filterNome',
+        'filterDataInicio', 'filterDataFim', 'filterTI'
+      ];
+      
+      filterIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          // Para inputs type="date", usar 'change' ao invés de 'input'
+          const eventType = (element.type === 'date') ? 'change' : 
+                           (element.tagName === 'INPUT') ? 'input' : 'change';
+          element.addEventListener(eventType, applyFilters);
+        }
+      });
+      
+      // Event listener específico para o filtro TI com atualização de badge
+      const filterTIElement = document.getElementById('filterTI');
+      if (filterTIElement) {
+        filterTIElement.addEventListener('change', function() {
+          updateBadgeTI();
+          applyFilters();
+        });
+      }
+      
+      document.getElementById('btnLimparFiltros').addEventListener('click', clearFilters);
+      document.getElementById('btnExportarFiltrados').addEventListener('click', exportarCSV);
+    }
+
+    function populateSelect(selectId, options) {
+      const select = document.getElementById(selectId);
+      const firstOption = select.options[0] || null;
+      select.innerHTML = '';
+      if (firstOption) {
+        select.appendChild(firstOption);
+      }
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        select.appendChild(option);
+      });
+    }
+
+    // S/N
+    function checkSN(value, filterValue) {
+      if (!filterValue) return true;
+      const val = String(value || '').toUpperCase().trim();
+      if (!val) return false;
+      const f = filterValue.toUpperCase();
+      if (f === 'S') {
+        return val === 'S' || val === 'SIM';
+      }
+      if (f === 'N') {
+        return val === 'N' || val === 'NAO' || val === 'NÃO';
+      }
+      return false;
+    }
+
+    function applyFilters() {
+      const filters = {
+        regioes:         getCheckedValues('regiao'),
+        tipos:           getCheckedValues('tipoViolencia'),
+        tiposInstituicao: getCheckedValues('tipoInstituicao'),
+        escolas:         getCheckedValues('escola'),
+        encaminhamentos: getCheckedValues('encaminhamento'),
+        racas:           getCheckedValues('raca'),
+        generos:         getCheckedValues('genero'),
+        
+        // NOVO FILTRO: Tipos de deficiência/transtorno selecionados
+        tiposDeficiencia: getCheckedValues('tipoDeficiencia'),
+        
+        // NOVOS FILTROS
+        orientacoes:     getCheckedValues('orientacao'),
+        classificacoes:  getCheckedValues('classificacao'),
+        motivacoes:      getCheckedValues('motivacao'),
+
+        pcd:                  document.getElementById('filterPCD').value,
+        ocorreu:              document.getElementById('filterOcorreuEscola').value,
+        fonteInformada:       document.getElementById('filterFonteInformada').value,
+        profissionalAutor:    document.getElementById('filterProfissionalAutor').value,
+        estudanteAutor:       document.getElementById('filterEstudanteAutor').value,
+        violenciaNaoEscola:   document.getElementById('filterViolenciaNaoEscola').value,
+        violenciaInformada:   document.getElementById('filterViolenciaInformada').value,
+
+        idadeMin: document.getElementById('filterIdadeMin').value,
+        idadeMax: document.getElementById('filterIdadeMax').value,
+
+        nome: document.getElementById('filterNome').value.toLowerCase(),
+
+        dataInicio: document.getElementById('filterDataInicio').value,
+        dataFim:    document.getElementById('filterDataFim').value
+      };
+
+      const dataInicioDate = filters.dataInicio ? new Date(filters.dataInicio + 'T00:00:00') : null;
+      const dataFimDate    = filters.dataFim    ? new Date(filters.dataFim    + 'T23:59:59') : null;
+      
+      filteredData = originalData.filter(row => {
+        // Multi (OU) - com suporte a campos multi-valor separados por vírgula
+        if (filters.regioes.length && columnNames.regiao) {
+          const rowVals = String(row[columnNames.regiao] || '').split(',').map(v => v.trim());
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.regioes.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        if (filters.tipos.length && columnNames.tipo) {
+          // Filtro de Tipo de Violência: NÃO separa por barra (/)
+          // "Financeira/Econômica" é tratada como uma categoria única
+          const rowVals = String(row[columnNames.tipo] || '')
+            .split(',')
+            .map(v => v.trim())
+            .filter(v => v);
+          
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.tipos.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        // Filtro por tipo de instituição (CMEI/EMEF/Não Encontrada)
+        if (filters.tiposInstituicao.length && columnNames.escola) {
+          const tipoEscola = getTipoInstituicao(row[columnNames.escola]);
+          const tipoParaFiltro = tipoEscola || (row[columnNames.escola] ? 'Não Encontrada' : null);
+          
+          if (!tipoParaFiltro || !filters.tiposInstituicao.includes(tipoParaFiltro)) {
+            return false;
+          }
+        }
+        if (filters.escolas.length && columnNames.escola) {
+          const rowVals = String(row[columnNames.escola] || '').split(',').map(v => v.trim());
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.escolas.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        
+        // FILTRO: Tempo Integral (corrigido para usar sigla → nome completo)
+        const selectTI = document.getElementById('filterTI');
+        const filtroTI = selectTI ? selectTI.value : '';
+        
+        if (filtroTI && columnNames.escola) {
+          const escola = row[columnNames.escola]; // Sigla da escola (ex.: "ABS", "AA")
+          
+          if (filtroTI === 'TI') {
+            // Só mantém registros de escolas de tempo integral
+            if (!isTempoIntegral(escola)) {
+              return false;
+            }
+          } else if (filtroTI === 'Regular') {
+            // Só mantém registros de escolas que NÃO são TI
+            if (isTempoIntegral(escola)) {
+              return false;
+            }
+          }
+          // Se filtroTI === '' → não filtra por tempo integral
+        }
+        
+        if (filters.encaminhamentos.length && columnNames.encaminhamento) {
+          // Filtro inteligente: separa por vírgula E barra (/)
+          // Exemplos: "Escola/CT", "Saúde/Educação/CT", "CT/UBS"
+          const rowVals = String(row[columnNames.encaminhamento] || '')
+            .split(',')
+            .flatMap(v => v.split('/'))
+            .map(v => v.trim())
+            .filter(v => v);
+          
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.encaminhamentos.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        if (filters.racas.length && columnNames.raca) {
+          const rowVals = String(row[columnNames.raca] || '').split(',').map(v => v.trim());
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.racas.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        if (filters.generos.length && columnNames.genero) {
+          // Para gênero (coluna D), verifica se é M ou F
+          const rowValue = String(row[columnNames.genero] || '').trim().toUpperCase();
+          const ok = filters.generos.some(v => v.toUpperCase() === rowValue);
+          if (!ok) return false;
+        }
+        
+        // NOVO FILTRO: Tipo de deficiência/transtorno
+        // Este filtro trabalha em conjunto com o filtro de PCD
+        // APLICA NORMALIZAÇÃO para que "TDAH", "TDH", "tdah" sejam considerados iguais
+        if (filters.tiposDeficiencia.length && columnNames.detalhePCD) {
+          // Se o usuário selecionou tipos de deficiência, o registro deve:
+          // 1) Ser PCD (ter "S" ou "SIM" na coluna PCD)
+          // 2) Ter um detalhamento que bata com as opções selecionadas
+          
+          // Verifica se é PCD
+          const isPCD = checkSN(row[columnNames.pcd], 'S');
+          if (!isPCD) return false; // Se não é PCD, não passa no filtro
+          
+          // Verifica se o detalhamento bate com alguma opção selecionada
+          // Separa por vírgula E por barra (/) para considerar múltiplos transtornos
+          const rowVals = String(row[columnNames.detalhePCD] || '')
+            .split(',')
+            .flatMap(v => v.split('/'))
+            .map(v => v.trim())
+            .filter(v => v);
+          
+          // APLICA NORMALIZAÇÃO aos valores do registro E aos filtros selecionados
+          const rowNormalizados = rowVals.map(v => normalizarTranstorno(v));
+          const filterNormalizados = filters.tiposDeficiencia; // Já vem normalizado do checkbox
+          
+          // Compara usando normalizeText para remover acentos e maiúsculas
+          const rowNorms = rowNormalizados.map(v => normalizeText(v));
+          const filterNorms = filterNormalizados.map(v => normalizeText(v));
+          
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        
+        // NOVO FILTRO: Orientação Sexual (OU)
+        if (filters.orientacoes.length && columnNames.orientacaoSexual) {
+          const rowVals = String(row[columnNames.orientacaoSexual] || '')
+            .split(',')
+            .flatMap(v => v.split('/'))
+            .map(v => v.trim())
+            .filter(v => v);
+          
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.orientacoes.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        
+        // NOVO FILTRO: Classificação da Violência (OU)
+        if (filters.classificacoes.length && columnNames.classificacaoViolencia) {
+          const rowVals = String(row[columnNames.classificacaoViolencia] || '')
+            .split(',')
+            .flatMap(v => v.split('/'))
+            .map(v => v.trim())
+            .filter(v => v);
+          
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.classificacoes.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+        
+        // NOVO FILTRO: Motivação da Violência (OU)
+        if (filters.motivacoes.length && columnNames.motivacaoViolencia) {
+          const rowVals = String(row[columnNames.motivacaoViolencia] || '')
+            .split(',')
+            .flatMap(v => v.split('/'))
+            .map(v => v.trim())
+            .filter(v => v);
+          
+          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
+          const filterNorms = filters.motivacoes.map(v => normalizeText(v));
+          const ok = rowNorms.some(rn => filterNorms.includes(rn));
+          if (!ok) return false;
+        }
+
+        // S/N
+        if (filters.pcd && columnNames.pcd && !checkSN(row[columnNames.pcd], filters.pcd)) return false;
+        
+        // FILTRO: Ocorreu na escola - Combina colunas U (ocorreu) e Q (violenciaEscolaOcorreu)
+        // Se o usuário filtrar "Sim", mostra registros onde U OU Q = Sim
+        // Se o usuário filtrar "Não", mostra registros onde U E Q = Não
+        if (filters.ocorreu) {
+          const ocorreuU = columnNames.ocorreu ? checkSN(row[columnNames.ocorreu], 'S') : false;
+          const ocorreuQ = columnNames.violenciaEscolaOcorreu ? checkSN(row[columnNames.violenciaEscolaOcorreu], 'S') : false;
+          const ocorreuNaEscola = ocorreuU || ocorreuQ;
+          
+          if (filters.ocorreu === 'S' && !ocorreuNaEscola) return false;
+          if (filters.ocorreu === 'N' && ocorreuNaEscola) return false;
+        }
+        
+        if (filters.fonteInformada && columnNames.fonteInformada && !checkSN(row[columnNames.fonteInformada], filters.fonteInformada)) return false;
+        if (filters.profissionalAutor && columnNames.profissionalAutor &&
+            !checkSN(row[columnNames.profissionalAutor], filters.profissionalAutor)) return false;
+        if (filters.estudanteAutor && columnNames.estudanteAutor &&
+            !checkSN(row[columnNames.estudanteAutor], filters.estudanteAutor)) return false;
+        if (filters.violenciaNaoEscola && columnNames.violenciaNaoEscola &&
+            !checkSN(row[columnNames.violenciaNaoEscola], filters.violenciaNaoEscola)) return false;
+        if (filters.violenciaInformada && columnNames.violenciaInformada &&
+            !checkSN(row[columnNames.violenciaInformada], filters.violenciaInformada)) return false;
+
+        // Idade
+        if (columnNames.idade) {
+          const idade = parseInt(row[columnNames.idade], 10);
+          if (filters.idadeMin && !isNaN(idade) && idade < parseInt(filters.idadeMin, 10)) return false;
+          if (filters.idadeMax && !isNaN(idade) && idade > parseInt(filters.idadeMax, 10)) return false;
+        }
+
+        // Nome (contains)
+        if (filters.nome && columnNames.crianca) {
+          const nome = String(row[columnNames.crianca] || '').toLowerCase();
+          if (!nome.includes(filters.nome)) return false;
+        }
+
+        // Data
+        if ((dataInicioDate || dataFimDate) && columnNames.data) {
+          const rowDate = parseDateCell(row[columnNames.data]);
+          // Se houver filtro de data mas o registro não tem data válida, pula o registro
+          if (rowDate) {
+            // Normaliza as datas para comparação (apenas dia/mês/ano, sem horas)
+            const rowDateOnly = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+            const dataInicioOnly = dataInicioDate ? new Date(dataInicioDate.getFullYear(), dataInicioDate.getMonth(), dataInicioDate.getDate()) : null;
+            const dataFimOnly = dataFimDate ? new Date(dataFimDate.getFullYear(), dataFimDate.getMonth(), dataFimDate.getDate()) : null;
+            
+            if (dataInicioOnly && rowDateOnly < dataInicioOnly) return false;
+            if (dataFimOnly && rowDateOnly > dataFimOnly) return false;
+          }
+        }
+
+        return true;
+      });
+
+      // Resetar para primeira página ao aplicar filtros
+      paginaAtual = 1;
+
+      renderStats(filteredData);
+      renderCharts(filteredData);
+      renderTable(filteredData);
+    }
+
+    function clearFilters() {
+      // Limpar checkboxes dos filtros avançados
+      const allCheckboxes = document.querySelectorAll('.custom-checkbox');
+      allCheckboxes.forEach(cb => cb.checked = false);
+      
+      // Limpar badges
+      const badges = document.querySelectorAll('.badge-count');
+      badges.forEach(badge => badge.classList.add('hidden'));
+      
+      // Remover estados ativos dos cards
+      const cards = document.querySelectorAll('.filter-card');
+      cards.forEach(card => card.classList.remove('active'));
+      
+      // Esconder todas as seções
+      const sections = document.querySelectorAll('.filter-section');
+      sections.forEach(section => {
+        section.classList.remove('show');
+        section.classList.add('hidden');
+      });
+      
+      // Fechar painel
+      document.getElementById('advancedPanel').classList.remove('open');
+      
+      // Limpar selects e inputs
+      const filterIds = [
+        'filterPCD', 'filterOcorreuEscola',
+        'filterFonteInformada', 'filterViolenciaEscolaOcorreu', 'filterProfissionalAutor',
+        'filterEstudanteAutor', 'filterViolenciaNaoEscola', 'filterViolenciaInformada',
+        'filterIdadeMin', 'filterIdadeMax', 'filterNome',
+        'filterDataInicio', 'filterDataFim', 'filterTI'
+      ];
+      
+      filterIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.tagName === 'SELECT') {
+          Array.from(el.options).forEach(o => o.selected = false);
+        } else {
+          el.value = '';
+        }
+      });
+      
+      filteredData = [...originalData];
+      
+      // Resetar para primeira página ao limpar filtros
+      paginaAtual = 1;
+      
+      renderStats(filteredData);
+      renderCharts(filteredData);
+      renderTable(filteredData);
+    }
+
+    // ==============================
+    // Estatísticas / Tabela / Modal
+    // ==============================
+    function renderStats(data) {
+      const total = originalData.length;
+      const filtrados = data.length;
+      
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statFiltrados').textContent = filtrados;
+      
+      let countEscola = 0;
+      // Considera AMBAS as colunas U (ocorreu na escola 1.1) e Q (violência identificada pela escola ocorrida na escola)
+      // Se qualquer uma delas for 'S' ou 'Sim', conta como ocorrido na escola
+      if (columnNames.ocorreu || columnNames.violenciaEscolaOcorreu) {
+        countEscola = data.reduce((acc, row) => {
+          const ocorreuU = columnNames.ocorreu ? checkSN(row[columnNames.ocorreu], 'S') : false;
+          const ocorreuQ = columnNames.violenciaEscolaOcorreu ? checkSN(row[columnNames.violenciaEscolaOcorreu], 'S') : false;
+          return acc + (ocorreuU || ocorreuQ ? 1 : 0);
+        }, 0);
+      }
+      document.getElementById('statEscola').textContent = countEscola;
+      
+      const tiposDiv = document.getElementById('statTipos');
+      tiposDiv.innerHTML = '';
+      if (columnNames.tipo) {
+        const mapa = {};
+        data.forEach(row => {
+          const tipo = row[columnNames.tipo];
+          if (!tipo) return;
+          const rotulo = String(tipo).trim();
+          mapa[rotulo] = (mapa[rotulo] || 0) + 1;
+        });
+        const tipos = Object.keys(mapa).sort();
+        if (tipos.length === 0) {
+          tiposDiv.textContent = 'Nenhum tipo identificado nos registros filtrados.';
+        } else {
+          tipos.forEach(t => {
+            const p = document.createElement('div');
+            p.textContent = `${t}: ${mapa[t]}`;
+            tiposDiv.appendChild(p);
+          });
+        }
+      } else {
+        tiposDiv.textContent = 'Coluna "Tipo de Violência" não encontrada.';
+      }
+    }
+    
+    // ==============================
+    // Gráficos
+    // ==============================
+    function renderCharts(data) {
+      // Cores para os gráficos
+      const colors = [
+        'rgba(59, 130, 246, 0.8)',   // azul
+        'rgba(239, 68, 68, 0.8)',    // vermelho
+        'rgba(34, 197, 94, 0.8)',    // verde
+        'rgba(234, 179, 8, 0.8)',    // amarelo
+        'rgba(168, 85, 247, 0.8)',   // roxo
+        'rgba(236, 72, 153, 0.8)',   // rosa
+        'rgba(20, 184, 166, 0.8)',   // teal
+        'rgba(251, 146, 60, 0.8)',   // laranja
+        'rgba(148, 163, 184, 0.8)',  // cinza
+        'rgba(6, 182, 212, 0.8)'     // cyan
+      ];
+      
+      // Gráfico: Tipos de Violência (normalizado)
+      if (columnNames.tipo) {
+        const dados = {};
+        const mapaNormalizado = {}; // norm -> label original mais comum
+        
+        data.forEach(row => {
+          const tipo = row[columnNames.tipo];
+          if (tipo) {
+            const original = String(tipo).trim();
+            const norm = normalizeText(original);
+            if (norm) {
+              dados[norm] = (dados[norm] || 0) + 1;
+              // Guarda o label original mais usado (capitalizado)
+              if (!mapaNormalizado[norm] || original.length > mapaNormalizado[norm].length) {
+                mapaNormalizado[norm] = original;
+              }
+            }
+          }
+        });
+        
+        // Converte de volta para labels originais
+        const sorted = Object.entries(dados)
+          .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
+          .sort((a, b) => b[1] - a[1]);
+        renderPieChart('chartTipoViolencia', sorted, colors);
+      }
+      
+      // Gráfico: Por Região (normalizado)
+      if (columnNames.regiao) {
+        const dados = {};
+        const mapaNormalizado = {};
+        
+        data.forEach(row => {
+          const regiao = row[columnNames.regiao];
+          if (regiao) {
+            const original = String(regiao).trim();
+            const norm = normalizeText(original);
+            if (norm) {
+              dados[norm] = (dados[norm] || 0) + 1;
+              if (!mapaNormalizado[norm] || original.length > mapaNormalizado[norm].length) {
+                mapaNormalizado[norm] = original;
+              }
+            }
+          }
+        });
+        
+        const sorted = Object.entries(dados)
+          .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
+          .sort((a, b) => b[1] - a[1]);
+        renderBarChart('chartRegiao', sorted, colors);
+      }
+      
+      // Gráfico: Top 10 Escolas (normalizado)
+      if (columnNames.escola) {
+        const dados = {};
+        const mapaNormalizado = {};
+        
+        data.forEach(row => {
+          const escola = row[columnNames.escola];
+          if (escola) {
+            const original = String(escola).trim();
+            const norm = normalizeText(original);
+            if (norm) {
+              dados[norm] = (dados[norm] || 0) + 1;
+              if (!mapaNormalizado[norm] || original.length > mapaNormalizado[norm].length) {
+                mapaNormalizado[norm] = original;
+              }
+            }
+          }
+        });
+        
+        const sorted = Object.entries(dados)
+          .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10);
+        renderBarChart('chartEscola', sorted, colors);
+      }
+      
+      // Gráfico: Faixa Etária
+      if (columnNames.idade) {
+        const faixas = {
+          '0-5 anos': 0,
+          '6-10 anos': 0,
+          '11-14 anos': 0,
+          '15-17 anos': 0,
+          '18+ anos': 0
+        };
+        
+        data.forEach(row => {
+          const idade = parseInt(row[columnNames.idade], 10);
+          if (!isNaN(idade)) {
+            if (idade <= 5) faixas['0-5 anos']++;
+            else if (idade <= 10) faixas['6-10 anos']++;
+            else if (idade <= 14) faixas['11-14 anos']++;
+            else if (idade <= 17) faixas['15-17 anos']++;
+            else faixas['18+ anos']++;
+          }
+        });
+        
+        const sorted = Object.entries(faixas).filter(([k, v]) => v > 0);
+        renderBarChart('chartIdade', sorted, colors);
+      }
+      
+      // Gráfico: Gênero (Coluna D: M ou F)
+      if (columnNames.genero) {
+        const dados = { 'F': 0, 'M': 0 };
+        data.forEach(row => {
+          const genero = row[columnNames.genero];
+          if (genero) {
+            const key = String(genero).trim().toUpperCase();
+            if (key === 'F') dados['F']++;
+            else if (key === 'M') dados['M']++;
+          }
+        });
+        
+        // Filtra apenas os que têm valores
+        const sorted = Object.entries(dados).filter(([k, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+        renderPieChart('chartGenero', sorted, colors);
+      }
+      
+      // Gráfico: Raça/Cor (normalizado)
+      if (columnNames.raca) {
+        const dados = {};
+        const mapaNormalizado = {};
+        
+        data.forEach(row => {
+          const raca = row[columnNames.raca];
+          if (raca) {
+            const original = String(raca).trim();
+            const norm = normalizeText(original);
+            if (norm) {
+              dados[norm] = (dados[norm] || 0) + 1;
+              if (!mapaNormalizado[norm] || original.length > mapaNormalizado[norm].length) {
+                mapaNormalizado[norm] = original;
+              }
+            }
+          }
+        });
+        
+        const sorted = Object.entries(dados)
+          .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
+          .sort((a, b) => b[1] - a[1]);
+        renderPieChart('chartRaca', sorted, colors);
+      }
+      
+      // Gráfico: Linha do Tempo
+      if (columnNames.data) {
+        console.log('=== INÍCIO DEBUG GRÁFICO TEMPORAL ===');
+        console.log('Total de registros:', data.length);
+        
+        const porMes = {};
+        let datasValidas = 0;
+        let datasInvalidas = 0;
+        
+        data.forEach((row, index) => {
+          const rawData = row[columnNames.data];
+          console.log(`Registro ${index + 1}: rawData =`, rawData, typeof rawData);
+          
+          const date = parseDateCell(rawData);
+          console.log(`  → Após parseDateCell:`, date);
+          
+          if (date) {
+            datasValidas++;
+            const mes = date.getMonth();
+            const ano = date.getFullYear();
+            const key = `${ano}-${String(mes + 1).padStart(2, '0')}`;
+            
+            console.log(`  → Data válida: ${date.toLocaleDateString('pt-BR')} → Chave: ${key}`);
+            
+            porMes[key] = (porMes[key] || 0) + 1;
+          } else {
+            datasInvalidas++;
+            console.log(`  → Data INVÁLIDA (null/undefined)`);
+          }
+        });
+        
+        console.log('Datas válidas:', datasValidas);
+        console.log('Datas inválidas:', datasInvalidas);
+        console.log('Contagem por mês:', porMes);
+        
+        const sorted = Object.entries(porMes).sort((a, b) => a[0].localeCompare(b[0]));
+        console.log('Meses ordenados:', sorted);
+        
+        const labels = sorted.map(([key]) => {
+          const [ano, mes] = key.split('-');
+          const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+          return `${meses[parseInt(mes) - 1]}/${ano}`;
+        });
+        const valores = sorted.map(([, v]) => v);
+        
+        console.log('Labels para gráfico:', labels);
+        console.log('Valores para gráfico:', valores);
+        console.log('=== FIM DEBUG GRÁFICO TEMPORAL ===');
+        
+        renderLineChart('chartTemporal', labels, valores);
+      }
+    }
+    
+    function renderPieChart(canvasId, data, colors) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      // Destroi gráfico anterior se existir
+      if (charts[canvasId]) {
+        charts[canvasId].destroy();
+      }
+      
+      const labels = data.map(([k]) => k);
+      const valores = data.map(([, v]) => v);
+      
+      charts[canvasId] = new Chart(canvas, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: valores,
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 10,
+                font: { size: 11 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function renderBarChart(canvasId, data, colors) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      // Destroi gráfico anterior se existir
+      if (charts[canvasId]) {
+        charts[canvasId].destroy();
+      }
+      
+      const labels = data.map(([k]) => k);
+      const valores = data.map(([, v]) => v);
+      
+      charts[canvasId] = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Quantidade',
+            data: valores,
+            backgroundColor: colors[0],
+            borderColor: colors[0].replace('0.8', '1'),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Casos: ${context.parsed.y}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+    
+    function renderLineChart(canvasId, labels, valores) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      // Destroi gráfico anterior se existir
+      if (charts[canvasId]) {
+        charts[canvasId].destroy();
+      }
+      
+      charts[canvasId] = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Casos por Mês',
+            data: valores,
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Casos: ${context.parsed.y}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      const recordCount = document.getElementById('recordCount');
+      const noResults = document.getElementById('noResultsMessage');
+      
+      tbody.innerHTML = '';
+      recordCount.textContent = data.length;
+      
+      if (data.length === 0) {
+        noResults.classList.remove('hidden');
+        document.getElementById('paginacao').style.display = 'none';
+        return;
+      } else {
+        noResults.classList.add('hidden');
+        document.getElementById('paginacao').style.display = 'flex';
+      }
+      
+      // Calcular total de páginas
+      totalPaginas = Math.ceil(data.length / registrosPorPagina);
+      
+      // Garantir que a página atual seja válida
+      if (paginaAtual > totalPaginas) {
+        paginaAtual = totalPaginas;
+      }
+      if (paginaAtual < 1) {
+        paginaAtual = 1;
+      }
+      
+      // Calcular índices para slice
+      const inicio = (paginaAtual - 1) * registrosPorPagina;
+      const fim = inicio + registrosPorPagina;
+      
+      // Pegar apenas os registros da página atual
+      const registrosPagina = data.slice(inicio, fim);
+      
+      registrosPagina.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        // Adicionar classes para zebra stripes e hover effect modernos
+        const zebraClass = (index % 2 === 0) ? 'bg-white' : 'bg-gray-50/50';
+        tr.className = 'record-row hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200 hover:shadow-sm border-l-4 border-l-transparent hover:border-l-blue-500 ' + zebraClass;
+        
+        const nome = columnNames.crianca ? (row[columnNames.crianca] || 'Não informado') : 'Não informado';
+        const idade = columnNames.idade ? (row[columnNames.idade] || 'Não informado') : 'Não informado';
+        const dataViol = columnNames.data ? formatDate(row[columnNames.data]) : 'Não informado';
+        const tipo = columnNames.tipo ? (row[columnNames.tipo] || 'Não informado') : 'Não informado';
+        const escolaOriginal = columnNames.escola ? (row[columnNames.escola] || '') : '';
+        const escola = escolaOriginal ? getDisplayName(escolaOriginal) : 'Não informado';
+        const regiao = columnNames.regiao ? (row[columnNames.regiao] || 'Não informado') : 'Não informado';
+        const encaminhamento = columnNames.encaminhamento ? (row[columnNames.encaminhamento] || 'Não informado') : 'Não informado';
+        
+        // Combinar colunas U (ocorreu na escola 1.1) e Q (violência identificada pela escola ocorrida na escola)
+        let ocorreuNaEscola = '';
+        const ocorreuU = columnNames.ocorreu ? (row[columnNames.ocorreu] || '') : '';
+        const ocorreuQ = columnNames.violenciaEscolaOcorreu ? (row[columnNames.violenciaEscolaOcorreu] || '') : '';
+        
+        if (checkSN(ocorreuU, 'S') || checkSN(ocorreuQ, 'S')) {
+          ocorreuNaEscola = 'Sim';
+        } else if (checkSN(ocorreuU, 'N') || checkSN(ocorreuQ, 'N')) {
+          ocorreuNaEscola = 'Não';
+        } else if (ocorreuU || ocorreuQ) {
+          ocorreuNaEscola = ocorreuU || ocorreuQ;
+        } else {
+          ocorreuNaEscola = 'Não informado';
+        }
+        
+        const campos = [nome, idade, dataViol, tipo, escola, regiao, encaminhamento, ocorreuNaEscola];
+        
+        campos.forEach(valor => {
+          const td = document.createElement('td');
+          td.className = 'px-4 py-3.5 align-top text-gray-700 text-sm font-medium';
+          
+          // Estilizar "Não informado" com cor diferente e itálico
+          if (valor === 'Não informado') {
+            td.className = 'px-4 py-3.5 align-top text-gray-400 text-sm italic';
+          }
+          
+          td.textContent = valor;
+          tr.appendChild(td);
+        });
+        
+        tr.addEventListener('click', () => openRecordModal(row));
+        tbody.appendChild(tr);
+      });
+      
+      // Atualizar controles de paginação
+      updatePaginationControls();
+    }
+
+    function openRecordModal(record) {
+      const modal = document.getElementById('recordModal');
+      const content = document.getElementById('modalContent');
+      content.innerHTML = '';
+      
+      const keys = Object.keys(record);
+      
+      keys.forEach(key => {
+        const value = record[key];
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'flex justify-between border-b py-2';
+        
+        const label = document.createElement('div');
+        label.className = 'font-medium text-gray-700 pr-4';
+        label.textContent = key;
+        
+        const valDiv = document.createElement('div');
+        valDiv.className = 'text-slate-600 flex-1 text-right';
+        
+        // Formata data se for a coluna de data
+        let displayValue;
+        if (key === columnNames.data) {
+          displayValue = formatDate(value) || 'Não informado';
+        } else if (value === undefined || value === null || value === '') {
+          displayValue = 'Não informado';
+        } else {
+          displayValue = value;
+        }
+        
+        // Destaca o campo de detalhamento PCD/transtorno se for essa coluna
+        if (key === columnNames.detalhePCD) {
+          if (!value || String(value).trim() === '') {
+            displayValue = 'Não informado';
+            valDiv.className = 'text-gray-400 flex-1 text-right italic';
+          } else {
+            // Adiciona ícone e destaque visual
+            label.innerHTML = '♿ ' + key;
+            valDiv.className = 'text-blue-700 flex-1 text-right font-semibold';
+          }
+        } else if (displayValue === 'Não informado') {
+          valDiv.className = 'text-gray-400 flex-1 text-right italic';
+        }
+        
+        valDiv.textContent = displayValue;
+        
+        rowDiv.appendChild(label);
+        rowDiv.appendChild(valDiv);
+        content.appendChild(rowDiv);
+      });
+      
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('recordModal').classList.add('hidden');
+    }
+
+    // ==============================
+    // Funções de Paginação
+    // ==============================
+    function updatePaginationControls() {
+      const info = document.getElementById('paginacaoInfo');
+      const btnPrimeira = document.getElementById('btnPrimeiraPagina');
+      const btnAnterior = document.getElementById('btnPaginaAnterior');
+      const btnProxima = document.getElementById('btnProximaPagina');
+      const btnUltima = document.getElementById('btnUltimaPagina');
+      
+      info.textContent = paginaAtual + ' de ' + totalPaginas;
+      
+      // Desabilitar botões conforme necessário
+      btnPrimeira.disabled = (paginaAtual === 1);
+      btnAnterior.disabled = (paginaAtual === 1);
+      btnProxima.disabled = (paginaAtual === totalPaginas);
+      btnUltima.disabled = (paginaAtual === totalPaginas);
+    }
+    
+    function irParaPagina(novaPagina) {
+      if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+        paginaAtual = novaPagina;
+        renderTable(filteredData);
+        // Scroll suave para a seção de resultados
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    function alterarRegistrosPorPagina() {
+      const select = document.getElementById('registrosPorPaginaSelect');
+      registrosPorPagina = parseInt(select.value, 10);
+      paginaAtual = 1; // Voltar para primeira página
+      renderTable(filteredData);
+    }
+
+    // ==============================
+    // Exportar CSV
+    // ==============================
+    function exportarCSV() {
+      if (!filteredData || filteredData.length === 0) {
+        alert('Não há registros filtrados para exportar.');
+        return;
+      }
+      
+      const headers = Object.keys(filteredData[0]);
+      const linhas = [];
+      linhas.push(headers.join(';'));
+      
+      filteredData.forEach(row => {
+        const linha = headers.map(h => {
+          let val = row[h];
+          if (val === null || val === undefined) val = '';
+          val = String(val).replace(/"/g, '""');
+          return `"${val}"`;
+        }).join(';');
+        linhas.push(linha);
+      });
+      
+      const csvContent = linhas.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'registros_filtrados.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ========================================
+    // VERIFICAR AUTENTICAÇÃO
+    // ========================================
+    function verificarAutenticacao() {
+      const userRole = sessionStorage.getItem('userRole');
+      const userEmail = sessionStorage.getItem('userEmail');
+      
+      // Se não estiver autenticado, redireciona para login
+      if (!userRole || !userEmail) {
+        alert('Acesso negado! Faça login para acessar o sistema.');
+        window.location.href = 'login.html';
+        return;
+      }
+    }
+
+    // ========================================
+    // MENU MOBILE TOGGLE
+    // ========================================
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenuNav');
+      const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+      if (mobileMenu) {
+        mobileMenu.classList.toggle('show');
+        if (menuIcon) {
+          menuIcon.style.transform = mobileMenu.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+      }
+    }
+    
+    // Fecha o menu ao redimensionar para desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        const mobileMenu = document.getElementById('mobileMenuNav');
+        const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+        if (mobileMenu && mobileMenu.classList.contains('show')) {
+          mobileMenu.classList.remove('show');
+          if (menuIcon) {
+            menuIcon.style.transform = 'rotate(0deg)';
+          }
+        }
+      }
+    });
+
+    // ========================================
+    // VERIFICAR E MOSTRAR MENU ADMIN
+    // ========================================
+    function verificarMenuAdmin() {
+      const userRole = sessionStorage.getItem('userRole');
+      const menuAdmin = document.getElementById('menuAdmin');
+      const btnSair = document.getElementById('btnSair');
+      const menuAdminMobile = document.getElementById('menuAdminMobile');
+      const btnSairMobile = document.getElementById('btnSairMobile');
+      
+      if (userRole === 'admin' || userRole === 'superuser') {
+        if (menuAdmin) {
+          menuAdmin.classList.remove('hidden');
+        }
+        if (btnSair) {
+          btnSair.classList.remove('hidden');
+        }
+        if (menuAdminMobile) {
+          menuAdminMobile.classList.remove('hidden');
+        }
+        if (btnSairMobile) {
+          btnSairMobile.classList.remove('hidden');
+        }
+      }
+    }
+
+    // ========================================
+    // FECHAR MENU MOBILE AO CLICAR EM LINK
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuLinks = document.querySelectorAll('#mobileMenuNav a');
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          const mobileMenu = document.getElementById('mobileMenuNav');
+          const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
+          if (mobileMenu) {
+            mobileMenu.classList.remove('show');
+            if (menuIcon) {
+              menuIcon.style.transform = 'rotate(0deg)';
+            }
+          }
+        });
+      });
+      
+      verificarMenuAdmin();
+    });
+
+    // ========================================
+    // FUNÇÃO SAIR
+    // ========================================
+    function sair() {
+      if (confirm('Deseja realmente sair do sistema?')) {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Chama verificações ao carregar
+    verificarAutenticacao();
+    verificarMenuAdmin();
+  </script>
+</body>
+</html>
