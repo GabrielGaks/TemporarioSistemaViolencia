@@ -56,7 +56,7 @@ const CONFIG = {
       return window.CONFIG_LOCAL.APPS_SCRIPT_CASOS;
     }
     // Valor padrão (substitua em produção)
-    return 'https://script.google.com/macros/s/AKfycbxeLPC5t_wzsjyq4yg4HPyktGZ_jVdXUUsZOTaUXn0qSaQHiBLeKb6UUZi07UZ9RbxS/exec';
+    return 'https://script.google.com/macros/s/AKfycbwYN652dqt7cc0l96iPAtIHZIgh-11PDVe3lK0_518mUDI5mHQ0iWMEeHgNuARTUD7S/exec';
   })()),
   
   
