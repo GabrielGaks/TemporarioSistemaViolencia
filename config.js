@@ -43,7 +43,7 @@ const CONFIG = {
       return window.CONFIG_LOCAL.APPS_SCRIPT_AUTH;
     }
     // Valor padrão (substitua em produção)
-    return 'https://script.google.com/macros/s/AKfycbxQCigJmlVZmZLL-3MmcLZbJ1O9QZOPmaIsrFHCh40UjqrJDi4jBVAWCNYUyYBe7NST/exec';
+    return 'https://script.google.com/macros/s/AKfycbyonzyLsu5EpohK2e6ZyvePjlzo2I__WP8XAbDJUsCVm5BPAFY09VC8-ohjfr8MnukE/exec';
   })()),
   
   // URL para CASOS (Cadastro, Edição e Listagem de Casos)

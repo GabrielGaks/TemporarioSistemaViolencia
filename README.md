@@ -5,10 +5,16 @@
 ![Status](https://img.shields.io/badge/status-ativo-success?style=for-the-badge)
 ![Versão](https://img.shields.io/badge/versão-2.2-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![GitHub Stars](https://img.shields.io/github/stars/GabrielGaks/sistema-registro-violencia?style=for-the-badge&logo=github)
+![GitHub Forks](https://img.shields.io/github/forks/GabrielGaks/sistema-registro-violencia?style=for-the-badge&logo=github)
 
 **Sistema web completo e moderno para registro, gerenciamento e acompanhamento de casos de violência escolar**
 
-[🚀 Funcionalidades](#-funcionalidades) • [🛠️ Tecnologias](#️-tecnologias) • [📦 Instalação](#-instalação) • [🔒 Segurança](#-segurança) • [📚 Documentação](#-documentação)
+[🌐 Acessar Sistema](https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2/index.html) • [🚀 Funcionalidades](#-funcionalidades) • [🛠️ Tecnologias](#️-tecnologias) • [📦 Instalação](#-instalação) • [🔒 Segurança](#-segurança) • [📚 Documentação](#-documentação)
+
+[![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-blue?style=for-the-badge&logo=github)](https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2/index.html)
+[![Issues](https://img.shields.io/github/issues/GabrielGaks/sistema-registro-violencia?style=for-the-badge&logo=github)](https://github.com/GabrielGaks/sistema-registro-violencia/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/GabrielGaks/sistema-registro-violencia?style=for-the-badge&logo=github)](https://github.com/GabrielGaks/sistema-registro-violencia/pulls)
 
 </div>
 
@@ -20,6 +26,7 @@
 - [✨ Funcionalidades](#-funcionalidades)
 - [🛠️ Tecnologias](#️-tecnologias)
 - [🏗️ Arquitetura](#️-arquitetura)
+- [👥 Equipe](#-equipe)
 - [📦 Instalação](#-instalação)
 - [⚙️ Configuração](#️-configuração)
 - [🔒 Segurança](#-segurança)
@@ -27,6 +34,7 @@
 - [🚀 Deploy](#-deploy)
 - [📚 Documentação](#-documentação)
 - [🤝 Contribuindo](#-contribuindo)
+- [📊 Estatísticas](#-estatísticas)
 - [📝 Licença](#-licença)
 
 ---
@@ -43,10 +51,20 @@ Sistema desenvolvido para a **Secretaria Municipal de Educação de Vitória/ES*
 - ✅ **Controle de acesso** baseado em roles e permissões
 - ✅ **Segurança robusta** com validações e sanitização
 - ✅ **Responsivo** para desktop, tablet e mobile
+- ✅ **Exportação de dados** em PDF com gráficos e estatísticas
 
 ### 🏢 Contexto
 
-Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Educação de Vitória/ES, permitindo o registro, acompanhamento e análise de casos de violência escolar em toda a rede municipal de ensino.
+Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Educação de Vitória/ES, permitindo o registro, acompanhamento e análise de casos de violência escolar em toda a rede municipal de ensino, contribuindo para a proteção e segurança de crianças e adolescentes.
+
+### 🌟 Destaques
+
+- 🎨 **Interface moderna** e intuitiva
+- 📊 **Dashboard interativo** com gráficos em tempo real
+- 🔐 **Sistema de autenticação** robusto e seguro
+- 📱 **100% responsivo** para todos os dispositivos
+- 🚀 **Performance otimizada** para grandes volumes de dados
+- 🔒 **Segurança em primeiro lugar** com validações e sanitização
 
 ---
 
@@ -62,6 +80,7 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
 | 💾 **Sessão Persistente** | SessionStorage para manter login |
 | 🔄 **Redirecionamento Automático** | Baseado em role do usuário |
 | 👤 **Gerenciamento de Usuários** | CRUD completo de usuários |
+| 🔐 **Recuperação de Senha** | Sistema completo com email |
 
 #### 📊 Roles e Permissões
 
@@ -81,6 +100,7 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
 - ✅ **Conversão automática** de dados (datas, gênero, etc.)
 - ✅ **Preservação de siglas** existentes
 - ✅ **Interface responsiva** e acessível
+- ✅ **Autocomplete inteligente** com similaridade de strings
 
 ### 📊 Painel de Casos (Dashboard)
 
@@ -90,6 +110,8 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
 - 📄 **Exportação para PDF** com gráficos e estatísticas
 - 📋 **Tabela de dados** completa e pesquisável
 - 🎨 **Visualizações modernas** e responsivas
+- 📊 **Top 5 Escolas** com mais casos
+- 📅 **Análise temporal** de ocorrências
 
 ### 👥 Gerenciamento de Usuários
 
@@ -106,6 +128,7 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
 - 🗑️ **Exclusão** de casos
 - 🔍 **Busca e filtros** avançados
 - 📋 **Visualização detalhada** de cada caso
+- 📄 **Paginação inteligente** para grandes volumes
 
 ### 🔐 Recuperação de Senha
 
@@ -173,7 +196,7 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
                 │                       │
         ┌───────▼────────┐    ┌────────▼────────┐
         │  Supabase      │    │  Google Apps     │
-        │  (Auth + DB)    │    │  Script (API)   │
+        │  (Auth + DB)   │    │  Script (API)   │
         └───────┬────────┘    └────────┬────────┘
                 │                      │
         ┌───────▼────────┐    ┌────────▼────────┐
@@ -191,6 +214,48 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
 
 ---
 
+## 👥 Equipe
+
+Este projeto foi desenvolvido por uma equipe dedicada de profissionais comprometidos com a educação e segurança de crianças e adolescentes.
+
+### 👨‍💻 Desenvolvedores
+
+- **Equipe de Desenvolvimento** - Secretaria Municipal de Educação de Vitória/ES
+  - Desenvolvimento Full-Stack
+  - Arquitetura e Design de Sistema
+  - Implementação de Segurança
+  - Interface e Experiência do Usuário
+
+### 🎨 Design e UX
+
+- **Equipe de Design** - Interface e Experiência do Usuário
+  - Design responsivo e moderno
+  - Experiência do usuário otimizada
+  - Acessibilidade e usabilidade
+
+### 🔒 Segurança
+
+- **Equipe de Segurança** - Implementação de Medidas de Segurança
+  - Validação e sanitização de dados
+  - Proteção contra vulnerabilidades
+  - Auditoria e logging seguro
+
+### 📊 Análise de Dados
+
+- **Equipe de Análise** - Visualizações e Estatísticas
+  - Gráficos interativos
+  - Análise de tendências
+  - Relatórios e exportação
+
+### 🏫 Parceiros
+
+- **Secretaria Municipal de Educação de Vitória/ES**
+  - Requisitos e especificações
+  - Testes e validação
+  - Suporte e feedback
+
+---
+
 ## 📦 Instalação
 
 ### Pré-requisitos
@@ -203,8 +268,8 @@ Sistema desenvolvido para atender às necessidades da Secretaria Municipal de Ed
 ### 1️⃣ Clone o Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/sistema-violencia-escolar.git
-cd sistema-violencia-escolar/FormularioRegistroV2
+git clone https://github.com/GabrielGaks/sistema-registro-violencia.git
+cd sistema-registro-violencia/FormularioRegistroV2
 ```
 
 ### 2️⃣ Configure as Credenciais
@@ -269,7 +334,7 @@ const CONFIG_LOCAL = {
   SUPABASE_KEY: 'sua-chave-anon',
   
   // URL base do site (para emails de recuperação)
-  BASE_URL: 'https://seu-usuario.github.io/seu-repo/FormularioRegistroV2'
+  BASE_URL: 'https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2'
 };
 ```
 
@@ -385,9 +450,9 @@ FormularioRegistroV2/
 ├── 📄 *.html                    # Páginas HTML (raiz)
 │   ├── index.html               # Login
 │   ├── registro-novo-caso.html  # Formulário de registro
-│   ├── gerenciar-casos.html     # Gerenciamento de casos
+│   ├── gerenciar-casos.html    # Gerenciamento de casos
 │   ├── gerenciar-usuarios.html  # Gerenciamento de usuários
-│   ├── painel-casos.html        # Dashboard
+│   ├── painel-casos.html       # Dashboard
 │   ├── recuperar-senha.html    # Recuperação de senha
 │   └── resetar-senha.html      # Reset de senha
 │
@@ -398,11 +463,11 @@ FormularioRegistroV2/
 │   ├── css/
 │   │   └── styles-elegant.css   # Estilos compartilhados
 │   └── js/
-│       ├── modules/              # Módulos específicos
+│       ├── modules/             # Módulos específicos
 │       │   └── dashboard-stats.js
-│       └── utils/                # Utilitários compartilhados
+│       └── utils/               # Utilitários compartilhados
 │           ├── api.js           # Módulo de API
-│           ├── security.js      # Módulo de segurança
+│           ├── security.js       # Módulo de segurança
 │           ├── logger.js         # Sistema de logging
 │           ├── config-loader.js  # Carregador de config
 │           └── page-transitions.js
@@ -421,7 +486,7 @@ FormularioRegistroV2/
 │   ├── security/                # Segurança
 │   │   ├── SECURITY.md
 │   │   └── README-SEGURANCA.md
-│   ├── troubleshooting/         # Solução de problemas
+│   ├── troubleshooting/          # Solução de problemas
 │   │   ├── TROUBLESHOOTING-RESET-SENHA.md
 │   │   ├── RESOLVER-PERMISSAO-EMAIL.md
 │   │   ├── CONFIGURAR-EMAIL-PRODUCAO.md
@@ -439,12 +504,16 @@ FormularioRegistroV2/
 
 ## 🚀 Deploy
 
+### 🌐 Acesso ao Sistema
+
+**🔗 Link de Acesso:** [https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2/index.html](https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2/index.html)
+
 ### GitHub Pages
 
 1. **Faça push do código para o GitHub**
    ```bash
    git add .
-   git commit -m "Deploy inicial"
+   git commit -m "Atualização do sistema"
    git push origin main
    ```
 
@@ -455,7 +524,7 @@ FormularioRegistroV2/
 
 3. **Configure URLs no `config.local.js`**
    ```javascript
-   BASE_URL: 'https://seu-usuario.github.io/seu-repo/FormularioRegistroV2'
+   BASE_URL: 'https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2'
    ```
 
 ### Servidor Local
@@ -510,25 +579,70 @@ Contribuições são bem-vindas! Siga estes passos:
 - ✅ Adicione comentários em código complexo
 - ✅ Mantenha a documentação atualizada
 
+### 🐛 Reportar Bugs
+
+Encontrou um bug? [Abra uma issue](https://github.com/GabrielGaks/sistema-registro-violencia/issues) descrevendo:
+- 📝 Descrição do problema
+- 🔄 Passos para reproduzir
+- 💻 Ambiente (navegador, sistema operacional)
+- 📸 Screenshots (se aplicável)
+
+---
+
+## 📊 Estatísticas
+
+![GitHub Stars](https://img.shields.io/github/stars/GabrielGaks/sistema-registro-violencia?style=social)
+![GitHub Forks](https://img.shields.io/github/forks/GabrielGaks/sistema-registro-violencia?style=social)
+![GitHub Watchers](https://img.shields.io/github/watchers/GabrielGaks/sistema-registro-violencia?style=social)
+
+![GitHub Issues](https://img.shields.io/github/issues/GabrielGaks/sistema-registro-violencia)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/GabrielGaks/sistema-registro-violencia)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/GabrielGaks/sistema-registro-violencia)
+
+### 📈 Métricas do Projeto
+
+- 📦 **35+ arquivos** organizados
+- 📝 **8.700+ linhas** de código
+- 🎨 **7 páginas** HTML
+- 🔧 **2 backends** (Google Apps Script)
+- 📚 **Documentação completa** organizada
+- 🔒 **Módulos de segurança** implementados
+
 ---
 
 ## 📝 Licença
 
 Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
+**Resumo da licença:**
+- ✅ Uso comercial
+- ✅ Modificação
+- ✅ Distribuição
+- ✅ Uso privado
+- ⚠️ Sem garantia
+
 ---
 
 ## 👥 Autores
 
 - **Equipe de Desenvolvimento** - Secretaria Municipal de Educação de Vitória/ES
+  - Desenvolvimento Full-Stack
+  - Arquitetura e Design de Sistema
+  - Implementação de Segurança
+  - Interface e Experiência do Usuário
 
 ---
 
 ## 🙏 Agradecimentos
 
-- Secretaria Municipal de Educação de Vitória/ES
-- Comunidade open source
-- Todos os contribuidores
+Este sistema foi desenvolvido com dedicação para apoiar o combate à violência escolar e a proteção de crianças e adolescentes da rede municipal de ensino de Vitória/ES.
+
+**Agradecimentos especiais:**
+
+- 🏫 **Secretaria Municipal de Educação de Vitória/ES**
+- 👨‍🏫 **Profissionais da educação** que utilizam o sistema
+- 👨‍💻 **Comunidade open-source**
+- 🌟 **Todos que contribuíram** com feedback e sugestões
 
 ---
 
@@ -537,5 +651,21 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 **⭐ Se este projeto foi útil, considere dar uma estrela! ⭐**
 
 [⬆ Voltar ao topo](#-sistema-de-registro-de-violência-escolar)
+
+---
+
+### 🛡️ Sistema de Registro de Violência Escolar v2.2
+
+**Desenvolvido com ❤️ para educação e segurança de crianças**
+
+_Dezembro de 2025_
+
+---
+
+[![Reportar Bug](https://img.shields.io/badge/🐛-Reportar_Bug-red?style=for-the-badge)](https://github.com/GabrielGaks/sistema-registro-violencia/issues)
+[![Solicitar Funcionalidade](https://img.shields.io/badge/✨-Nova_Funcionalidade-green?style=for-the-badge)](https://github.com/GabrielGaks/sistema-registro-violencia/issues)
+[![Acessar Sistema](https://img.shields.io/badge/🌐-Acessar_Sistema-blue?style=for-the-badge)](https://gabrielgaks.github.io/sistema-registro-violencia/FormularioRegistroV2/index.html)
+
+**Made with ❤️ for education and children's safety**
 
 </div>
