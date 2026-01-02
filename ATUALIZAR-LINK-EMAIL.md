@@ -99,3 +99,10 @@ Após fazer a alteração:
 
 **💡 Dica:** Você pode copiar todo o conteúdo do arquivo `backend/Code-Supabase.gs` local e colar no Google Apps Script para garantir que está tudo atualizado!
 
+
+
+
+
+
+
+

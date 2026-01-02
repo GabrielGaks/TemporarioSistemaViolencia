@@ -521,6 +521,8 @@
             </div>
           </div>
           
+          <!-- Card de Violências Institucionais será inserido aqui dinamicamente quando "Institucional" estiver selecionado -->
+          
           <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="tipoInstituicao" onclick="openFilterSection('tipoInstituicao')">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
@@ -604,33 +606,22 @@
             </div>
           </div>
           
-          <!-- NOVO CARD: Classificação da Violência -->
-          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="classificacao" onclick="openFilterSection('classificacao')">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="filter-card-icon text-2xl">🏷️</span>
-                <span class="text-sm font-medium text-gray-700">Classificação</span>
-              </div>
-              <span id="badge-classificacao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
-            </div>
-          </div>
-          
-          <!-- NOVO CARD: Motivação da Violência -->
-          <div class="filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm" data-filter="motivacao" onclick="openFilterSection('motivacao')">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="filter-card-icon text-2xl">🎯</span>
-                <span class="text-sm font-medium text-gray-700">Motivação</span>
-              </div>
-              <span id="badge-motivacao" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
-            </div>
-          </div>
-          
         </div>
       </div>
       
       <!-- Outros Filtros -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+        <!-- Filtro: Foi um membro familiar? -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Foi um membro familiar?</label>
+          <select id="filterMembroFamiliar" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="">Todos</option>
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+            <option value="naoinformado">Não informado</option>
+          </select>
+        </div>
         
         <!-- Filtro: É PCD -->
         <div>
@@ -834,16 +825,13 @@
             <div id="filterOrientacaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
           </div>
           
-          <!-- NOVA SEÇÃO: Classificação da Violência -->
-          <div id="section-classificacao" class="filter-section mb-6 hidden">
-            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🏷️ Classificação da Violência</h4>
-            <div id="filterClassificacaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
-          </div>
-          
-          <!-- NOVA SEÇÃO: Motivação da Violência -->
-          <div id="section-motivacao" class="filter-section mb-0 hidden">
-            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">🎯 Motivação da Violência</h4>
-            <div id="filterMotivacaoContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"></div>
+          <!-- NOVA SEÇÃO: Violências Institucionais -->
+          <div id="section-violenciaInstitucional" class="filter-section mb-6 hidden">
+            <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide flex items-center justify-between">
+              <span>🏛️ Violências Institucionais</span>
+              <span id="badge-violenciaInstitucional-total" class="badge-count hidden inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">0</span>
+            </h4>
+            <div id="filterViolenciaInstitucionalContainer" class="space-y-3"></div>
           </div>
         </div>
       </div>
@@ -1021,6 +1009,14 @@
           <h3 class="text-lg font-semibold text-gray-700 mb-4">Tipos de Violência</h3>
           <div class="relative" style="height: 300px;">
             <canvas id="chartTipoViolencia"></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico: Tipos de Violência Institucional -->
+        <div id="containerChartViolenciaInstitucional" class="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-4 border border-orange-200 hidden">
+          <h3 class="text-lg font-semibold text-orange-700 mb-4">🏛️ Violência Institucional</h3>
+          <div class="relative" style="height: 300px;">
+            <canvas id="chartTipoViolenciaInstitucional"></canvas>
           </div>
         </div>
         
@@ -1826,6 +1822,330 @@ Zilda Andrade,ZA`;
       }
     }
     
+    // ==============================
+    // Sistema de Grupos de Violências Institucionais
+    // ==============================
+    
+    // Definição dos grupos de violências institucionais (similar aos encaminhamentos)
+    const violenciasInstitucionaisAgrupadas = {
+      fisica: ['Física', 'Fisica'],
+      psicologica: ['Psicológica', 'Psicologica', 'Psicológica/Moral'],
+      sexual: ['Sexual', 'Abuso Sexual'],
+      verbal: ['Verbal', 'Verbal/Moral'],
+      negligencia: ['Negligência', 'Negligencia', 'Negligência/Abandono'],
+      patrimonial: ['Patrimonial', 'Patrimonial/Econômica'],
+      bullying: ['Bullying', 'Bullying/Cyberbullying'],
+      outras: ['Outras', 'Outros']
+    };
+    
+    // Nomes amigáveis dos grupos
+    const grupoNomesViolenciaInstitucional = {
+      fisica: 'Violência Física',
+      psicologica: 'Violência Psicológica',
+      sexual: 'Violência Sexual',
+      verbal: 'Violência Verbal',
+      negligencia: 'Negligência',
+      patrimonial: 'Violência Patrimonial',
+      bullying: 'Bullying/Cyberbullying',
+      outras: 'Outras Violências Institucionais'
+    };
+    
+    // Verifica se um termo pertence a algum grupo
+    function belongsToAnyGroupViolenciaInstitucional(term) {
+      const termNorm = normalizeText(term);
+      for (const groupKey in violenciasInstitucionaisAgrupadas) {
+        const children = violenciasInstitucionaisAgrupadas[groupKey];
+        if (children.some(child => normalizeText(child) === termNorm)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // Constrói a lista simples de violências institucionais (sem grupos)
+    function buildViolenciaInstitucionalGroups(data) {
+      const container = document.getElementById('filterViolenciaInstitucionalContainer');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      // Coleta todas as violências institucionais dos dados
+      // Apenas de registros que têm "Institucional" em tipoViolencia
+      const violenciasInstitucionais = new Set();
+      
+      data.forEach(row => {
+        const tipoViolencia = String(row[columnNames.tipo] || '').toLowerCase();
+        const temInstitucional = tipoViolencia.includes('institucional');
+        
+        if (temInstitucional && columnNames.tipoViolenciaInstitucional) {
+          const violenciaInstitucional = row[columnNames.tipoViolenciaInstitucional];
+          if (violenciaInstitucional) {
+            // Pode ter múltiplos valores separados por vírgula
+            const valores = String(violenciaInstitucional).split(',').map(v => v.trim()).filter(v => v);
+            valores.forEach(v => violenciasInstitucionais.add(v));
+          }
+        }
+      });
+      
+      const availableViolencias = Array.from(violenciasInstitucionais).sort();
+      
+      if (availableViolencias.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">Nenhuma violência institucional encontrada nos dados.</p>';
+        return;
+      }
+      
+      // Criar checkbox geral "Violência Institucional" que marca/desmarca todos
+      const grupoGeralDiv = document.createElement('div');
+      grupoGeralDiv.className = 'mb-4 p-3 bg-blue-50 border-2 border-blue-200 rounded-lg';
+      
+      const grupoGeralCheckboxDiv = document.createElement('div');
+      grupoGeralCheckboxDiv.className = 'flex items-center gap-3';
+      
+      const grupoGeralCheckbox = document.createElement('input');
+      grupoGeralCheckbox.type = 'checkbox';
+      grupoGeralCheckbox.id = 'checkbox-violencia-institucional-geral';
+      grupoGeralCheckbox.className = 'custom-checkbox';
+      grupoGeralCheckbox.onchange = () => {
+        const isChecked = grupoGeralCheckbox.checked;
+        const allCheckboxes = container.querySelectorAll('input[data-filter="violenciaInstitucional"]:not(#checkbox-violencia-institucional-geral)');
+        allCheckboxes.forEach(cb => {
+          cb.checked = isChecked;
+        });
+        updateBadgeViolenciaInstitucionalTotal();
+        applyFilters();
+      };
+      
+      const grupoGeralLabel = document.createElement('label');
+      grupoGeralLabel.htmlFor = 'checkbox-violencia-institucional-geral';
+      grupoGeralLabel.className = 'text-base font-bold text-gray-800 cursor-pointer flex-1';
+      grupoGeralLabel.textContent = 'Violência Institucional';
+      
+      grupoGeralCheckboxDiv.appendChild(grupoGeralCheckbox);
+      grupoGeralCheckboxDiv.appendChild(grupoGeralLabel);
+      grupoGeralDiv.appendChild(grupoGeralCheckboxDiv);
+      container.appendChild(grupoGeralDiv);
+      
+      // Criar checkboxes individuais para cada tipo de violência institucional
+      const checkboxesDiv = document.createElement('div');
+      checkboxesDiv.className = 'space-y-2 ml-6';
+      
+      availableViolencias.forEach((violencia, index) => {
+        const checkboxDiv = document.createElement('div');
+        checkboxDiv.className = 'flex items-center gap-2.5 p-2 bg-gray-50 rounded-lg border border-gray-200';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `checkbox-vi-${index}`;
+        checkbox.className = 'custom-checkbox';
+        checkbox.dataset.value = violencia;
+        checkbox.dataset.filter = 'violenciaInstitucional';
+        checkbox.onchange = () => {
+          // Atualiza o checkbox geral baseado no estado de todos os checkboxes
+          const allCheckboxes = container.querySelectorAll('input[data-filter="violenciaInstitucional"]:not(#checkbox-violencia-institucional-geral)');
+          const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+          const someChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+          
+          grupoGeralCheckbox.checked = allChecked;
+          grupoGeralCheckbox.indeterminate = someChecked && !allChecked;
+          
+          updateBadgeViolenciaInstitucionalTotal();
+          applyFilters();
+        };
+        
+        const label = document.createElement('label');
+        label.htmlFor = `checkbox-vi-${index}`;
+        label.className = 'checkbox-label flex-1 text-gray-700 text-sm cursor-pointer';
+        label.textContent = violencia;
+        
+        checkboxDiv.appendChild(checkbox);
+        checkboxDiv.appendChild(label);
+        checkboxesDiv.appendChild(checkboxDiv);
+      });
+      
+      container.appendChild(checkboxesDiv);
+    }
+    
+    
+    // Atualiza badge total de violência institucional
+    function updateBadgeViolenciaInstitucionalTotal() {
+      // Conta apenas os checkboxes individuais (exclui o checkbox geral)
+      const allChildCheckboxes = document.querySelectorAll('#filterViolenciaInstitucionalContainer input[data-filter="violenciaInstitucional"]:checked:not(#checkbox-violencia-institucional-geral)');
+      const count = allChildCheckboxes.length;
+      const badge = document.getElementById('badge-violenciaInstitucional-total');
+      
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Coleta todos os tipos de violência institucional selecionados
+    function gatherSelectedViolenciasInstitucionais() {
+      // Retorna apenas os checkboxes individuais (exclui o checkbox geral)
+      const selectedCheckboxes = document.querySelectorAll('#filterViolenciaInstitucionalContainer input[data-filter="violenciaInstitucional"]:checked:not(#checkbox-violencia-institucional-geral)');
+      return Array.from(selectedCheckboxes).map(cb => cb.dataset.value);
+    }
+    
+    // Verifica se uma célula de violência institucional corresponde aos termos selecionados (lógica OR)
+    function matchViolenciaInstitucionalCell(cellValue, selectedTerms) {
+      // Se nenhum termo foi selecionado, aceita todos
+      if (selectedTerms.length === 0) return true;
+      
+      // Se há termos selecionados mas a célula está vazia, REJEITA
+      if (!cellValue) return false;
+      
+      // Normalizar célula (split por vírgula)
+      const cellValues = String(cellValue)
+        .split(',')
+        .map(v => normalizeText(v.trim()))
+        .filter(v => v);
+      
+      // Se após normalizar não há valores, REJEITA
+      if (cellValues.length === 0) return false;
+      
+      // Normalizar termos selecionados
+      const selectedNormalized = selectedTerms.map(t => normalizeText(t));
+      
+      // Retorna true se qualquer valor da célula estiver nos selecionados (OR)
+      return cellValues.some(cv => selectedNormalized.includes(cv));
+    }
+    
+    // Verifica se "Institucional" está selecionado no filtro de Tipo Violência e mostra/esconde o card de Violências Institucionais
+    function verificarViolenciaInstitucionalNoFiltro() {
+      let cardViolenciaInstitucional = document.getElementById('card-violenciaInstitucional');
+      const sectionViolenciaInstitucional = document.getElementById('section-violenciaInstitucional');
+      
+      // Verifica se algum checkbox de "Institucional" está marcado no filtro de Tipo Violência
+      const tipoViolenciaCheckboxes = document.querySelectorAll('input[data-filter="tipoViolencia"]:checked');
+      const temInstitucional = Array.from(tipoViolenciaCheckboxes).some(cb => {
+        const valor = (cb.dataset.value || '').toLowerCase();
+        return valor === 'institucional' || valor.includes('institucional');
+      });
+      
+      if (temInstitucional) {
+        // Cria o card se não existir
+        if (!cardViolenciaInstitucional) {
+          const cardTipoViolencia = document.querySelector('[data-filter="tipoViolencia"]');
+          if (cardTipoViolencia) {
+            // Cria o card dinamicamente
+            const novoCard = document.createElement('div');
+            novoCard.id = 'card-violenciaInstitucional';
+            novoCard.className = 'filter-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm';
+            novoCard.setAttribute('data-filter', 'violenciaInstitucional');
+            novoCard.onclick = () => openFilterSection('violenciaInstitucional');
+            novoCard.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="filter-card-icon text-2xl">🏛️</span>
+                  <span class="text-sm font-medium text-gray-700">Violências Institucionais</span>
+                </div>
+                <span id="badge-violenciaInstitucional-total" class="badge-count hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">0</span>
+              </div>
+            `;
+            // Insere após o card de Tipo Violência
+            cardTipoViolencia.insertAdjacentElement('afterend', novoCard);
+            cardViolenciaInstitucional = novoCard;
+          }
+        } else {
+          // Card já existe, apenas mostra e posiciona
+          cardViolenciaInstitucional.classList.remove('hidden');
+          cardViolenciaInstitucional.style.display = '';
+          
+          // Move o card para aparecer logo após o card de Tipo Violência
+          const cardTipoViolencia = document.querySelector('[data-filter="tipoViolencia"]');
+          
+          if (cardTipoViolencia) {
+            // Verifica se já está na posição correta
+            const proximoIrmao = cardTipoViolencia.nextElementSibling;
+            if (!proximoIrmao || proximoIrmao.id !== 'card-violenciaInstitucional') {
+              // Remove o card de sua posição atual (se estiver em outro lugar)
+              if (cardViolenciaInstitucional.parentElement) {
+                cardViolenciaInstitucional.remove();
+              }
+              // Insere após o card de Tipo Violência
+              cardTipoViolencia.insertAdjacentElement('afterend', cardViolenciaInstitucional);
+            }
+          }
+        }
+        
+        // NOVO: Abre automaticamente a seção de Violências Institucionais
+        setTimeout(() => {
+          // Marca automaticamente o checkbox geral "Violência Institucional"
+          const grupoGeralCheckbox = document.getElementById('checkbox-violencia-institucional-geral');
+          if (grupoGeralCheckbox && !grupoGeralCheckbox.checked) {
+            grupoGeralCheckbox.checked = true;
+            grupoGeralCheckbox.dispatchEvent(new Event('change'));
+          }
+          
+          // Abre a seção de filtros se ainda não estiver aberta
+          if (sectionViolenciaInstitucional && sectionViolenciaInstitucional.classList.contains('hidden')) {
+            openFilterSection('violenciaInstitucional');
+          }
+          
+          // Mostra o gráfico de violência institucional
+          const containerChartViolenciaInst = document.getElementById('containerChartViolenciaInstitucional');
+          if (containerChartViolenciaInst) {
+            containerChartViolenciaInst.classList.remove('hidden');
+          }
+          // Re-renderiza os gráficos para atualizar o gráfico de violência institucional
+          if (typeof renderCharts === 'function' && filteredData) {
+            renderCharts(filteredData);
+          }
+        }, 100);
+      } else {
+        // Esconde o card e limpa os filtros de violências institucionais
+        if (cardViolenciaInstitucional) {
+          cardViolenciaInstitucional.classList.add('hidden');
+          cardViolenciaInstitucional.style.display = 'none';
+        }
+        
+        // Desmarca todos os checkboxes de violências institucionais
+        const viCheckboxes = document.querySelectorAll('#filterViolenciaInstitucionalContainer input[data-filter="violenciaInstitucional"]');
+        viCheckboxes.forEach(cb => {
+          cb.checked = false;
+          cb.indeterminate = false;
+        });
+        
+        // Desmarca o checkbox geral também
+        const grupoGeralCheckbox = document.getElementById('checkbox-violencia-institucional-geral');
+        if (grupoGeralCheckbox) {
+          grupoGeralCheckbox.checked = false;
+          grupoGeralCheckbox.indeterminate = false;
+        }
+        
+        // Atualiza badges
+        updateBadgeViolenciaInstitucionalTotal();
+        
+        // Fecha a seção se estiver aberta
+        if (sectionViolenciaInstitucional && sectionViolenciaInstitucional.classList.contains('show')) {
+          sectionViolenciaInstitucional.classList.remove('show');
+          sectionViolenciaInstitucional.classList.add('hidden');
+          cardViolenciaInstitucional.classList.remove('active');
+        }
+        
+        // Esconde o gráfico de violência institucional
+        const containerChartViolenciaInst = document.getElementById('containerChartViolenciaInstitucional');
+        if (containerChartViolenciaInst) {
+          containerChartViolenciaInst.classList.add('hidden');
+        }
+        // Destroi o gráfico se existir
+        if (charts['chartTipoViolenciaInstitucional']) {
+          charts['chartTipoViolenciaInstitucional'].destroy();
+          delete charts['chartTipoViolenciaInstitucional'];
+        }
+        
+        // Aplica filtros para atualizar a tabela
+        applyFilters();
+      }
+    }
+    
+    // Torna a função acessível globalmente
+    window.verificarViolenciaInstitucionalNoFiltro = verificarViolenciaInstitucionalNoFiltro;
+    
     // Coleta todos os encaminhamentos selecionados (de todos os grupos)
     function gatherSelectedEncaminhamentos() {
       const selectedCheckboxes = document.querySelectorAll('#filterEncaminhamentoContainer input[data-group]:checked');
@@ -1834,7 +2154,11 @@ Zilda Andrade,ZA`;
     
     // Verifica se uma célula de encaminhamento corresponde aos termos selecionados (lógica OR)
     function matchEncaminhamentoCell(cellValue, selectedTerms) {
-      if (!cellValue || selectedTerms.length === 0) return true;
+      // Se nenhum termo foi selecionado, aceita todos
+      if (selectedTerms.length === 0) return true;
+      
+      // Se há termos selecionados mas a célula está vazia, REJEITA
+      if (!cellValue) return false;
       
       // Normalizar célula (split por vírgula e barra)
       const cellValues = String(cellValue)
@@ -1842,6 +2166,9 @@ Zilda Andrade,ZA`;
         .flatMap(v => v.split('/'))
         .map(v => normalizeText(v.trim()))
         .filter(v => v);
+      
+      // Se após normalizar não há valores, REJEITA
+      if (cellValues.length === 0) return false;
       
       // Normalizar termos selecionados
       const selectedNormalized = selectedTerms.map(t => normalizeText(t));
@@ -2030,6 +2357,11 @@ Zilda Andrade,ZA`;
         checkbox.addEventListener('change', function() {
           updateBadge(filterName);
           applyFilters();
+          
+          // Se for filtro de tipoViolencia, verifica se "Institucional" está selecionado
+          if (filterName === 'tipoViolencia') {
+            verificarViolenciaInstitucionalNoFiltro();
+          }
         });
         
         const label = document.createElement('label');
@@ -2374,14 +2706,27 @@ Zilda Andrade,ZA`;
         // Qual a Orientação Sexual?
         orientacaoSexual: findColumn(data, ['qual a orientação sexual', 'qual a orientacao sexual', 'orientação sexual', 'orientacao sexual', 'orientação', 'orientacao']),
         
-        // Qual a classificação da Violencia?
-        classificacaoViolencia: findColumn(data, ['qual a classificação da violencia', 'qual a classificacao da violencia', 'classificação da violencia', 'classificacao da violencia', 'classificação', 'classificacao']),
-        
         // Tipo de Violência
         tipo: findColumn(data, ['tipo de violência', 'tipo de violencia', 'tipo']),
         
-        // Qual a Motivação da Violencia?
-        motivacaoViolencia: findColumn(data, ['qual a motivação da violencia', 'qual a motivacao da violencia', 'motivação da violencia', 'motivacao da violencia', 'motivação', 'motivacao']),
+        // Tipo de Violência Institucional (coluna K)
+        // OBS: Aceita tanto o novo cabeçalho quanto o antigo ("motivação da violência"),
+        // mas SEMPRE trata essa coluna como detalhamento da violência institucional.
+        tipoViolenciaInstitucional: findColumn(data, [
+          // Novos nomes esperados
+          'tipo de violência institucional',
+          'tipo de violencia institucional',
+          'violencia institucional',
+          'violência institucional',
+          'tipo violencia institucional',
+          // Nomes antigos reaproveitados (motivação da violência)
+          'qual a motivação da violencia',
+          'qual a motivacao da violencia',
+          'motivação da violencia',
+          'motivacao da violencia',
+          'motivação',
+          'motivacao'
+        ]),
         
         // Encaminhamento
         encaminhamento: findColumn(data, ['encaminhamento']),
@@ -2425,6 +2770,18 @@ Zilda Andrade,ZA`;
           'estudo caso?',
           'estudo'
         ])
+        ,
+        // Foi um membro familiar?
+        foiMembroFamiliar: findColumn(data, [
+          'foi um membro familiar?',
+          'foi um membro familiar',
+          'membro familiar',
+          'foi membro familiar',
+          'membro da família',
+          'membro da familia',
+          'familiar',
+          'foi familiar'
+        ])
       };
       
       // Debug: verificar se as colunas foram encontradas
@@ -2437,9 +2794,8 @@ Zilda Andrade,ZA`;
       console.log('Coluna de detalhePCD encontrada:', columnNames.detalhePCD);
       console.log('Coluna de raça/cor encontrada:', columnNames.raca);
       console.log('Coluna de orientação sexual encontrada:', columnNames.orientacaoSexual);
-      console.log('Coluna de classificação da violência encontrada:', columnNames.classificacaoViolencia);
       console.log('Coluna de tipo de violência encontrada:', columnNames.tipo);
-      console.log('Coluna de motivação da violência encontrada:', columnNames.motivacaoViolencia);
+      console.log('Coluna de tipo de violência institucional encontrada:', columnNames.tipoViolenciaInstitucional);
       console.log('Coluna de encaminhamento encontrada:', columnNames.encaminhamento);
       console.log('Coluna de escola encontrada:', columnNames.escola);
       console.log('Coluna de região encontrada:', columnNames.regiao);
@@ -2536,6 +2892,15 @@ Zilda Andrade,ZA`;
         // Usa função específica que NÃO separa por barra (mantém "Financeira/Econômica" junto)
         const valores = buildNormalizedOptionsTipoViolencia(columnNames.tipo, data);
         createCheckboxes('filterTipoViolenciaContainer', valores, 'tipoViolencia');
+        
+        // Adiciona listener para verificar quando "Institucional" é selecionado
+        const tipoViolenciaCheckboxes = document.querySelectorAll('input[data-filter="tipoViolencia"]');
+        tipoViolenciaCheckboxes.forEach(cb => {
+          cb.addEventListener('change', verificarViolenciaInstitucionalNoFiltro);
+        });
+        
+        // Verifica inicialmente se há "Institucional" já selecionado
+        setTimeout(verificarViolenciaInstitucionalNoFiltro, 500);
       }
       if (columnNames.escola) {
         // Filtro por tipo de instituição (CMEI/EMEF/Não Encontrada)
@@ -2584,26 +2949,26 @@ Zilda Andrade,ZA`;
         createCheckboxes('filterOrientacaoContainer', valores, 'orientacao');
       }
       
-      // NOVO FILTRO: Classificação da Violência
-      if (columnNames.classificacaoViolencia) {
-        const valores = buildNormalizedOptions(columnNames.classificacaoViolencia, data);
-        createCheckboxes('filterClassificacaoContainer', valores, 'classificacao');
+      // NOVO FILTRO: Violências Institucionais (agrupadas, similar aos encaminhamentos)
+      // Só constrói os grupos se a coluna existir (mas o card só aparece quando "Institucional" está selecionado)
+      if (columnNames.tipoViolenciaInstitucional) {
+        buildViolenciaInstitucionalGroups(data);
       }
       
-      // NOVO FILTRO: Motivação da Violência
-      if (columnNames.motivacaoViolencia) {
-        const valores = buildNormalizedOptions(columnNames.motivacaoViolencia, data);
-        createCheckboxes('filterMotivacaoContainer', valores, 'motivacao');
-      }
+      // Verifica se "Institucional" já está selecionado ao carregar os dados
+      setTimeout(verificarViolenciaInstitucionalNoFiltro, 1000);
       
+
+      // Adiciona o filtro de membro familiar
       const filterIds = [
         'filterPCD', 'filterOcorreuEscola',
         'filterFonteInformada', 'filterViolenciaEscolaOcorreu', 'filterProfissionalAutor',
         'filterEstudanteAutor', 'filterViolenciaNaoEscola', 'filterViolenciaInformada', 'filterEstudoCaso',
         'filterIdadeMin', 'filterIdadeMax', 'filterNome',
-        'filterDataInicio', 'filterDataFim', 'filterTI'
+        'filterDataInicio', 'filterDataFim', 'filterTI',
+        'filterMembroFamiliar' // <-- Adicionado aqui
       ];
-      
+
       filterIds.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -2672,8 +3037,7 @@ Zilda Andrade,ZA`;
         
         // NOVOS FILTROS
         orientacoes:     getCheckedValues('orientacao'),
-        classificacoes:  getCheckedValues('classificacao'),
-        motivacoes:      getCheckedValues('motivacao'),
+        violenciasInstitucionais: gatherSelectedViolenciasInstitucionais(),
 
         pcd:                  document.getElementById('filterPCD').value,
         ocorreu:              document.getElementById('filterOcorreuEscola').value,
@@ -2683,7 +3047,11 @@ Zilda Andrade,ZA`;
         estudanteAutor:       document.getElementById('filterEstudanteAutor').value,
         violenciaNaoEscola:   document.getElementById('filterViolenciaNaoEscola').value,
         violenciaInformada:   document.getElementById('filterViolenciaInformada').value,
+
         estudoCaso:           document.getElementById('filterEstudoCaso').value,
+
+        // NOVO FILTRO: Foi um membro familiar?
+        membroFamiliar: document.getElementById('filterMembroFamiliar').value,
 
         idadeMin: document.getElementById('filterIdadeMin').value,
         idadeMax: document.getElementById('filterIdadeMax').value,
@@ -2698,6 +3066,16 @@ Zilda Andrade,ZA`;
       const dataFimDate    = filters.dataFim    ? new Date(filters.dataFim    + 'T23:59:59') : null;
       
       filteredData = originalData.filter(row => {
+
+                // FILTRO: Foi um membro familiar?
+                // Opções: '' (Todos), 'Sim', 'Não', 'naoinformado'
+                if (filters.membroFamiliar && columnNames.foiMembroFamiliar) {
+                  const valor = String(row[columnNames.foiMembroFamiliar] || '').trim().toUpperCase();
+                  console.log('[Filtro Membro Familiar] Valor na linha:', valor, '| Filtro selecionado:', filters.membroFamiliar);
+                  if (filters.membroFamiliar === 'Sim' && valor !== 'S') return false;
+                  if (filters.membroFamiliar === 'Não' && valor !== 'N') return false;
+                  if (filters.membroFamiliar === 'naoinformado' && valor !== '') return false;
+                }
         // Multi (OU) - com suporte a campos multi-valor separados por vírgula
         if (filters.regioes.length && columnNames.regiao) {
           const rowVals = String(row[columnNames.regiao] || '').split(',').map(v => v.trim());
@@ -2822,32 +3200,21 @@ Zilda Andrade,ZA`;
           if (!ok) return false;
         }
         
-        // NOVO FILTRO: Classificação da Violência (OU)
-        if (filters.classificacoes.length && columnNames.classificacaoViolencia) {
-          const rowVals = String(row[columnNames.classificacaoViolencia] || '')
-            .split(',')
-            .flatMap(v => v.split('/'))
-            .map(v => v.trim())
-            .filter(v => v);
+        // FILTRO: Violências Institucionais
+        // Só aplica se o registro tem "Institucional" em tipoViolencia
+        if (filters.violenciasInstitucionais && filters.violenciasInstitucionais.length > 0) {
+          const tipoViolencia = String(row[columnNames.tipo] || '').toLowerCase();
+          const temInstitucional = tipoViolencia.includes('institucional');
           
-          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
-          const filterNorms = filters.classificacoes.map(v => normalizeText(v));
-          const ok = rowNorms.some(rn => filterNorms.includes(rn));
-          if (!ok) return false;
-        }
-        
-        // NOVO FILTRO: Motivação da Violência (OU)
-        if (filters.motivacoes.length && columnNames.motivacaoViolencia) {
-          const rowVals = String(row[columnNames.motivacaoViolencia] || '')
-            .split(',')
-            .flatMap(v => v.split('/'))
-            .map(v => v.trim())
-            .filter(v => v);
-          
-          const rowNorms = rowVals.map(v => normalizeText(v)).filter(v => v);
-          const filterNorms = filters.motivacoes.map(v => normalizeText(v));
-          const ok = rowNorms.some(rn => filterNorms.includes(rn));
-          if (!ok) return false;
+          if (temInstitucional && columnNames.tipoViolenciaInstitucional) {
+            const violenciaInstitucional = row[columnNames.tipoViolenciaInstitucional];
+            if (!matchViolenciaInstitucionalCell(violenciaInstitucional, filters.violenciasInstitucionais)) {
+              return false;
+            }
+          } else {
+            // Se não tem "Institucional" em tipoViolencia, não passa no filtro
+            return false;
+          }
         }
 
         // S/N
@@ -3023,6 +3390,12 @@ Zilda Andrade,ZA`;
       // Atualiza variável global para dashboard-stats.js
       window.filteredData = filteredData;
       
+      // Esconde card de Violências Institucionais ao limpar filtros
+      const cardViolenciaInstitucional = document.getElementById('card-violenciaInstitucional');
+      if (cardViolenciaInstitucional) {
+        cardViolenciaInstitucional.classList.add('hidden');
+      }
+      
       // Resetar para primeira página ao limpar filtros
       paginaAtual = 1;
       
@@ -3128,6 +3501,91 @@ Zilda Andrade,ZA`;
           .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
           .sort((a, b) => b[1] - a[1]);
         renderPieChart('chartTipoViolencia', sorted, colors);
+      }
+      
+      // Gráfico: Tipos de Violência Institucional (normalizado)
+      // Só renderiza se "Institucional" estiver selecionado no filtro de tipo de violência
+      const containerChartViolenciaInst = document.getElementById('containerChartViolenciaInstitucional');
+      const tipoViolenciaCheckboxes = document.querySelectorAll('input[data-filter="tipoViolencia"]:checked');
+      const temInstitucional = Array.from(tipoViolenciaCheckboxes).some(cb => {
+        const valor = (cb.dataset.value || '').toLowerCase();
+        return valor === 'institucional' || valor.includes('institucional');
+      });
+      
+      if (temInstitucional && columnNames.tipoViolenciaInstitucional) {
+        // Mostra o container do gráfico
+        if (containerChartViolenciaInst) {
+          containerChartViolenciaInst.classList.remove('hidden');
+        }
+        
+        const dados = {};
+        const mapaNormalizado = {};
+        
+        // Filtra apenas registros que têm "Institucional" no tipo de violência
+        // Usa os dados já filtrados (parâmetro 'data' da função renderCharts)
+        const dataInstitucional = data.filter(row => {
+          const tipoViolencia = row[columnNames.tipo];
+          if (!tipoViolencia) return false;
+          const tipoViolenciaStr = String(tipoViolencia).toLowerCase();
+          return tipoViolenciaStr.includes('institucional');
+        });
+        
+        dataInstitucional.forEach(row => {
+          const tipoInst = row[columnNames.tipoViolenciaInstitucional];
+          if (tipoInst) {
+            const original = String(tipoInst).trim();
+            const norm = normalizeText(original);
+            if (norm) {
+              dados[norm] = (dados[norm] || 0) + 1;
+              // Guarda o label original mais usado (capitalizado)
+              if (!mapaNormalizado[norm] || original.length > mapaNormalizado[norm].length) {
+                mapaNormalizado[norm] = original;
+              }
+            }
+          }
+        });
+        
+        // Converte de volta para labels originais
+        const sorted = Object.entries(dados)
+          .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
+          .sort((a, b) => b[1] - a[1]);
+        
+        // Se houver dados, renderiza o gráfico
+        if (sorted.length > 0) {
+          // Restaura o canvas se foi substituído por mensagem
+          const canvas = document.getElementById('chartTipoViolenciaInstitucional');
+          if (!canvas) {
+            const container = document.getElementById('containerChartViolenciaInstitucional');
+            if (container) {
+              const canvasDiv = container.querySelector('.relative');
+              if (canvasDiv) {
+                canvasDiv.innerHTML = '<canvas id="chartTipoViolenciaInstitucional"></canvas>';
+              }
+            }
+          }
+          renderPieChart('chartTipoViolenciaInstitucional', sorted, colors);
+        } else {
+          // Se não houver dados, mostra mensagem
+          const canvas = document.getElementById('chartTipoViolenciaInstitucional');
+          if (canvas && canvas.parentElement) {
+            // Destroi o gráfico se existir
+            if (charts['chartTipoViolenciaInstitucional']) {
+              charts['chartTipoViolenciaInstitucional'].destroy();
+              delete charts['chartTipoViolenciaInstitucional'];
+            }
+            canvas.parentElement.innerHTML = '<p class="text-gray-500 text-sm text-center mt-8">Nenhuma violência institucional encontrada nos dados filtrados.</p>';
+          }
+        }
+      } else {
+        // Esconde o container do gráfico se "Institucional" não estiver selecionado
+        if (containerChartViolenciaInst) {
+          containerChartViolenciaInst.classList.add('hidden');
+        }
+        // Destroi o gráfico se existir
+        if (charts['chartTipoViolenciaInstitucional']) {
+          charts['chartTipoViolenciaInstitucional'].destroy();
+          delete charts['chartTipoViolenciaInstitucional'];
+        }
       }
       
       // Gráfico: Por Região (normalizado)
@@ -3526,25 +3984,32 @@ Zilda Andrade,ZA`;
         const mesAtual = agora.getMonth();
         const anoAtual = agora.getFullYear();
         
-        // Últimos 6 meses
+        // Função auxiliar para calcular mês e ano corretamente
+        const calcularMesAno = (mesesAtras) => {
+          const dataAlvo = new Date(anoAtual, mesAtual - mesesAtras, 1);
+          return {
+            mes: dataAlvo.getMonth(),
+            ano: dataAlvo.getFullYear()
+          };
+        };
+        
+        // Últimos 6 meses (0 a 5 meses atrás)
         const ultimos6Meses = {};
         for (let i = 0; i < 6; i++) {
-          const mes = (mesAtual - i + 12) % 12;
-          const ano = mesAtual - i < 0 ? anoAtual - 1 : anoAtual;
+          const { mes, ano } = calcularMesAno(i);
           const key = `${ano}-${String(mes + 1).padStart(2, '0')}`;
           ultimos6Meses[key] = { mes, ano, count: 0 };
         }
         
-        // Período anterior (meses 7-12 atrás)
+        // Período anterior (6 a 11 meses atrás)
         const periodoAnterior = {};
         for (let i = 6; i < 12; i++) {
-          const mes = (mesAtual - i + 12) % 12;
-          const ano = mesAtual - i < 0 ? anoAtual - 1 : anoAtual;
+          const { mes, ano } = calcularMesAno(i);
           const key = `${ano}-${String(mes + 1).padStart(2, '0')}`;
           periodoAnterior[key] = { mes, ano, count: 0 };
         }
         
-        // Conta os casos
+        // Conta os casos - INCLUI TODOS os dados que caem nos períodos
         data.forEach(row => {
           const rawData = row[dataCol];
           if (!rawData) return;
@@ -3556,6 +4021,7 @@ Zilda Andrade,ZA`;
           const rowAno = date.getFullYear();
           const key = `${rowAno}-${String(rowMes + 1).padStart(2, '0')}`;
           
+          // Verifica se o registro cai em algum dos períodos definidos
           if (ultimos6Meses[key]) {
             ultimos6Meses[key].count++;
           } else if (periodoAnterior[key]) {
@@ -3575,16 +4041,25 @@ Zilda Andrade,ZA`;
         const sortedAnterior = Object.entries(periodoAnterior)
           .sort((a, b) => a[0].localeCompare(b[0]));
         
-        // Cria um mapa do período anterior por mês
-        const anteriorPorMes = {};
-        sortedAnterior.forEach(([key, { mes, count }]) => {
-          anteriorPorMes[mes] = count;
+        // Cria um mapa do período anterior usando a chave completa (ano-mês)
+        const anteriorPorChave = {};
+        sortedAnterior.forEach(([key, { mes, ano, count }]) => {
+          anteriorPorChave[key] = count;
         });
         
-        sortedUltimos6.forEach(([key, { mes, count }]) => {
-          labels.push(meses[mes]);
-          dadosUltimos6.push(count);
-          dadosAnterior.push(anteriorPorMes[mes] || 0);
+        // Alinha os dados: para cada mês dos últimos 6, busca o mês correspondente do período anterior
+        // O período anterior é exatamente 6 meses antes, então precisamos mapear corretamente
+        sortedUltimos6.forEach(([keyUltimos6, { mes: mesUltimos6, ano: anoUltimos6, count: countUltimos6 }]) => {
+          // Calcula o mês correspondente no período anterior (6 meses antes)
+          const dataAnterior = new Date(anoUltimos6, mesUltimos6 - 6, 1);
+          const mesAnterior = dataAnterior.getMonth();
+          const anoAnterior = dataAnterior.getFullYear();
+          const keyAnterior = `${anoAnterior}-${String(mesAnterior + 1).padStart(2, '0')}`;
+          
+          labels.push(meses[mesUltimos6]);
+          dadosUltimos6.push(countUltimos6);
+          // Busca o count do período anterior usando a chave calculada
+          dadosAnterior.push(anteriorPorChave[keyAnterior] || 0);
         });
         
         if (labels.length > 0) {
@@ -3671,6 +4146,7 @@ Zilda Andrade,ZA`;
       // Limpa filtros anteriores relacionados
       const filtrosRelacionados = {
         'chartTipoViolencia': ['tipoViolencia'],
+        'chartTipoViolenciaInstitucional': ['violenciaInstitucional'],
         'chartRegiao': ['regiao'],
         'chartEscola': ['escola'],
         'chartIdade': ['idade'],
@@ -3736,6 +4212,8 @@ Zilda Andrade,ZA`;
             }
           });
           updateBadge('tipoViolencia');
+          // Verifica se precisa mostrar card de Violências Institucionais
+          setTimeout(verificarViolenciaInstitucionalNoFiltro, 100);
           break;
           
         case 'chartRegiao':
@@ -3785,6 +4263,44 @@ Zilda Andrade,ZA`;
             }
           });
           updateBadge('raca');
+          break;
+          
+        case 'chartTipoViolenciaInstitucional':
+          // Primeiro, garante que "Institucional" está selecionado no tipo de violência
+          const tipoViolenciaCheckboxes = document.querySelectorAll(`input[data-filter="tipoViolencia"]`);
+          let temInstitucional = false;
+          tipoViolenciaCheckboxes.forEach(cb => {
+            const cbValue = (cb.dataset.value || '').toLowerCase();
+            if (cbValue === 'institucional' || cbValue.includes('institucional')) {
+              cb.checked = true;
+              temInstitucional = true;
+            }
+          });
+          if (temInstitucional) {
+            updateBadge('tipoViolencia');
+            // Verifica e mostra o card de Violências Institucionais se necessário
+            setTimeout(verificarViolenciaInstitucionalNoFiltro, 100);
+          }
+          
+          // Marca o checkbox de violência institucional específico
+          const violenciaInstCheckboxes = document.querySelectorAll(`input[data-filter="violenciaInstitucional"]:not(#checkbox-violencia-institucional-geral)`);
+          violenciaInstCheckboxes.forEach(cb => {
+            const cbValueNorm = normalizeText(cb.dataset.value || '');
+            if (cbValueNorm === valorNormalizado || cb.dataset.value === valor) {
+              cb.checked = true;
+            }
+          });
+          
+          // Atualiza o checkbox geral se todos estiverem marcados
+          const allViolenciaInstCheckboxes = document.querySelectorAll(`input[data-filter="violenciaInstitucional"]:not(#checkbox-violencia-institucional-geral)`);
+          const checkedCount = Array.from(allViolenciaInstCheckboxes).filter(cb => cb.checked).length;
+          const grupoGeral = document.getElementById('checkbox-violencia-institucional-geral');
+          if (grupoGeral) {
+            grupoGeral.checked = checkedCount === allViolenciaInstCheckboxes.length;
+            grupoGeral.indeterminate = checkedCount > 0 && checkedCount < allViolenciaInstCheckboxes.length;
+          }
+          
+          updateBadgeViolenciaInstitucionalTotal();
           break;
           
         case 'chartEncaminhamento':
@@ -3985,6 +4501,12 @@ Zilda Andrade,ZA`;
       
       // Aplica filtros e rola até a tabela
       console.log('[aplicarFiltroDoGrafico] Aplicando filtros após configurar:', tipoGrafico, 'valor:', valor);
+      
+      // Se for gráfico de Tipo Violência ou Violência Institucional, verifica se precisa mostrar card de Violências Institucionais
+      if (tipoGrafico === 'chartTipoViolencia' || tipoGrafico === 'chartTipoViolenciaInstitucional') {
+        setTimeout(verificarViolenciaInstitucionalNoFiltro, 100);
+      }
+      
       applyFilters();
       
       // Aguarda um pouco para garantir que os filtros foram aplicados e a tabela foi atualizada
@@ -4736,14 +5258,47 @@ Zilda Andrade,ZA`;
       
       const keys = Object.keys(record);
       
+      // Verifica se o tipo de violência contém "Institucional"
+      const tipoViolencia = record[columnNames.tipo] || '';
+      const temInstitucional = String(tipoViolencia).toLowerCase().includes('institucional');
+      
       keys.forEach(key => {
+        // Ignora a coluna de classificação da violência (coluna I), que não é mais usada
+        if (key) {
+          const keyNorm = String(key).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (
+            keyNorm.includes('classificacao da violencia') ||
+            keyNorm.includes('classificacao da viol') ||
+            keyNorm.includes('classificacao') && keyNorm.includes('violencia')
+          ) {
+            return; // pula esta coluna
+          }
+        }
+        
+        // Verifica se é a coluna de tipoViolenciaInstitucional
+        const isTipoViolenciaInstitucional = (
+          key === columnNames.tipoViolenciaInstitucional ||
+          (key && String(key).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('motivacao') && String(key).toLowerCase().includes('violencia'))
+        );
+        
+        // Se for tipoViolenciaInstitucional, só mostra se tiver "Institucional" no tipo de violência
+        if (isTipoViolenciaInstitucional && !temInstitucional) {
+          return; // não mostra se não for violência institucional
+        }
+        
         const value = record[key];
         const rowDiv = document.createElement('div');
         rowDiv.className = 'flex justify-between border-b py-2';
         
         const label = document.createElement('div');
         label.className = 'font-medium text-gray-700 pr-4';
-        label.textContent = key;
+        
+        // Renomeia o label se for tipoViolenciaInstitucional
+        if (isTipoViolenciaInstitucional) {
+          label.textContent = 'Qual o tipo da violência institucional';
+        } else {
+          label.textContent = key;
+        }
         
         const valDiv = document.createElement('div');
         valDiv.className = 'text-slate-600 flex-1 text-right';
@@ -4768,7 +5323,19 @@ Zilda Andrade,ZA`;
             label.innerHTML = '♿ ' + key;
             valDiv.className = 'text-blue-700 flex-1 text-right font-semibold';
           }
-        } else if (displayValue === 'Não informado') {
+        } 
+        // Destaca o campo de tipo de violência institucional se for essa coluna
+        else if (isTipoViolenciaInstitucional) {
+          if (!value || String(value).trim() === '') {
+            displayValue = 'Não informado';
+            valDiv.className = 'text-gray-400 flex-1 text-right italic';
+          } else {
+            // Adiciona ícone e destaque visual
+            label.innerHTML = '🏛️ ' + label.textContent;
+            valDiv.className = 'text-indigo-700 flex-1 text-right font-semibold';
+          }
+        }
+        else if (displayValue === 'Não informado') {
           valDiv.className = 'text-gray-400 flex-1 text-right italic';
         }
         

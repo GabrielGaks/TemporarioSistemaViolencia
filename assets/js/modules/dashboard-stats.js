@@ -111,7 +111,7 @@ function exportarExcel() {
 function capturarGraficosComoImagens() {
   const imagens = {};
   const canvasIds = [
-    'chartTipoViolencia', 'chartRegiao', 'chartEscola', 'chartIdade',
+    'chartTipoViolencia', 'chartTipoViolenciaInstitucional', 'chartRegiao', 'chartEscola', 'chartIdade',
     'chartGenero', 'chartRaca', 'chartTemporal', 'chartEncaminhamento',
     'chartAutor', 'chartOcorreuEscola', 'chartCorrelacaoTipoIdade',
     'chartComparativoTemporal', 'chartTendenciaAnual'
@@ -536,6 +536,12 @@ async function exportarPDF() {
         <div class="chart-container">
           <div class="chart-title">Tipos de Violência</div>
           <img src="${imagensGraficos.chartTipoViolencia}" class="chart-image" alt="Gráfico de Tipos de Violência">
+        </div>
+      ` : ''}
+      ${imagensGraficos.chartTipoViolenciaInstitucional ? `
+        <div class="chart-container">
+          <div class="chart-title">🏛️ Violência Institucional</div>
+          <img src="${imagensGraficos.chartTipoViolenciaInstitucional}" class="chart-image" alt="Gráfico de Violência Institucional">
         </div>
       ` : ''}
       ${imagensGraficos.chartRegiao ? `

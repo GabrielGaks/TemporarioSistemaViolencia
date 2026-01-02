@@ -760,65 +760,34 @@
               </p>
             </div>
             
-            <!-- Classificação da Violência -->
-            <div>
-              <label for="classificacaoViolencia-input" class="block text-sm font-semibold text-gray-700 mb-2">
-                Qual a Classificação da Violência?
+            <!-- Tipo de Violência Institucional (Condicional) -->
+            <div id="tipoViolenciaInstitucionalContainer" class="hidden">
+              <label for="tipoViolenciaInstitucional-input" class="block text-sm font-semibold text-gray-700 mb-2">
+                Qual o tipo da violência institucional <span class="text-red-500">*</span>
               </label>
               
               <!-- Container de tags -->
-              <div id="classificacaoViolencia-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
+              <div id="tipoViolenciaInstitucional-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
               
               <!-- Input com autocomplete -->
               <div class="relative">
                 <input 
                   type="text"
-                  id="classificacaoViolencia-input" 
+                  id="tipoViolenciaInstitucional-input" 
                   class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
-                  placeholder="Digite para adicionar classificação (ex: Intrafamiliar)"
+                  placeholder="Digite para adicionar tipo de violência institucional (ex: Física, Psicológica)"
                   autocomplete="off"
                 />
                 
                 <!-- Lista de sugestões -->
-                <div id="classificacaoViolencia-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+                <div id="tipoViolenciaInstitucional-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
               </div>
               
               <!-- Campo oculto que será enviado -->
-              <input type="hidden" id="classificacaoViolencia" name="classificacaoViolencia" />
+              <input type="hidden" id="tipoViolenciaInstitucional" name="tipoViolenciaInstitucional" />
               
               <p class="text-xs text-gray-500 mt-1.5">
-                Digite e pressione Enter para adicionar. Clique no × para remover.
-              </p>
-            </div>
-            
-            <!-- Motivação da Violência -->
-            <div>
-              <label for="motivacaoViolencia-input" class="block text-sm font-semibold text-gray-700 mb-2">
-                Qual a Motivação da Violência?
-              </label>
-              
-              <!-- Container de tags -->
-              <div id="motivacaoViolencia-tags" class="flex flex-wrap gap-2 mb-2 min-h-[40px] p-2 border border-gray-200 rounded-lg bg-gray-50"></div>
-              
-              <!-- Input com autocomplete -->
-              <div class="relative">
-                <input 
-                  type="text"
-                  id="motivacaoViolencia-input" 
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
-                  placeholder="Digite para adicionar motivação (ex: Conflito Escolar)"
-                  autocomplete="off"
-                />
-                
-                <!-- Lista de sugestões -->
-                <div id="motivacaoViolencia-suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
-              </div>
-              
-              <!-- Campo oculto que será enviado -->
-              <input type="hidden" id="motivacaoViolencia" name="motivacaoViolencia" />
-              
-              <p class="text-xs text-gray-500 mt-1.5">
-                Digite e pressione Enter para adicionar. Clique no × para remover.
+                Digite e pressione Enter para adicionar. Pode adicionar múltiplos tipos (ex: Física, Psicológica). Este campo aparece apenas quando "Institucional" está selecionado no Tipo de Violência.
               </p>
             </div>
             
@@ -973,6 +942,32 @@
           <div class="space-y-4">
             
             <!-- Fonte informadores foi a escola? -->
+                        <!-- Foi um membro familiar? -->
+                        <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
+                          <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
+                            Foi um membro familiar?
+                          </label>
+                          <div class="flex flex-wrap gap-2 sm:gap-3">
+                            <label class="relative flex items-center cursor-pointer">
+                              <input type="radio" name="foiMembroFamiliar" value="Sim" class="peer sr-only">
+                              <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
+                                ✓ Sim
+                              </div>
+                            </label>
+                            <label class="relative flex items-center cursor-pointer">
+                              <input type="radio" name="foiMembroFamiliar" value="Não" class="peer sr-only">
+                              <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 hover:border-gray-300 hover:bg-gray-100">
+                                ✗ Não
+                              </div>
+                            </label>
+                            <label class="relative flex items-center cursor-pointer">
+                              <input type="radio" name="foiMembroFamiliar" value="" checked class="peer sr-only">
+                              <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-700 hover:border-gray-300 hover:bg-gray-100">
+                                ⊘ Não informado
+                              </div>
+                            </label>
+                          </div>
+                        </div>
             <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
               <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
                 A fonte dos informadores foi a escola?
@@ -1168,11 +1163,10 @@
             <div class="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-purple-300">
               <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4">
                 📋 Foi Realizado Estudo de Caso?
-                <span class="text-red-500 ml-1">*</span>
               </label>
               <div class="flex flex-wrap gap-2 sm:gap-3">
                 <label class="relative flex items-center cursor-pointer">
-                  <input type="radio" name="estudoCaso" value="Sim" required class="peer sr-only">
+                  <input type="radio" name="estudoCaso" value="Sim" class="peer sr-only">
                   <div class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 bg-gray-50 text-xs sm:text-sm font-medium text-gray-600 transition-all peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 hover:bg-gray-100">
                     ✓ Sim
                   </div>
@@ -1485,17 +1479,24 @@
       'Síndrome de Down',
       'Deficiência Intelectual',
       'Deficiência Visual',
+      'Distúrbio de Linguagem',
       'Deficiência Auditiva',
       'Deficiência Física',
       'Deficiência Múltipla',
       'Dislexia',
       'Discalculia',
       'Transtorno do Espectro Autista',
+      'Transtorno de Pânico',
       'Paralisia Cerebral',
       'TOD (Transtorno Opositor Desafiador)',
       'Transtorno de Ansiedade',
+      'Encefalopatia Crônica',
       'Depressão Infantil',
+      'Transtorno Mental',
+      'Muliplas Deficiências',
+      'Encefalopatia Epilética',
       'Síndrome de Asperger',
+      'Transtorno Comportamental',
       'Transtorno Bipolar',
       'Esquizofrenia',
       'Transtorno de Conduta',
@@ -1653,6 +1654,7 @@
       'Vara da Infância',
       'Assistência Social',
       'Psicólogo',
+      'Outras Delegacias',
       'Outros'
     ];
     
@@ -1789,7 +1791,6 @@
       'Financeira/Econômica',
       'Física',
       'Institucional',
-      'Institucional/física',
       'Negligência',
       'Psicológica',
       'Sexual',
@@ -1913,38 +1914,31 @@
     }
     
     // ========================================
-    // SISTEMA DE TAGS - CLASSIFICAÇÃO DA VIOLÊNCIA
+    // SISTEMA DE TAGS - TIPO DE VIOLÊNCIA INSTITUCIONAL (CONDICIONAL)
     // ========================================
-    // IMPORTANTE: Valores devem coincidir com a validação da planilha
-    const classificacoesViolenciaPredefinidas = [
-      'Autoprovocada',
-      'Intrafamiliar/Doméstica',
-      'Extrafamiliar/Comunitária/Urbana',
-      'Coletiva',
-      'Institucional',
-      'Virtual'
-    ];
+    let tiposViolenciaInstitucionalSelecionados = [];
+    let tiposViolenciaInstitucionalDisponiveis = []; // Será preenchido com dados existentes da planilha
     
-    let classificacoesViolenciaSelecionadas = [];
-    
-    // Renderiza as tags de classificação da violência
-    function renderizarTagsClassificacaoViolencia() {
-      const container = document.getElementById('classificacaoViolencia-tags');
-      const hiddenInput = document.getElementById('classificacaoViolencia');
+    // Renderiza as tags de tipo de violência institucional
+    function renderizarTagsViolenciaInstitucional() {
+      const container = document.getElementById('tipoViolenciaInstitucional-tags');
+      const hiddenInput = document.getElementById('tipoViolenciaInstitucional');
       
-      if (classificacoesViolenciaSelecionadas.length === 0) {
-        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhuma classificação adicionada</span>';
+      if (!container || !hiddenInput) return;
+      
+      if (tiposViolenciaInstitucionalSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhum tipo adicionado</span>';
         hiddenInput.value = '';
         return;
       }
       
-      container.innerHTML = classificacoesViolenciaSelecionadas.map((classif, index) => `
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium border border-orange-200 shadow-sm">
-          ${classif}
+      container.innerHTML = tiposViolenciaInstitucionalSelecionados.map((tipo, index) => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-medium border border-indigo-200 shadow-sm">
+          ${tipo}
           <button 
             type="button" 
-            onclick="removerClassificacaoViolencia(${index})"
-            class="hover:bg-orange-200 rounded-full p-0.5 transition-colors">
+            onclick="removerViolenciaInstitucional(${index})"
+            class="hover:bg-indigo-200 rounded-full p-0.5 transition-colors">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
             </svg>
@@ -1952,13 +1946,13 @@
         </span>
       `).join('');
       
-      hiddenInput.value = classificacoesViolenciaSelecionadas.join(', ');
+      hiddenInput.value = tiposViolenciaInstitucionalSelecionados.join(', ');
     }
     
-    // Remove uma classificação da violência
-    function removerClassificacaoViolencia(index) {
-      classificacoesViolenciaSelecionadas.splice(index, 1);
-      renderizarTagsClassificacaoViolencia();
+    // Remove um tipo de violência institucional
+    function removerViolenciaInstitucional(index) {
+      tiposViolenciaInstitucionalSelecionados.splice(index, 1);
+      renderizarTagsViolenciaInstitucional();
       
       // Salva automaticamente após remover tag
       if (typeof AutoSave !== 'undefined') {
@@ -1966,24 +1960,24 @@
       }
     }
     
-    // Adiciona uma classificação da violência
-    function adicionarClassificacaoViolencia(texto) {
+    // Adiciona um tipo de violência institucional
+    function adicionarViolenciaInstitucional(texto) {
       const textoTrimmed = texto.trim();
       if (!textoTrimmed) return;
       
       // Primeiro, tenta encontrar uma correspondência similar
       const correspondencia = encontrarMelhorCorrespondencia(
         textoTrimmed, 
-        classificacoesViolenciaPredefinidas, 
-        classificacoesViolenciaSelecionadas
+        tiposViolenciaInstitucionalDisponiveis, 
+        tiposViolenciaInstitucionalSelecionados
       );
       
       // Se encontrou correspondência similar, usa ela; caso contrário, usa o texto digitado
       const valorFinal = correspondencia || textoTrimmed;
       
-      if (!classificacoesViolenciaSelecionadas.includes(valorFinal)) {
-        classificacoesViolenciaSelecionadas.push(valorFinal);
-        renderizarTagsClassificacaoViolencia();
+      if (!tiposViolenciaInstitucionalSelecionados.includes(valorFinal)) {
+        tiposViolenciaInstitucionalSelecionados.push(valorFinal);
+        renderizarTagsViolenciaInstitucional();
         
         // Salva automaticamente após adicionar tag
         if (typeof AutoSave !== 'undefined') {
@@ -1991,19 +1985,27 @@
         }
       }
       
-      document.getElementById('classificacaoViolencia-input').value = '';
-      document.getElementById('classificacaoViolencia-suggestions').classList.add('hidden');
+      const input = document.getElementById('tipoViolenciaInstitucional-input');
+      const suggestions = document.getElementById('tipoViolenciaInstitucional-suggestions');
+      if (input) input.value = '';
+      if (suggestions) suggestions.classList.add('hidden');
     }
     
-    // Filtra e mostra sugestões de classificação da violência
-    function mostrarSugestoesClassificacaoViolencia(query) {
-      const suggestionsDiv = document.getElementById('classificacaoViolencia-suggestions');
+    // Filtra e mostra sugestões de tipo de violência institucional
+    function mostrarSugestoesViolenciaInstitucional(query) {
+      const suggestionsDiv = document.getElementById('tipoViolenciaInstitucional-suggestions');
+      if (!suggestionsDiv) return;
+      
+      // Se ainda não carregou os dados disponíveis, tenta carregar
+      if (tiposViolenciaInstitucionalDisponiveis.length === 0) {
+        carregarTiposViolenciaInstitucionalDisponiveis();
+      }
       
       const filtrados = query.trim() === '' 
-        ? classificacoesViolenciaPredefinidas.filter(classif => !classificacoesViolenciaSelecionadas.includes(classif))
-        : classificacoesViolenciaPredefinidas.filter(classif => 
-            classif.toLowerCase().includes(query.toLowerCase()) &&
-            !classificacoesViolenciaSelecionadas.includes(classif)
+        ? tiposViolenciaInstitucionalDisponiveis.filter(tipo => !tiposViolenciaInstitucionalSelecionados.includes(tipo))
+        : tiposViolenciaInstitucionalDisponiveis.filter(tipo => 
+            tipo.toLowerCase().includes(query.toLowerCase()) &&
+            !tiposViolenciaInstitucionalSelecionados.includes(tipo)
           );
       
       if (filtrados.length === 0) {
@@ -2020,136 +2022,73 @@
         return;
       }
       
-      suggestionsDiv.innerHTML = filtrados.map(classif => `
+      suggestionsDiv.innerHTML = filtrados.map(tipo => `
         <div 
-          class="px-4 py-2 hover:bg-orange-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
-          onclick="adicionarClassificacaoViolencia('${classif.replace(/'/g, "\\'")}')">
-          ${classif}
+          class="px-4 py-2 hover:bg-indigo-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
+          onclick="adicionarViolenciaInstitucional('${tipo.replace(/'/g, "\\'")}')">
+          ${tipo}
         </div>
       `).join('');
       
       suggestionsDiv.classList.remove('hidden');
     }
     
-    // ========================================
-    // SISTEMA DE TAGS - MOTIVAÇÃO DA VIOLÊNCIA
-    // ========================================
-    // IMPORTANTE: Valores devem coincidir EXATAMENTE com a validação da planilha
-    const motivacoesViolenciaPredefinidas = [
-      'Discriminação',
-      'Racismo',
-      'Gênero',
-      'LGBTQIAPN+fobia',
-      'Intolerância religiosa',
-      'Gordofobia',
-      'Bullying'
-    ];
-    
-    let motivacoesViolenciaSelecionadas = [];
-    
-    // Renderiza as tags de motivação da violência
-    function renderizarTagsMotivacaoViolencia() {
-      const container = document.getElementById('motivacaoViolencia-tags');
-      const hiddenInput = document.getElementById('motivacaoViolencia');
-      
-      if (motivacoesViolenciaSelecionadas.length === 0) {
-        container.innerHTML = '<span class="text-gray-400 text-sm">Nenhuma motivação adicionada</span>';
-        hiddenInput.value = '';
-        return;
-      }
-      
-      container.innerHTML = motivacoesViolenciaSelecionadas.map((motiv, index) => `
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium border border-purple-200 shadow-sm">
-          ${motiv}
-          <button 
-            type="button" 
-            onclick="removerMotivacaoViolencia(${index})"
-            class="hover:bg-purple-200 rounded-full p-0.5 transition-colors">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-            </svg>
-          </button>
-        </span>
-      `).join('');
-      
-      hiddenInput.value = motivacoesViolenciaSelecionadas.join(', ');
+    // Carrega tipos de violência institucional disponíveis da planilha (via dados já carregados)
+    function carregarTiposViolenciaInstitucionalDisponiveis() {
+      // Esta função será chamada quando os dados forem carregados do painel
+      // Por enquanto, usa valores comuns
+      tiposViolenciaInstitucionalDisponiveis = [
+        'Física',
+        'Psicológica',
+        'Sexual',
+        'Verbal',
+        'Negligência',
+        'Patrimonial',
+        'Bullying',
+        'Cyberbullying',
+        'Não informada'
+      ];
     }
     
-    // Remove uma motivação da violência
-    function removerMotivacaoViolencia(index) {
-      motivacoesViolenciaSelecionadas.splice(index, 1);
-      renderizarTagsMotivacaoViolencia();
+    // Verifica se "Institucional" está selecionado no tipo de violência
+    function verificarViolenciaInstitucional() {
+      const tipoViolenciaInput = document.getElementById('tipoViolencia');
+      const container = document.getElementById('tipoViolenciaInstitucionalContainer');
       
-      // Salva automaticamente após remover tag
-      if (typeof AutoSave !== 'undefined') {
-        AutoSave.salvar();
+      if (!tipoViolenciaInput || !container) return;
+      
+      const tipoViolenciaValue = tipoViolenciaInput.value || '';
+      const tiposSelecionados = tipoViolenciaValue.split(',').map(t => t.trim()).filter(t => t);
+      const temInstitucional = tiposSelecionados.some(t => {
+        const tLower = t.toLowerCase();
+        return tLower === 'institucional' || tLower.includes('institucional');
+      });
+      
+      if (temInstitucional) {
+        container.classList.remove('hidden');
+        // Adiciona animação suave
+        container.style.animation = 'slideDown 0.3s ease-out';
+        // Torna o campo obrigatório quando visível
+        const hiddenInput = document.getElementById('tipoViolenciaInstitucional');
+        if (hiddenInput) hiddenInput.required = true;
+      } else {
+        container.classList.add('hidden');
+        // Limpa os tipos selecionados
+        tiposViolenciaInstitucionalSelecionados = [];
+        renderizarTagsViolenciaInstitucional();
+        // Limpa input
+        const input = document.getElementById('tipoViolenciaInstitucional-input');
+        if (input) input.value = '';
+        // Remove obrigatoriedade quando oculto
+        const hiddenInput = document.getElementById('tipoViolenciaInstitucional');
+        if (hiddenInput) hiddenInput.required = false;
       }
     }
     
-    // Adiciona uma motivação da violência
-    function adicionarMotivacaoViolencia(texto) {
-      const textoTrimmed = texto.trim();
-      if (!textoTrimmed) return;
-      
-      // Primeiro, tenta encontrar uma correspondência similar
-      const correspondencia = encontrarMelhorCorrespondencia(
-        textoTrimmed, 
-        motivacoesViolenciaPredefinidas, 
-        motivacoesViolenciaSelecionadas
-      );
-      
-      // Se encontrou correspondência similar, usa ela; caso contrário, usa o texto digitado
-      const valorFinal = correspondencia || textoTrimmed;
-      
-      if (!motivacoesViolenciaSelecionadas.includes(valorFinal)) {
-        motivacoesViolenciaSelecionadas.push(valorFinal);
-        renderizarTagsMotivacaoViolencia();
-        
-        // Salva automaticamente após adicionar tag
-        if (typeof AutoSave !== 'undefined') {
-          AutoSave.salvar();
-        }
-      }
-      
-      document.getElementById('motivacaoViolencia-input').value = '';
-      document.getElementById('motivacaoViolencia-suggestions').classList.add('hidden');
-    }
-    
-    // Filtra e mostra sugestões de motivação da violência
-    function mostrarSugestoesMotivacaoViolencia(query) {
-      const suggestionsDiv = document.getElementById('motivacaoViolencia-suggestions');
-      
-      const filtrados = query.trim() === '' 
-        ? motivacoesViolenciaPredefinidas.filter(motiv => !motivacoesViolenciaSelecionadas.includes(motiv))
-        : motivacoesViolenciaPredefinidas.filter(motiv => 
-            motiv.toLowerCase().includes(query.toLowerCase()) &&
-            !motivacoesViolenciaSelecionadas.includes(motiv)
-          );
-      
-      if (filtrados.length === 0) {
-        if (query.trim()) {
-          suggestionsDiv.innerHTML = `
-            <div class="p-3 text-sm text-gray-500">
-              Nenhuma sugestão. Pressione Enter para adicionar "${query}"
-            </div>
-          `;
-          suggestionsDiv.classList.remove('hidden');
-        } else {
-          suggestionsDiv.classList.add('hidden');
-        }
-        return;
-      }
-      
-      suggestionsDiv.innerHTML = filtrados.map(motiv => `
-        <div 
-          class="px-4 py-2 hover:bg-purple-50 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-0"
-          onclick="adicionarMotivacaoViolencia('${motiv.replace(/'/g, "\\'")}')">
-          ${motiv}
-        </div>
-      `).join('');
-      
-      suggestionsDiv.classList.remove('hidden');
-    }
+    // Torna as funções acessíveis globalmente
+    window.adicionarViolenciaInstitucional = adicionarViolenciaInstitucional;
+    window.removerViolenciaInstitucional = removerViolenciaInstitucional;
+    window.verificarViolenciaInstitucional = verificarViolenciaInstitucional;
     
     // ========================================
     // MENU MOBILE TOGGLE
@@ -2208,8 +2147,12 @@
       // Renderiza estado inicial das tags
       renderizarTagsTranstornos();
       renderizarTagsTipoViolencia();
-      renderizarTagsClassificacaoViolencia();
-      renderizarTagsMotivacaoViolencia();
+      renderizarTagsViolenciaInstitucional();
+      carregarTiposViolenciaInstitucionalDisponiveis();
+      
+      // Configura menu baseado no role
+      verificarMenuAdmin();
+      verificarAutenticacao();
       
       // Listener para mostrar/ocultar campo de detalhes
       pcdTranstornoSelect.addEventListener('change', function() {
@@ -2282,53 +2225,57 @@
         }
       });
       
-      // === Eventos para Classificação da Violência ===
-      const classificacaoViolenciaInput = document.getElementById('classificacaoViolencia-input');
-      
-      classificacaoViolenciaInput.addEventListener('focus', function(e) {
-        mostrarSugestoesClassificacaoViolencia(e.target.value);
-      });
-      
-      classificacaoViolenciaInput.addEventListener('input', function(e) {
-        mostrarSugestoesClassificacaoViolencia(e.target.value);
-      });
-      
-      classificacaoViolenciaInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          adicionarClassificacaoViolencia(e.target.value);
+      // === Lógica Condicional para Violência Institucional ===
+      // Listener no campo tipoViolencia para verificar se "Institucional" está selecionado
+      const tipoViolenciaHiddenInput = document.getElementById('tipoViolencia');
+      if (tipoViolenciaHiddenInput) {
+        // Verifica quando o campo muda (incluindo quando tags são adicionadas/removidas)
+        const observer = new MutationObserver(function() {
+          verificarViolenciaInstitucional();
+        });
+        
+        // Observa mudanças no campo oculto
+        observer.observe(tipoViolenciaHiddenInput, { attributes: true, attributeFilter: ['value'] });
+        
+        // Também verifica quando tags são renderizadas
+        const originalRenderizar = window.renderizarTagsTipoViolencia;
+        if (originalRenderizar) {
+          window.renderizarTagsTipoViolencia = function() {
+            originalRenderizar();
+            setTimeout(verificarViolenciaInstitucional, 100);
+          };
         }
-      });
+        
+        // Verifica inicialmente
+        setTimeout(verificarViolenciaInstitucional, 500);
+      }
       
-      document.addEventListener('click', function(e) {
-        if (!e.target.closest('#classificacaoViolencia-input') && !e.target.closest('#classificacaoViolencia-suggestions')) {
-          document.getElementById('classificacaoViolencia-suggestions').classList.add('hidden');
-        }
-      });
+      // === Eventos para Tipo de Violência Institucional ===
+      const tipoViolenciaInstitucionalInput = document.getElementById('tipoViolenciaInstitucional-input');
       
-      // === Eventos para Motivação da Violência ===
-      const motivacaoViolenciaInput = document.getElementById('motivacaoViolencia-input');
-      
-      motivacaoViolenciaInput.addEventListener('focus', function(e) {
-        mostrarSugestoesMotivacaoViolencia(e.target.value);
-      });
-      
-      motivacaoViolenciaInput.addEventListener('input', function(e) {
-        mostrarSugestoesMotivacaoViolencia(e.target.value);
-      });
-      
-      motivacaoViolenciaInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          adicionarMotivacaoViolencia(e.target.value);
-        }
-      });
-      
-      document.addEventListener('click', function(e) {
-        if (!e.target.closest('#motivacaoViolencia-input') && !e.target.closest('#motivacaoViolencia-suggestions')) {
-          document.getElementById('motivacaoViolencia-suggestions').classList.add('hidden');
-        }
-      });
+      if (tipoViolenciaInstitucionalInput) {
+        tipoViolenciaInstitucionalInput.addEventListener('focus', function(e) {
+          mostrarSugestoesViolenciaInstitucional(e.target.value);
+        });
+        
+        tipoViolenciaInstitucionalInput.addEventListener('input', function(e) {
+          mostrarSugestoesViolenciaInstitucional(e.target.value);
+        });
+        
+        tipoViolenciaInstitucionalInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            adicionarViolenciaInstitucional(e.target.value);
+          }
+        });
+        
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('#tipoViolenciaInstitucional-input') && !e.target.closest('#tipoViolenciaInstitucional-suggestions')) {
+            const suggestions = document.getElementById('tipoViolenciaInstitucional-suggestions');
+            if (suggestions) suggestions.classList.add('hidden');
+          }
+        });
+      }
     });
 
     // Configura eventos do input
@@ -2879,7 +2826,7 @@
         });
         
         // Campos hidden de tags (que contêm os valores reais)
-        ['pcdDetalhes', 'tipoViolencia', 'classificacaoViolencia', 'motivacaoViolencia', 'encaminhamento'].forEach(id => {
+        ['pcdDetalhes', 'tipoViolencia', 'tipoViolenciaInstitucional', 'encaminhamento'].forEach(id => {
           const campo = document.getElementById(id);
           if (campo && campo.value) {
             dados[id] = campo.value;
@@ -3050,20 +2997,11 @@
             }
           }
           
-          if (dados.classificacoesSelecionadas && Array.isArray(dados.classificacoesSelecionadas)) {
-            if (typeof classificacoesSelecionadas !== 'undefined') {
-              classificacoesSelecionadas = [...dados.classificacoesSelecionadas];
-              if (typeof renderizarTagsClassificacaoViolencia === 'function') {
-                renderizarTagsClassificacaoViolencia();
-              }
-            }
-          }
-          
-          if (dados.motivacoesSelecionadas && Array.isArray(dados.motivacoesSelecionadas)) {
-            if (typeof motivacoesSelecionadas !== 'undefined') {
-              motivacoesSelecionadas = [...dados.motivacoesSelecionadas];
-              if (typeof renderizarTagsMotivacaoViolencia === 'function') {
-                renderizarTagsMotivacaoViolencia();
+          if (dados.tiposViolenciaInstitucionalSelecionados && Array.isArray(dados.tiposViolenciaInstitucionalSelecionados)) {
+            if (typeof tiposViolenciaInstitucionalSelecionados !== 'undefined') {
+              tiposViolenciaInstitucionalSelecionados = [...dados.tiposViolenciaInstitucionalSelecionados];
+              if (typeof renderizarTagsViolenciaInstitucional === 'function') {
+                renderizarTagsViolenciaInstitucional();
               }
             }
           }
@@ -3084,11 +3022,8 @@
           if (dados.tipoViolencia) {
             this.recriarTags('tipoViolencia', dados.tipoViolencia);
           }
-          if (dados.classificacaoViolencia) {
-            this.recriarTags('classificacaoViolencia', dados.classificacaoViolencia);
-          }
-          if (dados.motivacaoViolencia) {
-            this.recriarTags('motivacaoViolencia', dados.motivacaoViolencia);
+          if (dados.tipoViolenciaInstitucional) {
+            this.recriarTags('tipoViolenciaInstitucional', dados.tipoViolenciaInstitucional);
           }
           if (dados.encaminhamento) {
             this.recriarTags('encaminhamento', dados.encaminhamento);
@@ -3114,10 +3049,8 @@
           funcaoAdicionar = window.adicionarTranstorno;
         } else if (campoId === 'tipoViolencia') {
           funcaoAdicionar = window.adicionarTipoViolencia;
-        } else if (campoId === 'classificacaoViolencia') {
-          funcaoAdicionar = window.adicionarClassificacaoViolencia;
-        } else if (campoId === 'motivacaoViolencia') {
-          funcaoAdicionar = window.adicionarMotivacaoViolencia;
+        } else if (campoId === 'tipoViolenciaInstitucional') {
+          funcaoAdicionar = window.adicionarViolenciaInstitucional;
         } else if (campoId === 'encaminhamento') {
           funcaoAdicionar = window.adicionarEncaminhamento;
         }
@@ -3136,7 +3069,7 @@
       // Observar mudanças nos sistemas de tags
       observarMudancasTags() {
         // Observar mudanças nos campos hidden de tags
-        ['pcdDetalhes', 'tipoViolencia', 'classificacaoViolencia', 'motivacaoViolencia', 'encaminhamento'].forEach(id => {
+        ['pcdDetalhes', 'tipoViolencia', 'tipoViolenciaInstitucional', 'encaminhamento'].forEach(id => {
           const campo = document.getElementById(id);
           if (campo) {
             // Usar MutationObserver para detectar mudanças no value
@@ -3324,17 +3257,15 @@
         }
         // Validação padrão para outros campos
         else if (campo.type === 'radio') {
-          // Para radio buttons, verifica se ALGUMA opção do grupo está selecionada
-          // (mesmo que seja a opção "Não informado" com value="")
+          // Para radio buttons, verifica se ALGUMA opção com valor não-vazio foi selecionada
+          // Ignora a opção padrão "Não informado" que tem value=""
           const radioGroup = form.querySelectorAll(`input[type="radio"][name="${campo.name}"]`);
-          const algumMarcado = Array.from(radioGroup).some(radio => radio.checked);
-          // Se algum está marcado, considera preenchido (mesmo que seja valor vazio)
-          // Isso é importante para campos como "estudoCaso" que têm opção padrão "Não informado"
-          preenchido = algumMarcado;
+          const selecionadoComValor = Array.from(radioGroup).find(radio => radio.checked && radio.value && radio.value.trim() !== '');
+          preenchido = !!selecionadoComValor;
           
           // Log para debug de radio buttons
           if (!preenchido && campo.hasAttribute('required')) {
-            console.log('⚠️ Radio button obrigatório não selecionado:', {
+            console.log('⚠️ Radio button obrigatório não preenchido com valor válido:', {
               name: campo.name,
               grupo: Array.from(radioGroup).map(r => ({ value: r.value, checked: r.checked }))
             });
@@ -3585,6 +3516,29 @@
         }
       }
       
+      // Validação especial para tipoViolenciaInstitucional (campo condicional obrigatório)
+      const tipoViolenciaInstitucionalContainer = document.getElementById('tipoViolenciaInstitucionalContainer');
+      const tipoViolenciaInstitucionalHidden = document.getElementById('tipoViolenciaInstitucional');
+      const tipoViolenciaInstitucionalTagsContainer = document.getElementById('tipoViolenciaInstitucional-tags');
+      
+      // Só valida se o container estiver visível (ou seja, "Institucional" está selecionado)
+      if (tipoViolenciaInstitucionalContainer && !tipoViolenciaInstitucionalContainer.classList.contains('hidden')) {
+        const tipoViolenciaInstitucionalValue = tipoViolenciaInstitucionalHidden?.value || '';
+        const temTiposViolenciaInstitucional = (typeof tiposViolenciaInstitucionalSelecionados !== 'undefined' && tiposViolenciaInstitucionalSelecionados.length > 0) || tipoViolenciaInstitucionalValue.trim() !== '';
+        
+        if (!temTiposViolenciaInstitucional) {
+          if (tipoViolenciaInstitucionalTagsContainer) {
+            tipoViolenciaInstitucionalTagsContainer.classList.add('field-error');
+          }
+          valido = false;
+          mostrarAlerta('❌ Por favor, adicione pelo menos um tipo de violência institucional.', 'error');
+        } else {
+          if (tipoViolenciaInstitucionalTagsContainer) {
+            tipoViolenciaInstitucionalTagsContainer.classList.remove('field-error');
+          }
+        }
+      }
+      
       // Validação condicional: se PCD = Sim, então deve ter pelo menos um transtorno selecionado
       const pcdTranstorno = document.getElementById('pcdTranstorno')?.value || '';
       const pcdDetalhesHidden = document.getElementById('pcdDetalhes');
@@ -3680,7 +3634,7 @@
       });
       
       // Garante que campos hidden de tags sejam coletados (backup)
-      ['pcdDetalhes', 'tipoViolencia', 'classificacaoViolencia', 'motivacaoViolencia', 'encaminhamento'].forEach(id => {
+      ['pcdDetalhes', 'tipoViolencia', 'tipoViolenciaInstitucional', 'encaminhamento'].forEach(id => {
         const campo = document.getElementById(id);
         if (campo && campo.value) {
           dados[id] = campo.value;
@@ -3694,14 +3648,9 @@
           console.log('📝 tipoViolencia preenchido a partir do array:', dados.tipoViolencia);
         }
       }
-      if (!dados.classificacaoViolencia || dados.classificacaoViolencia.trim() === '') {
-        if (typeof classificacoesSelecionadas !== 'undefined' && classificacoesSelecionadas.length > 0) {
-          dados.classificacaoViolencia = classificacoesSelecionadas.join(', ');
-        }
-      }
-      if (!dados.motivacaoViolencia || dados.motivacaoViolencia.trim() === '') {
-        if (typeof motivacoesSelecionadas !== 'undefined' && motivacoesSelecionadas.length > 0) {
-          dados.motivacaoViolencia = motivacoesSelecionadas.join(', ');
+      if (!dados.tipoViolenciaInstitucional || dados.tipoViolenciaInstitucional.trim() === '') {
+        if (typeof tiposViolenciaInstitucionalSelecionados !== 'undefined' && tiposViolenciaInstitucionalSelecionados.length > 0) {
+          dados.tipoViolenciaInstitucional = tiposViolenciaInstitucionalSelecionados.join(', ');
         }
       }
       if (!dados.encaminhamento || dados.encaminhamento.trim() === '') {
@@ -4059,16 +4008,10 @@
           renderizarTagsTipoViolencia();
         }
       }
-      if (typeof classificacoesSelecionadas !== 'undefined') {
-        classificacoesSelecionadas = [];
-        if (typeof renderizarTagsClassificacaoViolencia === 'function') {
-          renderizarTagsClassificacaoViolencia();
-        }
-      }
-      if (typeof motivacoesSelecionadas !== 'undefined') {
-        motivacoesSelecionadas = [];
-        if (typeof renderizarTagsMotivacaoViolencia === 'function') {
-          renderizarTagsMotivacaoViolencia();
+      if (typeof tiposViolenciaInstitucionalSelecionados !== 'undefined') {
+        tiposViolenciaInstitucionalSelecionados = [];
+        if (typeof renderizarTagsViolenciaInstitucional === 'function') {
+          renderizarTagsViolenciaInstitucional();
         }
       }
       if (typeof encaminhamentosSelecionados !== 'undefined') {
