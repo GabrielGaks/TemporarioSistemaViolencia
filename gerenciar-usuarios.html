@@ -614,6 +614,15 @@
         </h2>
       </div>
 
+      <!-- ========================================
+           ABAS POR ROLE
+           ======================================== -->
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+        <div class="flex flex-wrap gap-2" id="containerAbas">
+          <!-- Abas serão renderizadas aqui via JavaScript -->
+        </div>
+      </div>
+
       <!-- Tabela com Scroll -->
       <div class="table-wrapper max-h-[600px] overflow-y-auto custom-scrollbar">
         <table class="table-elegant w-full">
@@ -884,6 +893,7 @@
     let usuarioExcluirId = null;
     let modoEdicao = false;
     let meuRole = null; // Role do usuário logado
+    let activeTab = 'all'; // Aba ativa para filtro de roles
 
     // Estado para Real-Time Updates
     let lastUpdateTimestamp = null;
@@ -1417,7 +1427,9 @@
         if (resultado.sucesso) {
           todosUsuarios = resultado.data || [];
           usuariosCache = todosUsuarios;
-          renderizarTabela(todosUsuarios);
+          activeTab = 'all'; // Reset para aba "Todos"
+          renderizarAbas(todosUsuarios); // Renderiza as abas
+          renderizarTabelaComFiltro(); // Renderiza a tabela
         } else {
           mostrarAlerta(resultado.mensagem || 'Erro ao carregar usuários', 'erro');
           todosUsuarios = [];
@@ -1430,6 +1442,81 @@
         todosUsuarios = [];
         renderizarTabela([]);
       }
+    }
+
+    // ========================================
+    // RENDERIZAR ABAS POR ROLE
+    // ========================================
+    function renderizarAbas(usuarios) {
+      const container = document.getElementById('containerAbas');
+      if (!container) return;
+
+      // Define as abas disponíveis com ícones
+      const abas = [
+        { id: 'all', label: 'Todos', icone: '👥' },
+        { id: 'superuser', label: 'Superuser', icone: '🔱' },
+        { id: 'admin', label: 'Admin', icone: '👔' },
+        { id: 'tecnico', label: 'Técnico', icone: '🔔' },
+        { id: 'estagiario', label: 'Estagiário', icone: '📝' },
+        { id: 'visualizador', label: 'Visualizador', icone: '👁️' }
+      ];
+
+      // Conta usuários por role
+      const contagemPorRole = {};
+      abas.forEach(aba => {
+        if (aba.id === 'all') {
+          contagemPorRole['all'] = usuarios.length;
+        } else {
+          contagemPorRole[aba.id] = usuarios.filter(u => u.role === aba.id).length;
+        }
+      });
+
+      // Gera as abas HTML
+      container.innerHTML = abas.map(aba => {
+        const isActive = activeTab === aba.id;
+        const count = contagemPorRole[aba.id] || 0;
+        
+        // Estilos condicional
+        const classAtivo = isActive ? 
+          'bg-blue-500 text-white shadow-lg' : 
+          'bg-gray-100 text-gray-700 hover:bg-gray-200';
+        
+        return `
+          <button 
+            onclick="mudarAba('${aba.id}'); renderizarTabelaComFiltro();"
+            class="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${classAtivo}">
+            <span>${aba.icone}</span>
+            <span>${aba.label}</span>
+            <span class="text-xs opacity-75 font-bold">(${count})</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function mudarAba(novaAba) {
+      activeTab = novaAba;
+    }
+
+    function renderizarTabelaComFiltro() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      // Começa com todos os usuários
+      let usuariosFiltrados = todosUsuarios;
+
+      // 1. Filtra por role (aba ativa)
+      if (activeTab !== 'all') {
+        usuariosFiltrados = usuariosFiltrados.filter(u => u.role === activeTab);
+      }
+
+      // 2. Aplica filtro de busca por e-mail
+      if (searchInput) {
+        usuariosFiltrados = usuariosFiltrados.filter(u =>
+          u.email.toLowerCase().includes(searchInput)
+        );
+      }
+
+      // Renderiza a tabela
+      renderizarTabela(usuariosFiltrados);
     }
 
     // ========================================
@@ -1633,18 +1720,8 @@
     // FILTRAR USUÁRIOS
     // ========================================
     function filtrarUsuarios() {
-      const busca = document.getElementById('searchInput').value.toLowerCase().trim();
-
-      if (!busca) {
-        renderizarTabela(todosUsuarios);
-        return;
-      }
-
-      const filtrados = todosUsuarios.filter(usuario =>
-        usuario.email.toLowerCase().includes(busca)
-      );
-
-      renderizarTabela(filtrados);
+      // Renderiza a tabela aplicando ambos os filtros: aba ativa + busca
+      renderizarTabelaComFiltro();
     }
 
     // ========================================
