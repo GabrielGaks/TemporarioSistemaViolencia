@@ -300,8 +300,45 @@
 
     /* Tab state transition - smooth color change */
     .tab-button {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      overflow: hidden;
+    }
+
+    /* Animação de ativação de aba */
+    @keyframes tabActivate {
+      0% {
+        transform: scale(1);
+      }
+      40% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .tab-activating {
+      animation: tabActivate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Efeito ripple ao clicar */
+    .tab-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .tab-button:active::before {
+      width: 300px;
+      height: 300px;
     }
 
     /* Table content fade transition - simples e eficiente */
@@ -1605,7 +1642,8 @@
         
         return `
           <button 
-            onclick="mudarAbaComAnimacao('${aba.id}')"
+            onclick="mudarAbaComAnimacao('${aba.id}', event)"
+            data-tab-id="${aba.id}"
             class="${baseClasses} ${stateClasses}"
             title="Filtrar por ${aba.label}">
             <span>${aba.icone}</span>
@@ -1623,8 +1661,15 @@
     // ========================================
     // MUDAR ABA COM ANIMAÇÃO
     // ========================================
-    function mudarAbaComAnimacao(novaAba) {
+    function mudarAbaComAnimacao(novaAba, event) {
       if (activeTab === novaAba) return; // Evita re-render desnecessário
+      
+      // Anima o botão clicado
+      if (event && event.currentTarget) {
+        const btn = event.currentTarget;
+        btn.classList.add('tab-activating');
+        setTimeout(() => btn.classList.remove('tab-activating'), 400);
+      }
       
       activeTab = novaAba;
       
