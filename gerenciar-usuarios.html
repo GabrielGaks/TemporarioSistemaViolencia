@@ -322,6 +322,37 @@
       animation: tabActivate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
+    /* Fade transitions para mudança de estado */
+    @keyframes tabFadeOut {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0.3;
+        transform: scale(0.95);
+      }
+    }
+
+    @keyframes tabFadeIn {
+      0% {
+        opacity: 0.3;
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .tab-fade-out {
+      animation: tabFadeOut 0.2s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    }
+
+    .tab-fade-in {
+      animation: tabFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
     /* Efeito ripple ao clicar */
     .tab-button::before {
       content: '';
@@ -1664,32 +1695,53 @@
     function mudarAbaComAnimacao(novaAba, event) {
       if (activeTab === novaAba) return; // Evita re-render desnecessário
       
-      // Anima o botão clicado
-      if (event && event.currentTarget) {
-        const btn = event.currentTarget;
-        btn.classList.add('tab-activating');
-        setTimeout(() => btn.classList.remove('tab-activating'), 400);
+      // 1. Encontra o botão atualmente ativo (antes da mudança)
+      const container = document.getElementById('containerAbas');
+      const botaoAtivoAnterior = container?.querySelector(`[data-tab-id="${activeTab}"]`);
+      const novoBotao = event?.currentTarget;
+      
+      // 2. Aplica fade-out no botão ativo anterior
+      if (botaoAtivoAnterior) {
+        botaoAtivoAnterior.classList.add('tab-fade-out');
+      }
+      
+      // 3. Aplica pulse no botão clicado
+      if (novoBotao) {
+        novoBotao.classList.add('tab-activating');
+        setTimeout(() => novoBotao.classList.remove('tab-activating'), 400);
       }
       
       activeTab = novaAba;
       
-      // Renderiza abas com novo estado ativo
-      renderizarAbas(todosUsuarios);
+      // 4. Aguarda fade-out completar antes de re-renderizar (200ms)
+      setTimeout(() => {
+        // Renderiza abas com novo estado ativo
+        renderizarAbas(todosUsuarios);
+        
+        // 5. Aplica fade-in no novo botão ativo
+        const novoBotaoAtivo = container?.querySelector(`[data-tab-id="${novaAba}"]`);
+        if (novoBotaoAtivo) {
+          novoBotaoAtivo.classList.add('tab-fade-in');
+          setTimeout(() => novoBotaoAtivo.classList.remove('tab-fade-in'), 300);
+        }
+      }, 200);
       
-      // Renderiza tabela com filtro
-      const tbody = document.getElementById('tabelaUsuarios');
-      const wrapper = tbody?.closest('.table-wrapper');
-      
-      if (wrapper) {
-        // Remove animação anterior se existir
-        wrapper.classList.remove('table-container');
-        // Força reflow para reiniciar animação
-        void wrapper.offsetWidth;
-        // Aplica animação
-        wrapper.classList.add('table-container');
-      }
-      
-      renderizarTabelaComFiltro();
+      // Renderiza tabela com filtro (com delay para sincronizar)
+      setTimeout(() => {
+        const tbody = document.getElementById('tabelaUsuarios');
+        const wrapper = tbody?.closest('.table-wrapper');
+        
+        if (wrapper) {
+          // Remove animação anterior se existir
+          wrapper.classList.remove('table-container');
+          // Força reflow para reiniciar animação
+          void wrapper.offsetWidth;
+          // Aplica animação
+          wrapper.classList.add('table-container');
+        }
+        
+        renderizarTabelaComFiltro();
+      }, 200);
     }
 
 
