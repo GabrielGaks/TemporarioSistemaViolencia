@@ -198,6 +198,106 @@
       animation: fadeInScale 0.3s ease-out forwards;
     }
 
+    /* Animação de entrada do modal */
+    .modal-enter {
+      animation: fadeIn 0.3s ease-out, scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.85);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Animação de clique nos botões de abas */
+    .btn-tab-active {
+      animation: btnPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes btnPulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Animação para botões de ação */
+    .btn-action-click {
+      animation: actionBtnPulse 0.3s ease-out;
+    }
+
+    @keyframes actionBtnPulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(0.92);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Animação de entrada do modal */
+    .modal-enter {
+      animation: fadeIn 0.3s ease-out, scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.85);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Animação de clique nos botões */
+    .btn-tab-active {
+      animation: btnPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes btnPulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Animação para botões de ação */
+    .btn-action-click {
+      animation: actionBtnPulse 0.3s ease-out;
+    }
+
+    @keyframes actionBtnPulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(0.92);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
     html.no-scroll {
       scroll-behavior: auto !important;
       /* Evita animação suave ao restaurar scroll */
@@ -1451,14 +1551,14 @@
       const container = document.getElementById('containerAbas');
       if (!container) return;
 
-      // Define as abas disponíveis com ícones
+      // Define as abas disponíveis com ícones (Todos por último)
       const abas = [
-        { id: 'all', label: 'Todos', icone: '👥' },
         { id: 'superuser', label: 'Superuser', icone: '🔱' },
         { id: 'admin', label: 'Admin', icone: '👔' },
         { id: 'tecnico', label: 'Técnico', icone: '🔔' },
         { id: 'estagiario', label: 'Estagiário', icone: '📝' },
-        { id: 'visualizador', label: 'Visualizador', icone: '👁️' }
+        { id: 'visualizador', label: 'Visualizador', icone: '👁️' },
+        { id: 'all', label: 'Todos', icone: '👥' }
       ];
 
       // Conta usuários por role
@@ -1483,8 +1583,8 @@
         
         return `
           <button 
-            onclick="mudarAba('${aba.id}'); renderizarTabelaComFiltro();"
-            class="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${classAtivo}">
+            onclick="mudarAba('${aba.id}'); renderizarTabelaComFiltro(); this.classList.add('btn-tab-active');"
+            class="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${classAtivo} cursor-pointer hover:shadow-md transform">
             <span>${aba.icone}</span>
             <span>${aba.label}</span>
             <span class="text-xs opacity-75 font-bold">(${count})</span>
@@ -1593,8 +1693,8 @@
               <div class="flex items-center justify-center gap-2">
                 ${podeEditar ? `
                   <button 
-                    onclick="editarUsuario('${usuario.id}')"
-                    class="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-all"
+                    onclick="editarUsuario('${usuario.id}'); this.classList.add('btn-action-click');"
+                    class="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-all transform cursor-pointer"
                     title="Editar">
                     ✏️
                   </button>
@@ -1608,8 +1708,8 @@
                 `}
                 ${podeExcluir ? `
                   <button 
-                    onclick="abrirModalExcluir('${usuario.id}')"
-                    class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-all"
+                    onclick="abrirModalExcluir('${usuario.id}'); this.classList.add('btn-action-click');"
+                    class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-all transform cursor-pointer"
                     title="Excluir">
                     🗑️
                   </button>
@@ -1751,7 +1851,11 @@
       // Limita opções de papel baseado no role do usuário
       atualizarOpcoesPapel();
 
-      document.getElementById('modalUsuario').classList.add('show');
+      // Animação de entrada
+      lockBodyScroll();
+      const modal = document.getElementById('modalUsuario');
+      modal.classList.add('show', 'modal-enter');
+      setTimeout(() => modal.classList.remove('modal-enter'), 300);
     }
 
     // ========================================
@@ -1838,7 +1942,11 @@
       // Atualiza opções de papel com restrições baseadas no role
       atualizarOpcoesPapel(usuario.role);
 
-      document.getElementById('modalUsuario').classList.add('show');
+      // Animação de entrada
+      lockBodyScroll();
+      const modal = document.getElementById('modalUsuario');
+      modal.classList.add('show', 'modal-enter');
+      setTimeout(() => modal.classList.remove('modal-enter'), 300);
     }
 
     // ========================================
@@ -1960,7 +2068,11 @@
 
       document.getElementById('excluirPapel').textContent = `${badgeIcon} ${usuario.role}`;
 
-      document.getElementById('modalExcluir').classList.add('show');
+      // Animação de entrada
+      lockBodyScroll();
+      const modal = document.getElementById('modalExcluir');
+      modal.classList.add('show', 'modal-enter');
+      setTimeout(() => modal.classList.remove('modal-enter'), 300);
     }
 
     function fecharModalExcluir() {
