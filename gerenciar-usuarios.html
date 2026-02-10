@@ -320,6 +320,13 @@
       animation: tableContentFade 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
+    /* Estado preparado para animação - opaco antes de animar */
+    .table-animating {
+      opacity: 0.7 !important;
+      transform: translateY(4px) !important;
+      transition: none !important;
+    }
+
     html.no-scroll {
       scroll-behavior: auto !important;
       /* Evita animação suave ao restaurar scroll */
@@ -1628,21 +1635,32 @@
     function mudarAbaComAnimacao(novaAba) {
       if (activeTab === novaAba) return; // Evita re-render desnecessário
       
-      activeTab = novaAba;
-      
-      // Adiciona feedback visual na tabela
+      // 1. PREPARAR: Aplicar estado opaco ANTES de renderizar
       const tbody = document.getElementById('tabelaUsuarios');
       if (tbody) {
-        tbody.classList.add('table-content-enter');
-        setTimeout(() => tbody.classList.remove('table-content-enter'), 150);
+        tbody.classList.add('table-animating');
       }
       
-      // Renderiza abas com novo estado ativo
-      renderizarAbas(todosUsuarios);
+      activeTab = novaAba;
       
-      // Renderiza tabela com filtro
+      // 2. RENDERIZAR: Tabela é renderizada enquanto opaca
+      renderizarAbas(todosUsuarios);
       renderizarTabelaComFiltro();
+      
+      // 3. ANIMAR: Depois que renderizar, animar para opacidade 1
+      // Usar requestAnimationFrame para garantir timing correto
+      if (tbody) {
+        requestAnimationFrame(() => {
+          tbody.classList.remove('table-animating');
+          tbody.classList.add('table-content-enter');
+          
+          setTimeout(() => {
+            tbody.classList.remove('table-content-enter');
+          }, 150);
+        });
+      }
     }
+
 
     function renderizarTabelaComFiltro() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
