@@ -304,27 +304,18 @@
       position: relative;
     }
 
-    /* Table content fade transition */
-    @keyframes tableContentFade {
+    /* Table content fade transition - simples e eficiente */
+    @keyframes tableContainerFade {
       from {
-        opacity: 0.7;
-        transform: translateY(4px);
+        opacity: 0;
       }
       to {
         opacity: 1;
-        transform: translateY(0);
       }
     }
 
-    .table-content-enter {
-      animation: tableContentFade 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    /* Estado preparado para animação - opaco antes de animar */
-    .table-animating {
-      opacity: 0.7 !important;
-      transform: translateY(4px) !important;
-      transition: none !important;
+    .table-container {
+      animation: tableContainerFade 0.3s ease-out;
     }
 
     html.no-scroll {
@@ -753,7 +744,7 @@
       </div>
 
       <!-- Tabela com Scroll -->
-      <div class="table-wrapper max-h-[600px] overflow-y-auto custom-scrollbar">
+      <div class="table-wrapper table-container max-h-[600px] overflow-y-auto custom-scrollbar">
         <table class="table-elegant w-full">
           <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
             <tr>
@@ -1635,31 +1626,27 @@
     function mudarAbaComAnimacao(novaAba) {
       if (activeTab === novaAba) return; // Evita re-render desnecessário
       
-      // 1. PREPARAR: Aplicar estado opaco ANTES de renderizar
-      const tbody = document.getElementById('tabelaUsuarios');
-      if (tbody) {
-        tbody.classList.add('table-animating');
-      }
-      
       activeTab = novaAba;
       
-      // 2. RENDERIZAR: Tabela é renderizada enquanto opaca
+      // Renderiza abas com novo estado ativo
       renderizarAbas(todosUsuarios);
-      renderizarTabelaComFiltro();
       
-      // 3. ANIMAR: Depois que renderizar, animar para opacidade 1
-      // Usar requestAnimationFrame para garantir timing correto
-      if (tbody) {
-        requestAnimationFrame(() => {
-          tbody.classList.remove('table-animating');
-          tbody.classList.add('table-content-enter');
-          
-          setTimeout(() => {
-            tbody.classList.remove('table-content-enter');
-          }, 150);
-        });
+      // Renderiza tabela com filtro
+      const tbody = document.getElementById('tabelaUsuarios');
+      const wrapper = tbody?.closest('.table-wrapper');
+      
+      if (wrapper) {
+        // Remove animação anterior se existir
+        wrapper.classList.remove('table-container');
+        // Força reflow para reiniciar animação
+        void wrapper.offsetWidth;
+        // Aplica animação
+        wrapper.classList.add('table-container');
       }
+      
+      renderizarTabelaComFiltro();
     }
+
 
 
     function renderizarTabelaComFiltro() {
