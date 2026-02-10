@@ -298,6 +298,28 @@
       }
     }
 
+    /* Tab state transition - smooth color change */
+    .tab-button {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    /* Table content fade transition */
+    @keyframes tableContentFade {
+      from {
+        opacity: 0.7;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .table-content-enter {
+      animation: tableContentFade 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
     html.no-scroll {
       scroll-behavior: auto !important;
       /* Evita animação suave ao restaurar scroll */
@@ -1571,20 +1593,23 @@
         }
       });
 
-      // Gera as abas HTML
+      // Gera as abas HTML com estado visual baseado em activeTab
       container.innerHTML = abas.map(aba => {
         const isActive = activeTab === aba.id;
         const count = contagemPorRole[aba.id] || 0;
         
-        // Estilos condicional
-        const classAtivo = isActive ? 
-          'bg-blue-500 text-white shadow-lg' : 
-          'bg-gray-100 text-gray-700 hover:bg-gray-200';
+        // Estilos condicionais baseados em estado ativo/inativo
+        const baseClasses = 'tab-button px-4 py-2 rounded-lg font-medium flex items-center gap-2 cursor-pointer transform';
+        
+        const stateClasses = isActive ? 
+          'bg-blue-500 text-white shadow-lg hover:shadow-xl hover:bg-blue-600' : 
+          'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md';
         
         return `
           <button 
-            onclick="mudarAba('${aba.id}'); renderizarTabelaComFiltro(); this.classList.add('btn-tab-active');"
-            class="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${classAtivo} cursor-pointer hover:shadow-md transform">
+            onclick="mudarAbaComAnimacao('${aba.id}')"
+            class="${baseClasses} ${stateClasses}"
+            title="Filtrar por ${aba.label}">
             <span>${aba.icone}</span>
             <span>${aba.label}</span>
             <span class="text-xs opacity-75 font-bold">(${count})</span>
@@ -1595,6 +1620,28 @@
 
     function mudarAba(novaAba) {
       activeTab = novaAba;
+    }
+
+    // ========================================
+    // MUDAR ABA COM ANIMAÇÃO
+    // ========================================
+    function mudarAbaComAnimacao(novaAba) {
+      if (activeTab === novaAba) return; // Evita re-render desnecessário
+      
+      activeTab = novaAba;
+      
+      // Adiciona feedback visual na tabela
+      const tbody = document.getElementById('tabelaUsuarios');
+      if (tbody) {
+        tbody.classList.add('table-content-enter');
+        setTimeout(() => tbody.classList.remove('table-content-enter'), 150);
+      }
+      
+      // Renderiza abas com novo estado ativo
+      renderizarAbas(todosUsuarios);
+      
+      // Renderiza tabela com filtro
+      renderizarTabelaComFiltro();
     }
 
     function renderizarTabelaComFiltro() {
