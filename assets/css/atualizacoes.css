@@ -1,0 +1,255 @@
+/* ============================================
+   ESTILOS PARA SISTEMA DE ATUALIZAÇÕES
+   ============================================ */
+
+/* Seção de atualizações */
+.secao-atualizacoes {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+
+.secao-atualizacoes h4 {
+  margin-top: 0;
+  color: #495057;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Ocultar h4 se estiver dentro de um container com gradiente */
+.secao-atualizacoes > .bg-gradient-to-r ~ h4 {
+  display: none;
+}
+
+/* Histórico readonly */
+.historico-readonly {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Lista de atualizações */
+.lista-atualizacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Item individual de atualização */
+.atualizacao-item {
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: #ffffff;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.atualizacao-item:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateX(2px);
+}
+
+.atualizacao-item:last-child {
+  margin-bottom: 0;
+}
+
+.atualizacao-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.data-atualizacao {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.usuario-atualizacao {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 600;
+}
+
+.texto-atualizacao {
+  margin: 0;
+  color: #212529;
+  line-height: 1.6;
+  white-space: pre-wrap; /* Preservar quebras de linha */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
+  display: block;
+}
+
+/* Campo para adicionar nova atualização */
+.adicionar-atualizacao {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 6px;
+  border: 2px dashed #007bff;
+  transition: all 0.3s ease;
+}
+
+.adicionar-atualizacao:hover {
+  border-color: #0056b3;
+  background-color: #f8f9fa;
+}
+
+.adicionar-atualizacao label {
+  display: block;
+  margin-bottom: 10px;
+  color: #495057;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.adicionar-atualizacao textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.3s ease;
+}
+
+.adicionar-atualizacao textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+.adicionar-atualizacao button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.adicionar-atualizacao button:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.adicionar-atualizacao button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+/* Mensagem quando não há atualizações */
+.sem-atualizacoes {
+  text-align: center;
+  padding: 30px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Mensagens de feedback */
+.mensagem {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 4px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
+}
+
+.mensagem-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.mensagem-error {
+  background-color: #dc3545;
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Loading spinner para atualizações */
+.atualizacoes-loading {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.atualizacoes-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .atualizacao-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .adicionar-atualizacao textarea {
+    font-size: 16px; /* Evitar zoom no iOS */
+  }
+  
+  .secao-atualizacoes {
+    padding: 15px;
+  }
+  
+  .mensagem {
+    right: 10px;
+    left: 10px;
+    top: 10px;
+  }
+}

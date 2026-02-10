@@ -9,6 +9,10 @@
 (function() {
   'use strict';
   
+  // Estado de carregamento
+  let configLoaded = false;
+  let configLoadPromise = null;
+  
   // Função para carregar configuração local de forma assíncrona
   // NOTA: config.local.js é opcional e só será carregado se existir
   // O arquivo principal de configuração é config.js (já carregado no HTML)
@@ -107,5 +111,63 @@
       }
     });
   }
+  
+  // Exporta ConfigLoader globalmente
+  if (typeof window !== 'undefined') {
+    window.ConfigLoader = {
+      /**
+       * Aguarda o carregamento completo da configuração
+       * @returns {Promise<void>}
+       */
+      waitForConfig: function() {
+        // Se já foi carregado, resolve imediatamente
+        if (configLoaded) {
+          return Promise.resolve();
+        }
+        
+        // Se já está carregando, retorna a promise existente
+        if (configLoadPromise) {
+          return configLoadPromise;
+        }
+        
+        // Cria nova promise de carregamento
+        configLoadPromise = new Promise((resolve) => {
+          // Verifica se CONFIG já existe
+          if (typeof window.CONFIG !== 'undefined') {
+            configLoaded = true;
+            resolve();
+            return;
+          }
+          
+          // Aguarda CONFIG estar disponível (máximo 5 segundos)
+          const maxAttempts = 50;
+          let attempts = 0;
+          
+          const checkConfig = setInterval(() => {
+            attempts++;
+            
+            if (typeof window.CONFIG !== 'undefined') {
+              clearInterval(checkConfig);
+              configLoaded = true;
+              resolve();
+            } else if (attempts >= maxAttempts) {
+              clearInterval(checkConfig);
+              console.error('⚠️ Timeout ao aguardar CONFIG');
+              resolve(); // Resolve mesmo com erro para não travar
+            }
+          }, 100);
+        });
+        
+        return configLoadPromise;
+      },
+      
+      /**
+       * Verifica se a configuração está carregada
+       * @returns {boolean}
+       */
+      isLoaded: function() {
+        return configLoaded && typeof window.CONFIG !== 'undefined';
+      }
+    };
+  }
 })();
-

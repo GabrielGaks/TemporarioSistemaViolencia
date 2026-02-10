@@ -1,0 +1,73 @@
+<!-- ========================================
+         ESTATÍSTICAS VISUAIS (SVG ANIMADO)
+         ======================================== -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+    <!-- Card 1: Distribuição de Admins (SVG Chart) -->
+    <div
+        class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between card-elegant relative overflow-hidden group">
+        <!-- Decoration BG -->
+        <div
+            class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500">
+        </div>
+
+        <div class="z-10">
+            <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Perfil de Acesso</h3>
+            <div class="flex items-baseline gap-1">
+                <p class="text-3xl font-black text-gray-800" id="statAdminPct">0%</p>
+                <span class="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">Admins</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">de <span id="statTotalUsers">0</span> usuários totais</p>
+        </div>
+
+        <!-- SVG ANIMADO -->
+        <div class="w-20 h-20 relative z-10">
+            <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                <!-- Background Ring -->
+                <path class="text-gray-100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                    stroke="currentColor" stroke-width="3" />
+
+                <!-- Value Ring (Animated) -->
+                <path id="chartAdminRing" class="text-blue-500 transition-all duration-1000 ease-out"
+                    stroke-dasharray="0, 100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                    stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <!-- Center Icon -->
+            <div class="absolute inset-0 flex items-center justify-center text-blue-400 opacity-0 animate-scale-in"
+                style="animation-delay: 0.5s; animation-fill-mode: forwards;">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Status do Sistema (Pulse Animation) -->
+    <div class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between card-elegant">
+        <div>
+            <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Status do Sistema</h3>
+            <p class="text-lg font-bold text-green-600 flex items-center gap-2">
+                <span class="relative flex h-3 w-3">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                Operacional
+            </p>
+            <p class="text-xs text-gray-400 mt-1">Sincronizado agora</p>
+        </div>
+
+        <!-- SVG Wave Animation -->
+        <div class="w-24 h-12 flex items-end gap-1">
+            <div class="w-1.5 bg-blue-400 rounded-t-sm animate-pulse" style="height: 40%; animation-delay: 0s"></div>
+            <div class="w-1.5 bg-blue-500 rounded-t-sm animate-pulse" style="height: 70%; animation-delay: 0.1s"></div>
+            <div class="w-1.5 bg-blue-600 rounded-t-sm animate-pulse" style="height: 100%; animation-delay: 0.2s"></div>
+            <div class="w-1.5 bg-blue-500 rounded-t-sm animate-pulse" style="height: 60%; animation-delay: 0.3s"></div>
+            <div class="w-1.5 bg-blue-400 rounded-t-sm animate-pulse" style="height: 30%; animation-delay: 0.4s"></div>
+        </div>
+    </div>
+
+</div>

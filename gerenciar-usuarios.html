@@ -1,57 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Administrativo - Usuários</title>
-  
+
   <!-- Esconde conteúdo IMEDIATAMENTE para evitar flash -->
   <style>
     html:not(.page-ready) {
       opacity: 0 !important;
       visibility: hidden !important;
     }
+
     html.page-ready {
       opacity: 1 !important;
       visibility: visible !important;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
   </style>
-  
+
   <!-- TailwindCSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- Estilos Elegantes Compartilhados -->
   <link rel="stylesheet" href="assets/css/styles-elegant.css">
-  
+
+  <!-- Intro.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+  <!-- Onboarding CSS -->
+  <link rel="stylesheet" href="assets/css/onboarding.css">
+
   <!-- Configuração Centralizada (DEVE VIR ANTES DOS SCRIPTS QUE USAM CONFIG) -->
   <script src="config.js"></script>
   <script src="assets/js/utils/config-loader.js"></script>
-  
+
   <!-- Sistema de Transições entre Páginas -->
   <script src="assets/js/utils/page-transitions.js"></script>
-  
+
+  <!-- Sistema de Loading Indicator Elegante -->
+  <script src="assets/js/utils/loading-indicator.js"></script>
+
+  <!-- Sistema de Navegação por Perfil -->
+  <script src="assets/js/utils/navigation.js"></script>
+
+  <script>
+    // Verifica acesso usando o sistema de navegacao por perfil
+    // Permitido: admin, superuser
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.NAVMNavigation) {
+        // Verifica acesso e renderiza menus
+        if (!window.NAVMNavigation.verificarAcesso(['admin', 'superuser'])) {
+          return; // Sera redirecionado
+        }
+        window.NAVMNavigation.renderMenus();
+      } else {
+        // Fallback caso navigation.js nao carregue
+        const role = sessionStorage.getItem('userRole');
+        if (!role) {
+          window.location.href = 'index.html';
+          return;
+        }
+        if (!['admin', 'superuser'].includes(role)) {
+          alert('Voce nao tem permissao para acessar esta pagina.');
+          window.location.href = 'painel-casos.html';
+        }
+      }
+    });
+  </script>
+
   <style>
     .alert {
       animation: slideDown 0.3s ease-out;
     }
-    
+
     @keyframes slideDown {
       from {
         opacity: 0;
         transform: translateY(-20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-    
+
     @keyframes fadeInScale {
       from {
         opacity: 0;
         transform: scale(0.95);
       }
+
       to {
         opacity: 1;
         transform: scale(1);
@@ -59,8 +99,13 @@
     }
 
     @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .animate-spin {
@@ -85,24 +130,140 @@
       align-items: center;
       justify-content: center;
     }
-    
-    .modal.show > div {
+
+    .modal.show>div {
       animation: fadeInScale 0.3s ease-out;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-slide-up {
+      animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    /* Animações de Saída do Modal */
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 0;
+      }
+    }
+
+    @keyframes fadeOutScale {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    .modal.animate-out {
+      animation: fadeOut 0.2s ease-out forwards;
+    }
+
+    .modal.animate-out>div {
+      animation: fadeOutScale 0.2s ease-out forwards;
+    }
+
+    /* Garante que o conteúdo comece visível antes de sair */
+    .animate-scale-in {
+      animation: fadeInScale 0.3s ease-out forwards;
+    }
+
+    html.no-scroll {
+      scroll-behavior: auto !important;
+      /* Evita animação suave ao restaurar scroll */
+    }
+
+    body.no-scroll {
+      position: fixed;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* CUSTOM SCROLLBAR (SMART & ELEGANT) */
+    .custom-scrollbar {
+      overflow-y: auto;
+      scrollbar-width: none;
+      /* Firefox: Oculto por padrão */
+      -ms-overflow-style: none;
+      /* IE/Edge */
+    }
+
+    /* Oculta scrollbar no Chrome/Safari por padrão */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
+
+    /* MOSTRA no HOVER com estilo ELEGANT */
+    .custom-scrollbar:hover {
+      scrollbar-width: thin;
+      /* Firefox */
+      scrollbar-color: #3b82f6 #f1f5f9;
+      /* Blue Thumb, Gray Track */
+    }
+
+    .custom-scrollbar:hover::-webkit-scrollbar {
+      width: 8px;
+      /* Largura do elegant */
+      display: block;
+    }
+
+    .custom-scrollbar:hover::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      /* Blue Gradient */
+      border-radius: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      /* Darker Blue */
     }
 
     .table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      /* overflow-x: auto; - Removido a pedido */
+      overflow-x: hidden;
       border-radius: 0.5rem;
     }
 
     table {
-      min-width: 800px;
+      width: 100%;
+      /* min-width: 800px; - Removido a pedido */
     }
 
     tbody tr:last-child td {
@@ -158,11 +319,11 @@
       .mobile-menu-button {
         display: flex !important;
       }
-      
+
       .desktop-menu {
         display: none !important;
       }
-      
+
       .mobile-menu {
         display: block !important;
         max-height: 0;
@@ -175,88 +336,73 @@
       }
 
       table {
-        min-width: 600px;
+        min-width: unset;
+        /* Scroll removido */
       }
     }
 
     /* Melhorias de toque para mobile */
     @media (hover: none) and (pointer: coarse) {
-      button, a, input, select {
+
+      button,
+      a,
+      input,
+      select {
         min-height: 44px;
       }
     }
   </style>
+
+  <!-- Intro.js - Sistema de Onboarding -->
+  <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+  <link rel="stylesheet" href="assets/css/onboarding.css">
 </head>
+
 <body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
 
   <!-- ========================================
        CONTAINER PRINCIPAL
        ======================================== -->
   <div class="max-w-5xl mx-auto px-4 py-8">
-    
+
     <!-- Menu de Navegação -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
+    <div data-tour="header" class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
       <div class="px-4 py-3">
         <!-- Botão Hamburguer (Mobile) -->
-        <button onclick="toggleMobileMenu()" class="mobile-menu-button w-full flex items-center justify-between text-white font-semibold">
+        <button onclick="toggleMobileMenu()"
+          class="mobile-menu-button w-full flex items-center justify-between text-white font-semibold">
           <span>📱 Menu</span>
           <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        
-        <!-- Menu Desktop -->
+
+        <!-- Menu Desktop (renderizado dinamicamente por navigation.js) -->
         <nav class="desktop-menu flex flex-wrap gap-2 justify-center items-center">
-          <a href="painel-casos.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
-            📊 Painel de Casos
-          </a>
-          <a href="registro-novo-caso.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
-            📝 Novo Registro
-          </a>
-          <a href="gerenciar-casos.html" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-400 transition-all">
-            📋 Gerenciar Registros
-          </a>
-          <a href="gerenciar-usuarios.html" class="px-5 py-2.5 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">
-            🔧 Painel Admin
-          </a>
-          <button onclick="sair()" class="btn-elegant btn-danger-elegant px-5 py-2.5 rounded-lg text-sm font-semibold">
-            🚪 Sair
-          </button>
+          <!-- Menu sera renderizado por NAVMNavigation.renderMenus() -->
         </nav>
-        
+
         <!-- Menu Mobile (Dropdown) -->
         <nav id="mobileMenuNav" class="mobile-menu mt-3">
           <div class="flex flex-col gap-2">
-            <a href="painel-casos.html" class="btn-elegant btn-primary-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
-              📊 Painel de Casos
-            </a>
-            <a href="registro-novo-caso.html" class="btn-elegant btn-primary-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
-              📝 Novo Registro
-            </a>
-            <a href="gerenciar-casos.html" class="btn-elegant btn-primary-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
-              📋 Gerenciar Registros
-            </a>
-            <a href="gerenciar-usuarios.html" class="btn-elegant px-5 py-3 bg-white text-blue-600 rounded-lg text-sm font-semibold shadow-md text-center border-2 border-blue-500">
-              🔧 Painel Admin
-            </a>
-            <button onclick="sair()" class="btn-elegant btn-danger-elegant px-5 py-3 rounded-lg text-sm font-semibold text-center">
-              🚪 Sair
-            </button>
+            <!-- Menu sera renderizado por NAVMNavigation.renderMenus() -->
           </div>
         </nav>
       </div>
     </div>
-    
+
     <!-- ========================================
          CABEÇALHO
          ======================================== -->
     <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
       <div class="flex items-center justify-center gap-4">
-        <div class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-3xl shadow-sm">
+        <div
+          class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-3xl shadow-sm">
           🔧
         </div>
         <div class="text-center">
-          <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800">
+          <h1
+            class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800">
             Painel Administrativo
           </h1>
           <p class="text-gray-600 mt-1">Gerenciamento de Usuários do Sistema</p>
@@ -277,18 +423,14 @@
         <!-- Busca -->
         <div class="flex-1">
           <label class="block text-sm font-bold text-gray-700 mb-2">🔍 Buscar por e-mail</label>
-          <input 
-            type="text" 
-            id="searchInput" 
-            placeholder="Digite o e-mail..."
-            oninput="filtrarUsuarios()"
+          <input type="text" id="searchInput" placeholder="Digite o e-mail..." oninput="filtrarUsuarios()"
             class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
         </div>
-        
+
+        <!-- Botões de Ação -->
         <!-- Botão Adicionar -->
         <div class="md:mt-7">
-          <button 
-            onclick="abrirModalAdicionar()"
+          <button onclick="abrirModalAdicionar()" data-tour="btn-criar-usuario"
             class="btn-elegant btn-primary-elegant w-full md:w-auto px-6 py-3 font-bold rounded-xl shadow-lg flex items-center justify-center gap-2">
             <span class="text-xl">➕</span>
             <span>Adicionar Usuário</span>
@@ -297,13 +439,167 @@
       </div>
     </div>
 
+
+
+    <!-- ========================================
+         ESTATÍSTICAS VISUAIS (SVG ANIMADO)
+         ======================================== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+      <!-- Card 1: Distribuição de Admins (SVG Chart) -->
+      <div
+        class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between card-elegant relative overflow-hidden group">
+        <!-- Decoration BG -->
+        <div
+          class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500">
+        </div>
+
+        <div class="z-10">
+          <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Perfil de Acesso</h3>
+          <div class="flex items-baseline gap-1">
+            <p class="text-4xl font-black text-gray-800" id="statAdminPct">0%</p>
+            <span class="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">Admins</span>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">de <span id="statTotalUsers">0</span> usuários totais</p>
+        </div>
+
+        <!-- SVG ANIMADO -->
+        <div class="w-24 h-24 relative z-10">
+          <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+            <!-- Background Ring -->
+            <path class="text-gray-100"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+              stroke="currentColor" stroke-width="3" />
+
+            <!-- Value Ring (Animated) -->
+            <path id="chartAdminRing" class="text-blue-500 transition-all duration-1000 ease-out"
+              stroke-dasharray="0, 100"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+              stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <!-- Center Icon -->
+          <div class="absolute inset-0 flex items-center justify-center text-blue-400 opacity-0 animate-scale-in"
+            style="animation-delay: 0.5s; animation-fill-mode: forwards;">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Status do Sistema (Pulse Animation) -->
+      <div class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between card-elegant">
+        <div>
+          <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Status do Sistema</h3>
+          <p class="text-lg font-bold text-green-600 flex items-center gap-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            Operacional
+          </p>
+          <p class="text-xs text-gray-400 mt-1">Updates em tempo real</p>
+        </div>
+
+        <!-- SVG Wave Animation -->
+        <div class="w-32 h-16 flex items-end gap-1.5 p-2">
+          <div class="w-2 bg-blue-300 rounded-t-sm animate-pulse" style="height: 40%; animation-delay: 0s"></div>
+          <div class="w-2 bg-blue-400 rounded-t-sm animate-pulse" style="height: 70%; animation-delay: 0.15s"></div>
+          <div class="w-2 bg-blue-500 rounded-t-sm animate-pulse" style="height: 100%; animation-delay: 0.3s"></div>
+          <div class="w-2 bg-blue-400 rounded-t-sm animate-pulse" style="height: 60%; animation-delay: 0.45s"></div>
+          <div class="w-2 bg-blue-300 rounded-t-sm animate-pulse" style="height: 30%; animation-delay: 0.6s"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================
+         GUIA DE PERMISSÕES (VISUAL)
+         ======================================== -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 relative overflow-hidden">
+
+      <div class="flex items-center gap-3 mb-6 relative z-10">
+        <div class="p-2 bg-blue-100 rounded-lg text-blue-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800">Guia de Níveis de Acesso</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+
+        <!-- Card 1: VISUALIZADOR -->
+        <div
+          class="group border-2 border-dashed border-gray-200 hover:border-blue-300 rounded-xl p-4 transition-all hover:bg-blue-50">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-2xl">👁️</span>
+            <span class="font-bold text-gray-700 group-hover:text-blue-700">Visualizador</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-2">Acesso Básico</p>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Visualizar Painel de Casos</li>
+            <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Sem permissão de edição</li>
+          </ul>
+          <p class="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100 italic">
+            <strong>Recomendado para:</strong> Usuários que irão apenas analisar dados, sem editá-los.
+          </p>
+        </div>
+
+        <!-- Card 2: TÉCNICO -->
+        <div
+          class="group border-2 border-dashed border-gray-200 hover:border-purple-300 rounded-xl p-4 transition-all hover:bg-purple-50">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-2xl">🔔</span>
+            <span class="font-bold text-gray-700 group-hover:text-purple-700">Técnico</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-2">Foco em Notificações</p>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Criar Novos Registros</li>
+            <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Menu Minhas Notificações</li>
+            <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Gerencia seus próprios casos</li>
+            <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Sem acesso a registros gerais</li>
+          </ul>
+          <p class="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100 italic">
+            <strong>Recomendado para:</strong> Funcionários do NAAM que realizam as notificações em si.
+          </p>
+        </div>
+
+        <!-- Card 3: ESTAGIÁRIO -->
+        <div
+          class="group border-2 border-dashed border-gray-200 hover:border-indigo-300 rounded-xl p-4 transition-all hover:bg-indigo-50">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-2xl">📝</span>
+            <span class="font-bold text-gray-700 group-hover:text-indigo-700">Estagiário</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-2">Foco em Registros</p>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Criar Novos Registros</li>
+            <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Gerenciar/Editar Casos</li>
+            <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Sem acesso a notificações</li>
+          </ul>
+          <p class="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100 italic">
+            <strong>Recomendado para:</strong> Estagiários vigentes no NAAM.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Background Decoration -->
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-gray-50 rounded-full opacity-50 z-0 pointer-events-none">
+      </div>
+    </div>
+
     <!-- ========================================
          TABELA DE USUÁRIOS
          ======================================== -->
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-      
+    <div data-tour="tabela-usuarios" class="bg-white rounded-2xl shadow-xl overflow-hidden">
+
       <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+      <div id="loadingOverlay"
+        class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-10">
         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
         <p class="text-gray-600 font-medium">Carregando usuários...</p>
       </div>
@@ -313,12 +609,13 @@
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
           <span>👥</span>
           <span>Usuários do Sistema</span>
-          <span id="totalUsuarios" class="ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">0</span>
+          <span id="totalUsuarios"
+            class="ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">0</span>
         </h2>
       </div>
 
-      <!-- Tabela -->
-      <div class="table-wrapper">
+      <!-- Tabela com Scroll -->
+      <div class="table-wrapper max-h-[600px] overflow-y-auto custom-scrollbar">
         <table class="table-elegant w-full">
           <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
             <tr>
@@ -351,6 +648,32 @@
 
     </div>
 
+    <!-- ========================================
+         SEÇÃO DE LOGS DO SISTEMA (EMBUTIDO)
+         ======================================== -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
+      <!-- Cabeçalho Logs -->
+      <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <span>📋</span>
+          <span>Atividades Recentes do Sistema</span>
+        </h2>
+        <button onclick="carregarSystemUpdates()"
+          class="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1 transition-colors px-3 py-1 rounded-lg hover:bg-blue-50">
+          🔄 Atualizar
+        </button>
+      </div>
+
+      <!-- Container de Lista com Scroll -->
+      <div class="max-h-[500px] overflow-y-auto p-6 bg-gray-50/30 scrollbar-elegant" id="containerSystemUpdates">
+        <!-- Loading State -->
+        <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+          <p class="text-sm">Carregando logs...</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ========================================
@@ -358,15 +681,14 @@
        ======================================== -->
   <div id="modalUsuario" class="modal">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
-      
+
       <!-- Cabeçalho -->
       <div class="flex items-center justify-between mb-6">
         <h3 id="modalTitulo" class="text-2xl font-bold text-gray-800 flex items-center gap-2">
           <span>➕</span>
           <span>Adicionar Usuário</span>
         </h3>
-        <button 
-          onclick="fecharModal()"
+        <button onclick="fecharModal()"
           class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-all">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -376,20 +698,27 @@
 
       <!-- Formulário -->
       <form onsubmit="salvarUsuario(event)" class="space-y-5">
-        
+
         <!-- Campo Hidden ID -->
         <input type="hidden" id="usuarioId" value="">
-        
+
+        <!-- Nome Completo -->
+        <div id="campoNomeContainer">
+          <label for="usuarioNome" class="block text-sm font-bold text-gray-700 mb-2">
+            👤 Nome Completo <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="usuarioNome" placeholder="Nome completo do usuário" maxlength="100"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          <span id="nomeError" class="text-red-500 text-xs mt-1 hidden"></span>
+          <span id="nomeSuccess" class="text-green-500 text-xs mt-1 hidden"></span>
+        </div>
+
         <!-- E-mail -->
         <div>
           <label for="usuarioEmail" class="block text-sm font-bold text-gray-700 mb-2">
             📧 E-mail <span class="text-red-500">*</span>
           </label>
-          <input 
-            type="email" 
-            id="usuarioEmail" 
-            required
-            placeholder="usuario@email.com"
+          <input type="email" id="usuarioEmail" required placeholder="usuario@email.com"
             class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
         </div>
 
@@ -398,10 +727,7 @@
           <label for="usuarioSenha" class="block text-sm font-bold text-gray-700 mb-2">
             🔒 Senha <span class="text-red-500" id="senhaObrig">*</span>
           </label>
-          <input 
-            type="password" 
-            id="usuarioSenha"
-            placeholder="Digite a senha"
+          <input type="password" id="usuarioSenha" placeholder="Digite a senha"
             class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
           <p class="text-xs text-gray-500 mt-1" id="senhaHint">Deixe em branco para manter a senha atual</p>
         </div>
@@ -411,28 +737,24 @@
           <label for="usuarioPapel" class="block text-sm font-bold text-gray-700 mb-2">
             🎭 Papel no Sistema <span class="text-red-500">*</span>
           </label>
-          <select 
-            id="usuarioPapel" 
-            required
+          <select id="usuarioPapel" required
             class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
             <option value="">Selecione...</option>
             <option value="superuser">🔱 Superuser (Acesso Total)</option>
             <option value="admin">👔 Admin (Gerencia Usuários)</option>
+            <option value="tecnico">🔔 Técnico (Gestão de Notificações)</option>
+            <option value="estagiario">📝 Estagiário (Gestão de Registros)</option>
             <option value="visualizador">👁️ Visualizador (Somente Leitura)</option>
-            <option value="user">👤 User (Acesso Básico)</option>
           </select>
         </div>
 
         <!-- Botões -->
         <div class="flex gap-3 pt-4">
-          <button 
-            type="button"
-            onclick="fecharModal()"
+          <button type="button" onclick="fecharModal()"
             class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
             Cancelar
           </button>
-          <button 
-            type="submit"
+          <button type="submit"
             class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
             💾 Salvar
           </button>
@@ -444,11 +766,52 @@
   </div>
 
   <!-- ========================================
+       MODAL - ATIVIDADES DO SISTEMA
+       ======================================== -->
+  <div id="modalSystemUpdates" class="modal" style="z-index: 99999;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh]">
+
+      <!-- Cabeçalho -->
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 rounded-t-2xl">
+        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <span>📋</span>
+          <span>Atividades do Sistema</span>
+        </h3>
+        <div class="flex items-center gap-3">
+          <button onclick="carregarSystemUpdates()"
+            class="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1 transition-colors">
+            🔄 Atualizar
+          </button>
+          <button onclick="fecharModalSystemUpdates()"
+            class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg p-2 transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros (Opcional - Layout futuro) -->
+      <!-- <div class="px-6 py-3 border-b border-gray-100 bg-white"></div> -->
+
+      <!-- Lista de Scrolls -->
+      <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50 custom-scrollbar" id="containerSystemUpdates">
+        <!-- Loading State -->
+        <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+          <p>Carregando logs...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================
        MODAL - CONFIRMAR EXCLUSÃO
        ======================================== -->
   <div id="modalExcluir" class="modal">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
-      
+
       <!-- Ícone de Aviso -->
       <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
@@ -467,13 +830,11 @@
 
       <!-- Botões -->
       <div class="flex gap-3">
-        <button 
-          onclick="fecharModalExcluir()"
+        <button onclick="fecharModalExcluir()"
           class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
           Cancelar
         </button>
-        <button 
-          onclick="confirmarExclusao()"
+        <button onclick="confirmarExclusao()"
           class="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
           🗑️ Excluir
         </button>
@@ -491,7 +852,7 @@
     // ========================================
     // Aguarda o CONFIG estar disponível (config.js já foi carregado no <head>)
     let APPS_SCRIPT_URL;
-    
+
     // Debug: Verifica se CONFIG está disponível
     console.log('🔍 Verificando CONFIG...', typeof CONFIG);
     if (typeof CONFIG !== 'undefined') {
@@ -499,7 +860,7 @@
         APPS_SCRIPT_AUTH: CONFIG.APPS_SCRIPT_AUTH ? CONFIG.APPS_SCRIPT_AUTH.substring(0, 50) + '...' : 'undefined'
       });
     }
-    
+
     if (typeof CONFIG !== 'undefined' && CONFIG.APPS_SCRIPT_AUTH && !CONFIG.APPS_SCRIPT_AUTH.includes('SEU_ID_AQUI')) {
       APPS_SCRIPT_URL = CONFIG.APPS_SCRIPT_AUTH;
       console.log('✅ Usando APPS_SCRIPT_AUTH do config.js');
@@ -508,15 +869,15 @@
       APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyi1ZAT9Lyow6xAl_S4iQAf06TF5Uqt9-v-bkn2bhtfu56n2Mb0jTa1YbDVstMvNZWd/exec';
       console.warn('⚠️ CONFIG não encontrado ou URL inválida, usando URL padrão do config.js');
     }
-    
+
     // Validação: Verifica se está configurado
     if (APPS_SCRIPT_URL.includes('SEU_ID_AQUI')) {
       console.error('❌ ERRO: Configure APPS_SCRIPT_AUTH em config.js para gerenciar usuários');
       alert('❌ ERRO: Configure APPS_SCRIPT_AUTH em config.js');
     }
-    
+
     console.log('🔗 URL final do Apps Script:', APPS_SCRIPT_URL.substring(0, 50) + '...');
-    
+
     // Dados globais
     let todosUsuarios = [];
     let usuariosCache = []; // Cache para verificações de permissão
@@ -524,27 +885,50 @@
     let modoEdicao = false;
     let meuRole = null; // Role do usuário logado
 
+    // Estado para Real-Time Updates
+    let lastUpdateTimestamp = null;
+    let pollingInterval = null;
+    let systemUpdatesCache = []; // Cache para detalhes do modal
+    let savedScrollTop = 0; // Para travar/destravar scroll sem perder posição
+
+    // ========================================
+    // HELPER: SCROLL LOCK (BULLETPROOF)
+    // ========================================
+    function lockBodyScroll() {
+      savedScrollTop = window.scrollY;
+      document.body.style.top = `-${savedScrollTop}px`;
+      document.body.classList.add('no-scroll');
+      document.documentElement.classList.add('no-scroll');
+    }
+
+    function unlockBodyScroll() {
+      document.body.classList.remove('no-scroll');
+      document.documentElement.classList.remove('no-scroll');
+      document.body.style.top = '';
+      window.scrollTo(0, savedScrollTop);
+    }
+
     // ========================================
     // FUNÇÕES DE ALERTA
     // ========================================
     function mostrarAlerta(mensagem, tipo) {
       const container = document.getElementById('alertContainer');
       container.innerHTML = '';
-      
+
       const cores = {
         sucesso: 'from-green-500 to-green-600',
         erro: 'from-red-500 to-red-600',
         aviso: 'from-yellow-500 to-yellow-600',
         info: 'from-blue-500 to-blue-600'
       };
-      
+
       const icones = {
         sucesso: '✅',
         erro: '❌',
         aviso: '⚠️',
         info: 'ℹ️'
       };
-      
+
       const alertDiv = document.createElement('div');
       alertDiv.className = `alert bg-gradient-to-r ${cores[tipo]} text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3`;
       alertDiv.innerHTML = `
@@ -556,9 +940,9 @@
           </svg>
         </button>
       `;
-      
+
       container.appendChild(alertDiv);
-      
+
       if (tipo !== 'erro') {
         setTimeout(() => {
           alertDiv.style.transition = 'all 0.3s ease-out';
@@ -567,8 +951,455 @@
           setTimeout(() => alertDiv.remove(), 300);
         }, 5000);
       }
-      
+
       alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ========================================
+    // ATIVIDADES DO SISTEMA
+    // ========================================
+    // (Modal removido - Logs carregados automaticamente)
+
+    async function carregarSystemUpdates() {
+      const container = document.getElementById('containerSystemUpdates');
+
+      // Determinar URL correta (Endpoint de Casos, não Auth)
+      let scriptUrl = APPS_SCRIPT_URL;
+      if (typeof CONFIG !== 'undefined' && CONFIG.APPS_SCRIPT_CASOS && !CONFIG.APPS_SCRIPT_CASOS.includes('SEU_ID_AQUI')) {
+        scriptUrl = CONFIG.APPS_SCRIPT_CASOS;
+      }
+
+      // Loading
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+          <p>Carregando logs...</p>
+        </div>
+      `;
+
+      try {
+        console.log('🔄 Buscando System Updates em:', scriptUrl);
+
+        // Usar POST com action=checkUpdates (igual ao admin-updates.js)
+        // Usar POST com JSON Body (Backend espera JSON)
+        const payload = {
+          action: 'listarSystemUpdates',
+          limit: 50
+        };
+
+
+
+        const response = await fetch(scriptUrl, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        const resultado = await response.json();
+        console.log('📦 Dados recebidos:', resultado);
+
+        if (resultado.success && resultado.updates) {
+          systemUpdatesCache = resultado.updates;
+          renderizarSystemUpdates(resultado.updates);
+
+          // Atualiza timestamp para o mais recente (primeiro da lista, pois está ordenado DESC)
+          if (resultado.updates && resultado.updates.length > 0) {
+            lastUpdateTimestamp = resultado.updates[0].created_at;
+          }
+
+          // Inicia polling após carga inicial
+          iniciarPollingUpdates(scriptUrl);
+
+        } else if (resultado.updates) {
+          // Algumas versoes retornam apenas { updates: [...] }
+          systemUpdatesCache = resultado.updates;
+          renderizarSystemUpdates(resultado.updates);
+
+          if (resultado.updates && resultado.updates.length > 0) {
+            lastUpdateTimestamp = resultado.updates[0].created_at;
+          }
+
+          iniciarPollingUpdates(scriptUrl);
+
+        } else {
+          container.innerHTML = `
+            <div class="text-center py-8 text-red-500">
+              <p>Erro ao carregar: ${resultado.error || 'Erro desconhecido'}</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('❌ Erro get_system_updates:', error);
+        container.innerHTML = `
+          <div class="text-center py-8 text-red-500">
+            <p>Erro de conexão: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // ========================================
+    // POLLING DE ATUALIZAÇÕES (REAL-TIME)
+    // ========================================
+    function iniciarPollingUpdates(scriptUrl) {
+      if (pollingInterval) clearInterval(pollingInterval);
+
+      console.log('🚀 Iniciando polling de updates (30s)...');
+
+      pollingInterval = setInterval(async () => {
+        if (!lastUpdateTimestamp) return;
+
+        try {
+          const payload = {
+            action: 'listarSystemUpdates',
+            limit: 10,
+            since: lastUpdateTimestamp
+          };
+
+          const response = await fetch(scriptUrl, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) return;
+
+          const dados = await response.json();
+
+          if (dados.success && dados.updates && dados.updates.length > 0) {
+            console.log(`✨ ${dados.updates.length} novas atualizações encontradas!`);
+
+            // Atualiza timestamp com o mais recente
+            lastUpdateTimestamp = dados.updates[0].created_at;
+
+            // Renderiza e prependa os novos itens
+            const container = document.getElementById('containerSystemUpdates');
+            const listaContainer = container.querySelector('.space-y-3');
+
+            if (listaContainer) {
+              // 1. Deduplicação via DOM (IDs já renderizados)
+              const idsNoDom = new Set(Array.from(listaContainer.querySelectorAll('[data-id]')).map(el => String(el.dataset.id)));
+
+              // 2. Filtra o que chegou
+              const novosReais = dados.updates.filter(u => !idsNoDom.has(String(u.id)));
+
+              if (novosReais.length > 0) {
+                console.log(`📝 Renderizando ${novosReais.length} itens realmente novos.`);
+
+                // Adiciona ao cache para o modal funcionar
+                systemUpdatesCache.unshift(...novosReais);
+
+                novosReais.slice().reverse().forEach(update => {
+                  const htmlItem = gerarHTMLUpdateItem(update, 0, true);
+                  listaContainer.insertAdjacentHTML('afterbegin', htmlItem);
+                });
+              } else {
+                console.log('Duplicate check: Todos os itens recebidos já estão na tela.');
+              }
+            }
+          }
+
+        } catch (e) {
+          console.warn('Falha no polling silencioso:', e);
+        }
+      }, 30000); // 30 segundos
+    }
+
+    // ========================================
+    // GERAÇÃO UNIFICADA DE ITEM (CARD)
+    // ========================================
+    function gerarHTMLUpdateItem(update, index = 0, isPolling = false) {
+      const data = formatarDataHoraSystemUpdate(update.created_at);
+      const corTipo = getCorTipoAcao(update.tipo_acao);
+      const icone = getIconeTipoAcao(update.tipo_acao);
+      const animationClass = isPolling ? 'animate-slide-in-top' : 'animate-slide-up';
+      const delay = isPolling ? '0ms' : `${index * 75}ms`;
+
+      return `
+        <div onclick="abrirModalDetalhesUpdate('${update.id}')" 
+             class="cursor-pointer border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white ${animationClass} relative overflow-hidden group" 
+             style="animation-delay: ${delay}"
+             data-id="${update.id}">
+          
+          <!-- Barra lateral colorida -->
+          <div class="absolute left-0 top-0 bottom-0 w-1 ${corTipo.split(' ')[0].replace('bg-', 'bg-')}"></div>
+          
+          <div class="pl-2">
+            <div class="flex justify-between items-start mb-2 flex-wrap gap-2">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${corTipo}">
+                ${icone} ${update.tipo_acao || 'N/A'}
+              </span>
+              <span class="text-xs text-gray-400 font-mono flex items-center gap-1">
+                📅 ${data}
+              </span>
+            </div>
+            
+            <div class="mb-2">
+              <p class="text-gray-900 font-semibold mb-1 text-base leading-snug">
+                ${update.resumo || 'Sem resumo'}
+              </p>
+            </div>
+            
+            <div class="flex items-center gap-4 text-xs text-gray-500 border-t border-gray-100 pt-2 mt-2">
+              <div class="flex items-center gap-1">
+                <span class="text-gray-400">📂 Tabela:</span>
+                <span class="font-medium bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">${update.tabela_afetada || 'Geral'}</span>
+              </div>
+              <div class="flex items-center gap-1 ml-auto">
+                <span class="text-gray-400">👤 Autor:</span>
+                <span class="font-medium text-gray-700 truncate max-w-[150px]" title="${update.autor_nome || update.autor_email}">
+                  ${update.autor_nome || update.autor_email || 'Sistema'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================
+    // LÓGICA DO MODAL DE DETALHES
+    // ========================================
+    function abrirModalDetalhesUpdate(id) {
+      const update = systemUpdatesCache.find(u => String(u.id) === String(id));
+      if (!update) {
+        console.error('Update não encontrado:', id);
+        return;
+      }
+
+      // Preenche os dados
+      document.getElementById('modalUpdateIcon').textContent = getIconeTipoAcao(update.tipo_acao);
+      document.getElementById('modalUpdateResumo').textContent = update.resumo || 'Sem resumo';
+      document.getElementById('modalUpdateAutor').textContent = update.autor_nome || update.autor_email || 'Sistema';
+      document.getElementById('modalUpdateData').textContent = formatarDataHoraSystemUpdate(update.created_at);
+
+      const elTipo = document.getElementById('modalUpdateTipo');
+      elTipo.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCorTipoAcao(update.tipo_acao)}`;
+      elTipo.textContent = update.tipo_acao;
+
+      document.getElementById('modalUpdateTabela').textContent = update.tabela_afetada || 'Geral';
+
+      // Formata e exibe os detalhes de forma AMIGÁVEL
+      const elDetalhes = document.getElementById('modalUpdateDetalhes');
+
+      // Limpa conteúdo anterior e define loading se necessário
+      elDetalhes.innerHTML = '<div class="p-6 text-center text-gray-400">Carregando detalhes...</div>';
+
+      try {
+        let dados = update.detalhes;
+
+        // Tenta parsear se for string
+        if (typeof dados === 'string' && (dados.startsWith('{') || dados.startsWith('['))) {
+          try { dados = JSON.parse(dados); } catch (e) { dados = update.detalhes; }
+        }
+
+        const htmlAmigavel = gerarHtmlDetalhesAmigavel(dados);
+        elDetalhes.innerHTML = htmlAmigavel;
+
+      } catch (e) {
+        console.error('Erro ao gerar HTML amigável:', e);
+        elDetalhes.innerHTML = `
+          <div class="p-4 text-red-500 bg-red-50 text-center text-sm rounded-b-lg">
+            Erro ao formatar detalhes: ${e.message}
+          </div>
+        `;
+      }
+
+      // Abre o modal
+      document.getElementById('modalDetalhesUpdate').classList.add('show');
+      // Trava scroll (Bulletproof)
+      lockBodyScroll();
+    }
+
+    function gerarHtmlDetalhesAmigavel(dados) {
+      // 1. Caso array de mudanças (Padrão: { mudancas: [...] })
+      if (dados && dados.mudancas && Array.isArray(dados.mudancas)) {
+        if (dados.mudancas.length === 0) {
+          return '<div class="p-6 text-center text-gray-400 italic">Nenhuma alteração registrada.</div>';
+        }
+
+        let html = '<div class="divide-y divide-gray-100">';
+        dados.mudancas.forEach(mudanca => {
+          html += `
+            <div class="p-4 hover:bg-gray-50 transition-colors grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+              <div class="font-medium text-gray-700 md:col-span-1 border-l-4 border-blue-400 pl-3">
+                ${formatarNomeCampo(mudanca.campo)}
+              </div>
+              <div class="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm">
+                <div class="flex-1 bg-red-50 text-red-700 px-3 py-1.5 rounded w-full sm:w-auto break-all border border-red-100 relative">
+                  <span class="text-[10px] font-bold text-red-400 block uppercase tracking-wider mb-0.5">De</span>
+                  ${mudanca.de || '<em class="opacity-50">(vazio)</em>'}
+                </div>
+                <div class="text-gray-300 transform rotate-90 sm:rotate-0 self-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+                <div class="flex-1 bg-green-50 text-green-700 px-3 py-1.5 rounded w-full sm:w-auto break-all border border-green-100 relative">
+                  <span class="text-[10px] font-bold text-green-500 block uppercase tracking-wider mb-0.5">Para</span>
+                  ${mudanca.para || '<em class="opacity-50">(vazio)</em>'}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        return html;
+      }
+
+      // 2. Caso Objeto simples (Key-Value)
+      if (typeof dados === 'object' && dados !== null && !Array.isArray(dados)) {
+        // Filtra chaves técnicas que não interessam
+        const ignoredKeys = ['action', 'token', 'spreadsheetId', 'sheetName', 'success'];
+        const keys = Object.keys(dados).filter(k => !ignoredKeys.includes(k));
+
+        if (keys.length === 0) {
+          return '<div class="p-6 text-center text-gray-400 italic">Sem detalhes adicionais.</div>';
+        }
+
+        let html = '<div class="divide-y divide-gray-100">';
+        keys.forEach(key => {
+          const valor = dados[key];
+          let valorFormatado = (typeof valor === 'object') ? JSON.stringify(valor) : String(valor);
+
+          if (valorFormatado === '[object Object]') valorFormatado = JSON.stringify(valor);
+
+          html += `
+             <div class="p-4 flex flex-col md:flex-row md:justify-between hover:bg-gray-50 transition-colors gap-2">
+               <span class="font-medium text-gray-600 mb-1 md:mb-0 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                  ${formatarNomeCampo(key)}
+               </span>
+               <span class="text-gray-800 bg-gray-100 px-3 py-1 rounded text-sm break-all font-mono">${valorFormatado}</span>
+             </div>
+          `;
+        });
+        html += '</div>';
+        return html;
+      }
+
+      // 3. Fallback: Texto ou String
+      return `
+        <div class="p-6 text-gray-600 bg-gray-50 text-sm font-mono whitespace-pre-wrap">
+          ${String(dados)}
+        </div>
+      `;
+    }
+
+    function formatarNomeCampo(campo) {
+      if (!campo) return 'Campo Desconhecido';
+      // Converte camelCase para Title Case (ex: dataNascimento -> Data Nascimento)
+      return campo
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, function (str) { return str.toUpperCase(); })
+        .trim();
+    }
+
+
+
+    function fecharModalDetalhesUpdate() {
+      fecharModalComAnimacao(document.getElementById('modalDetalhesUpdate'));
+    }
+
+    // ATENÇÃO: copiarDetalhes removido da UI
+
+    function renderizarSystemUpdates(updates) {
+      const container = document.getElementById('containerSystemUpdates');
+
+      if (!updates || updates.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-400">
+            <div class="text-5xl mb-3">📭</div>
+            <p>Nenhuma atividade registrada.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '<div class="space-y-3">';
+
+      updates.forEach((update, index) => {
+        html += gerarHTMLUpdateItem(update, index, false);
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function formatarDetalhesAtualizacao(detalhes) {
+      if (!detalhes) return 'Sem detalhes';
+
+      try {
+        let obj = detalhes;
+
+        // Se for string JSON, converte para objeto
+        if (typeof detalhes === 'string' && (detalhes.startsWith('{') || detalhes.startsWith('['))) {
+          try { obj = JSON.parse(detalhes); } catch (e) { return detalhes; }
+        }
+
+        // Se for objeto, tenta extrair informações úteis
+        if (typeof obj === 'object') {
+          // Caso 1: Array de mudanças (formato padrão de update)
+          if (obj.mudancas && Array.isArray(obj.mudancas)) {
+            const alters = obj.mudancas
+              .map(m => `${m.campo} (de "${m.de}" para "${m.para}")`)
+              .join(', ');
+            return `Alterado: ${alters}`;
+          }
+
+          // Caso 2: Campos atualizados simples
+          if (obj.campos_atualizados) return `Alterado: ${obj.campos_atualizados}`;
+
+          // Caso 3: Motivo
+          if (obj.motivo) return `Motivo: ${obj.motivo}`;
+
+          // Fallback: tenta stringify legível ou retorna string original
+          return JSON.stringify(obj);
+        }
+
+        return String(detalhes);
+      } catch (e) {
+        return String(detalhes);
+      }
+    }
+
+    // Helpers
+    function getCorTipoAcao(tipo) {
+      const t = (tipo || '').toUpperCase();
+      const cores = {
+        'CRIACAO': 'bg-green-100 text-green-800 border border-green-200',
+        'INSERT': 'bg-green-100 text-green-800 border border-green-200',
+
+        'EDICAO': 'bg-blue-100 text-blue-800 border border-blue-200',
+        'UPDATE': 'bg-blue-100 text-blue-800 border-blue-200',
+
+        'EXCLUSAO': 'bg-red-100 text-red-800 border border-red-200',
+        'DELETE': 'bg-red-100 text-red-800 border border-red-200',
+
+        'LOGIN': 'bg-purple-100 text-purple-800 border border-purple-200'
+      };
+      return cores[t] || 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+
+    function getIconeTipoAcao(tipo) {
+      const t = (tipo || '').toUpperCase();
+      const icones = {
+        'CRIACAO': '➕',
+        'INSERT': '➕',
+        'EDICAO': '✏️',
+        'UPDATE': '✏️',
+        'EXCLUSAO': '🗑️',
+        'DELETE': '🗑️',
+        'LOGIN': '🔐'
+      };
+      return icones[t] || '📝';
+    }
+
+    function formatarDataHoraSystemUpdate(isoString) {
+      if (!isoString) return '--/--/---- --:--';
+      try {
+        const data = new Date(isoString);
+        return data.toLocaleString('pt-BR', {
+          day: '2-digit', month: '2-digit', year: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        });
+      } catch (e) { return isoString; }
     }
 
     // ========================================
@@ -580,9 +1411,9 @@
           method: 'GET',
           redirect: 'follow'
         });
-        
+
         const resultado = await response.json();
-        
+
         if (resultado.sucesso) {
           todosUsuarios = resultado.data || [];
           usuariosCache = todosUsuarios;
@@ -593,7 +1424,7 @@
           usuariosCache = [];
           renderizarTabela([]);
         }
-        
+
       } catch (erro) {
         mostrarAlerta('Erro ao conectar com o servidor', 'erro');
         todosUsuarios = [];
@@ -608,36 +1439,41 @@
       const tbody = document.getElementById('tabelaUsuarios');
       const mensagemVazia = document.getElementById('mensagemVazia');
       const totalUsuarios = document.getElementById('totalUsuarios');
-      
+
       // Filtrar usuários baseado no role do usuário logado
       let usuariosFiltrados = usuarios;
       if (meuRole === 'admin') {
-        // Admin vê apenas users e visualizadores
-        usuariosFiltrados = usuarios.filter(u => u.role === 'user' || u.role === 'visualizador');
+        // Admin Vê todos EXCETO outros admins e superusers
+        usuariosFiltrados = usuarios.filter(u => u.role !== 'admin' && u.role !== 'superuser');
       }
       // Superuser vê todos
-      
+
       // Atualiza contador
       totalUsuarios.textContent = usuariosFiltrados.length;
-      
+
+      // Atualiza estatísticas (Novo Widget)
+      atualizarGraficoStats(usuariosFiltrados);
+
+
+
       if (usuariosFiltrados.length === 0) {
         tbody.innerHTML = '';
         mensagemVazia.classList.remove('hidden');
         return;
       }
-      
+
       mensagemVazia.classList.add('hidden');
-      
+
       tbody.innerHTML = usuariosFiltrados.map(usuario => {
         const badgeClass = usuario.role === 'superuser' ? 'badge-superuser' :
-                          usuario.role === 'admin' ? 'badge-admin' :
-                          usuario.role === 'visualizador' ? 'badge-visualizador' :
-                          'badge-user';
-        
+          usuario.role === 'admin' ? 'badge-admin' :
+            usuario.role === 'visualizador' ? 'badge-visualizador' :
+              'badge-user';
+
         const badgeIcon = usuario.role === 'superuser' ? '🔱' :
-                         usuario.role === 'admin' ? '👔' :
-                         usuario.role === 'visualizador' ? '👁️' : '👤';
-        
+          usuario.role === 'admin' ? '👔' :
+            usuario.role === 'visualizador' ? '👁️' : '👤';
+
         const dataFormatada = new Date(usuario.created_at).toLocaleDateString('pt-BR', {
           day: '2-digit',
           month: '2-digit',
@@ -645,11 +1481,11 @@
           hour: '2-digit',
           minute: '2-digit'
         });
-        
+
         // Controle de permissões
         const podeEditar = verificarPermissaoEditar(usuario.role);
         const podeExcluir = verificarPermissaoExcluir(usuario.role);
-        
+
         return `
           <tr class="hover:bg-gray-50 transition-colors">
             <td class="px-6 py-4 whitespace-nowrap">
@@ -670,7 +1506,7 @@
               <div class="flex items-center justify-center gap-2">
                 ${podeEditar ? `
                   <button 
-                    onclick='editarUsuario(${JSON.stringify(usuario).replace(/'/g, "&#39;")})'
+                    onclick="editarUsuario('${usuario.id}')"
                     class="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-all"
                     title="Editar">
                     ✏️
@@ -685,7 +1521,7 @@
                 `}
                 ${podeExcluir ? `
                   <button 
-                    onclick='abrirModalExcluir(${JSON.stringify(usuario).replace(/'/g, "&#39;")})'
+                    onclick="abrirModalExcluir('${usuario.id}')"
                     class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-all"
                     title="Excluir">
                     🗑️
@@ -706,16 +1542,67 @@
       }).join('');
     }
 
+
+
     // ========================================
+    // ATUALIZAR GRÁFICO (SVG DYNAMIC)
+    // ========================================
+    function atualizarGraficoStats(usuarios) {
+      if (!usuarios || usuarios.length === 0) {
+        const adminPct = document.getElementById('statAdminPct');
+        const totalUsers = document.getElementById('statTotalUsers');
+        const chartRing = document.getElementById('chartAdminRing');
+
+        if (adminPct) adminPct.textContent = "0%";
+        if (totalUsers) totalUsers.textContent = "0";
+        if (chartRing) chartRing.setAttribute('stroke-dasharray', "0, 100");
+        return;
+      }
+
+      const total = usuarios.length;
+      // Conta admins + superusers
+      const admins = usuarios.filter(u => u.role === 'admin' || u.role === 'superuser').length;
+      const pct = Math.round((admins / total) * 100);
+
+      // Animação dos números
+      const elPct = document.getElementById('statAdminPct');
+      if (elPct) animateValue(elPct, 0, pct, 1000, "%");
+
+      const elTotal = document.getElementById('statTotalUsers');
+      if (elTotal) elTotal.textContent = total;
+
+      // Animação do SVG (Stroke Dasharray)
+      // O círculo tem perímetro ~100 (devido ao viewBox e raio configurado no path d)
+      // d="... a 15.9155 ... 0 0 1 0 31.831 ..." -> Circunferência = 2 * PI * 15.9155 ≈ 100
+      // Então a porcentagem mapeia diretamente para o dasharray
+      setTimeout(() => {
+        const ring = document.getElementById('chartAdminRing');
+        if (ring) ring.setAttribute('stroke-dasharray', `${pct}, 100`);
+      }, 100);
+    }
+
+    function animateValue(obj, start, end, duration, suffix = "") {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start) + suffix;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
     // VERIFICAR PERMISSÕES
     // ========================================
     function verificarPermissaoEditar(roleAlvo) {
       // Superuser pode editar todos
       if (meuRole === 'superuser') return true;
-      
-      // Admin pode editar users e visualizadores
-      if (meuRole === 'admin' && (roleAlvo === 'user' || roleAlvo === 'visualizador')) return true;
-      
+
+      // Admin pode editar tecnico, estagiario, visualizador e user (legado)
+      if (meuRole === 'admin' && ['tecnico', 'estagiario', 'visualizador', 'user'].includes(roleAlvo)) return true;
+
       // Outros casos: sem permissão
       return false;
     }
@@ -723,10 +1610,10 @@
     function verificarPermissaoExcluir(roleAlvo) {
       // Superuser pode excluir qualquer um
       if (meuRole === 'superuser') return true;
-      
-      // Admin pode excluir users e visualizadores
-      if (meuRole === 'admin' && (roleAlvo === 'user' || roleAlvo === 'visualizador')) return true;
-      
+
+      // Admin pode excluir tecnico, estagiario, visualizador e user (legado)
+      if (meuRole === 'admin' && ['tecnico', 'estagiario', 'visualizador', 'user'].includes(roleAlvo)) return true;
+
       // Outros casos: sem permissão
       return false;
     }
@@ -734,10 +1621,10 @@
     function verificarPermissaoCriar(roleCriar) {
       // Superuser pode criar qualquer role
       if (meuRole === 'superuser') return true;
-      
-      // Admin pode criar users e visualizadores
-      if (meuRole === 'admin' && (roleCriar === 'user' || roleCriar === 'visualizador')) return true;
-      
+
+      // Admin pode criar tecnico, estagiario, visualizador e user (legado)
+      if (meuRole === 'admin' && ['tecnico', 'estagiario', 'visualizador', 'user'].includes(roleCriar)) return true;
+
       // Outros casos: sem permissão
       return false;
     }
@@ -747,16 +1634,16 @@
     // ========================================
     function filtrarUsuarios() {
       const busca = document.getElementById('searchInput').value.toLowerCase().trim();
-      
+
       if (!busca) {
         renderizarTabela(todosUsuarios);
         return;
       }
-      
-      const filtrados = todosUsuarios.filter(usuario => 
+
+      const filtrados = todosUsuarios.filter(usuario =>
         usuario.email.toLowerCase().includes(busca)
       );
-      
+
       renderizarTabela(filtrados);
     }
 
@@ -770,15 +1657,23 @@
       document.getElementById('usuarioEmail').value = '';
       document.getElementById('usuarioSenha').value = '';
       document.getElementById('usuarioPapel').value = '';
-      
+
+      // Nome: limpar, habilitar e tornar obrigatório
+      var campoNome = document.getElementById('usuarioNome');
+      campoNome.value = '';
+      campoNome.disabled = false;
+      campoNome.required = true;
+      document.getElementById('nomeError').classList.add('hidden');
+      document.getElementById('nomeSuccess').classList.add('hidden');
+
       // Senha obrigatória ao adicionar
       document.getElementById('usuarioSenha').required = true;
       document.getElementById('senhaObrig').classList.remove('hidden');
       document.getElementById('senhaHint').classList.add('hidden');
-      
+
       // Limita opções de papel baseado no role do usuário
       atualizarOpcoesPapel();
-      
+
       document.getElementById('modalUsuario').classList.add('show');
     }
 
@@ -787,24 +1682,26 @@
     // ========================================
     function atualizarOpcoesPapel(roleAtual = null) {
       const selectPapel = document.getElementById('usuarioPapel');
-      
+
       if (meuRole === 'superuser') {
         // Superuser vê todas as opções
         selectPapel.innerHTML = `
           <option value="">Selecione...</option>
           <option value="superuser">🔱 Superuser (Acesso Total)</option>
           <option value="admin">👔 Admin (Gerencia Usuários)</option>
+          <option value="tecnico">🔔 Técnico (Gestão de Notificações)</option>
+          <option value="estagiario">📝 Estagiário (Gestão de Registros)</option>
           <option value="visualizador">👁️ Visualizador (Somente Leitura)</option>
-          <option value="user">👤 User (Acesso Básico)</option>
         `;
       } else if (meuRole === 'admin') {
-        // Admin vê user e visualizador
+        // Admin vê papéis que pode gerenciar
         selectPapel.innerHTML = `
           <option value="">Selecione...</option>
+          <option value="tecnico">🔔 Técnico (Gestão de Notificações)</option>
+          <option value="estagiario">📝 Estagiário (Gestão de Registros)</option>
           <option value="visualizador">👁️ Visualizador (Somente Leitura)</option>
-          <option value="user">👤 User (Acesso Básico)</option>
         `;
-        
+
         // Se está editando um admin ou superuser, mostra mas desabilita
         if (roleAtual && (roleAtual === 'admin' || roleAtual === 'superuser')) {
           const badgeIcon = roleAtual === 'superuser' ? '🔱' : '👔';
@@ -815,7 +1712,7 @@
           selectPapel.disabled = true;
         }
       }
-      
+
       // Restaura valor se fornecido
       if (roleAtual && !selectPapel.disabled) {
         selectPapel.value = roleAtual;
@@ -825,27 +1722,45 @@
     // ========================================
     // MODAL - EDITAR
     // ========================================
-    function editarUsuario(usuario) {
+    // ========================================
+    // MODAL - EDITAR
+    // ========================================
+    function editarUsuario(id) {
+      const usuario = usuariosCache.find(u => u.id === id);
+
+      if (!usuario) {
+        mostrarAlerta('Usuário não encontrado', 'erro');
+        return;
+      }
+
       // Verifica se tem permissão para editar este usuário
       if (!verificarPermissaoEditar(usuario.role)) {
         mostrarAlerta('Você não tem permissão para editar este usuário', 'erro');
         return;
       }
-      
+
       modoEdicao = true;
       document.getElementById('modalTitulo').innerHTML = '<span>✏️</span><span>Editar Usuário</span>';
       document.getElementById('usuarioId').value = usuario.id;
       document.getElementById('usuarioEmail').value = usuario.email;
       document.getElementById('usuarioSenha').value = '';
-      
+
+      // Nome: exibir como somente leitura (imutável após criação)
+      var campoNome = document.getElementById('usuarioNome');
+      campoNome.value = usuario.nome || '';
+      campoNome.disabled = true;
+      campoNome.required = false;
+      document.getElementById('nomeError').classList.add('hidden');
+      document.getElementById('nomeSuccess').classList.add('hidden');
+
       // Senha opcional ao editar
       document.getElementById('usuarioSenha').required = false;
       document.getElementById('senhaObrig').classList.add('hidden');
       document.getElementById('senhaHint').classList.remove('hidden');
-      
+
       // Atualiza opções de papel com restrições baseadas no role
       atualizarOpcoesPapel(usuario.role);
-      
+
       document.getElementById('modalUsuario').classList.add('show');
     }
 
@@ -861,23 +1776,31 @@
     // ========================================
     async function salvarUsuario(event) {
       event.preventDefault();
-      
+
       const id = document.getElementById('usuarioId').value;
+      const nome = document.getElementById('usuarioNome').value.trim();
       const email = document.getElementById('usuarioEmail').value.trim();
       const senha = document.getElementById('usuarioSenha').value;
       const papel = document.getElementById('usuarioPapel').value;
-      
+
       // Validações
       if (!email || !papel) {
         mostrarAlerta('Preencha todos os campos obrigatórios', 'erro');
         return;
       }
-      
+
+      // Nome obrigatório na criação
+      if (!modoEdicao && !nome) {
+        mostrarAlerta('Nome é obrigatório ao criar usuário', 'erro');
+        document.getElementById('usuarioNome').focus();
+        return;
+      }
+
       if (!modoEdicao && !senha) {
         mostrarAlerta('Senha é obrigatória ao criar usuário', 'erro');
         return;
       }
-      
+
       // Verifica permissão antes de salvar
       if (modoEdicao) {
         // Encontra o usuário sendo editado
@@ -893,7 +1816,7 @@
           return;
         }
       }
-      
+
       try {
         const dados = {
           action: modoEdicao ? 'update_user' : 'create_user',
@@ -902,11 +1825,16 @@
           role: papel,
           caller_role: meuRole // Envia o role do usuário logado para validação backend
         };
-        
+
+        // Nome é enviado APENAS na criação (imutável após criação)
+        if (!modoEdicao) {
+          dados.nome = nome;
+        }
+
         if (modoEdicao) {
           dados.id = id;
         }
-        
+
         const response = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: {
@@ -915,9 +1843,9 @@
           body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
           redirect: 'follow'
         });
-        
+
         const resultado = await response.json();
-        
+
         if (resultado.sucesso) {
           mostrarAlerta(
             modoEdicao ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!',
@@ -928,7 +1856,7 @@
         } else {
           mostrarAlerta(resultado.mensagem || 'Erro ao salvar usuário', 'erro');
         }
-        
+
       } catch (erro) {
         mostrarAlerta('Erro ao conectar com o servidor', 'erro');
       }
@@ -937,14 +1865,24 @@
     // ========================================
     // MODAL - EXCLUIR
     // ========================================
-    function abrirModalExcluir(usuario) {
+    function abrirModalExcluir(id) {
+      const usuario = usuariosCache.find(u => u.id === id);
+
+      if (!usuario) {
+        mostrarAlerta('Usuário não encontrado', 'erro');
+        return;
+      }
+
       usuarioExcluirId = usuario.id;
       document.getElementById('excluirEmail').textContent = usuario.email;
-      
+
       const badgeIcon = usuario.role === 'superuser' ? '🔱' :
-                       usuario.role === 'admin' ? '👔' : '👤';
+        usuario.role === 'admin' ? '👔' :
+          usuario.role === 'tecnico' ? '🔔' :
+            usuario.role === 'estagiario' ? '📝' : '👁️';
+
       document.getElementById('excluirPapel').textContent = `${badgeIcon} ${usuario.role}`;
-      
+
       document.getElementById('modalExcluir').classList.add('show');
     }
 
@@ -958,14 +1896,14 @@
     // ========================================
     async function confirmarExclusao() {
       if (!usuarioExcluirId) return;
-      
+
       try {
-      const dados = {
-        action: 'delete_user',
-        id: usuarioExcluirId,
-        caller_role: meuRole
-      };
-        
+        const dados = {
+          action: 'delete_user',
+          id: usuarioExcluirId,
+          caller_role: meuRole
+        };
+
         const response = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: {
@@ -974,9 +1912,9 @@
           body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
           redirect: 'follow'
         });
-        
+
         const resultado = await response.json();
-        
+
         if (resultado.sucesso) {
           mostrarAlerta('Usuário excluído com sucesso!', 'sucesso');
           fecharModalExcluir();
@@ -984,11 +1922,60 @@
         } else {
           mostrarAlerta(resultado.mensagem || 'Erro ao excluir usuário', 'erro');
         }
-        
+
       } catch (erro) {
         mostrarAlerta('Erro ao conectar com o servidor', 'erro');
       }
     }
+
+    // ========================================
+    // VERIFICAÇÃO DE UNICIDADE DO NOME (real-time)
+    // ========================================
+    (function () {
+      var nomeCheckTimeout = null;
+      var campoNome = document.getElementById('usuarioNome');
+      if (campoNome) {
+        campoNome.addEventListener('blur', function () {
+          var nome = this.value.trim();
+          var errorEl = document.getElementById('nomeError');
+          var successEl = document.getElementById('nomeSuccess');
+
+          if (!nome || this.disabled) {
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+            return;
+          }
+
+          clearTimeout(nomeCheckTimeout);
+          nomeCheckTimeout = setTimeout(async function () {
+            try {
+              var dados = { action: 'check_nome_unique', nome: nome };
+              var response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+                redirect: 'follow'
+              });
+              var resultado = await response.json();
+
+              if (resultado.sucesso && resultado.available) {
+                errorEl.classList.add('hidden');
+                errorEl.textContent = '';
+                successEl.textContent = 'Nome disponível';
+                successEl.classList.remove('hidden');
+              } else {
+                successEl.classList.add('hidden');
+                successEl.textContent = '';
+                errorEl.textContent = resultado.mensagem || 'Este nome já está em uso';
+                errorEl.classList.remove('hidden');
+              }
+            } catch (e) {
+              // Silenciosamente ignora erros de rede na verificação
+            }
+          }, 500);
+        });
+      }
+    })();
 
     // ========================================
     // MENU MOBILE TOGGLE
@@ -1003,9 +1990,9 @@
         }
       }
     }
-    
+
     // Fecha o menu ao redimensionar para desktop
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       if (window.innerWidth > 768) {
         const mobileMenu = document.getElementById('mobileMenuNav');
         const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
@@ -1031,10 +2018,10 @@
     // ========================================
     // FECHAR MENU MOBILE AO CLICAR EM LINK
     // ========================================
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const mobileMenuLinks = document.querySelectorAll('#mobileMenuNav a');
       mobileMenuLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function () {
           const mobileMenu = document.getElementById('mobileMenuNav');
           const menuIcon = mobileMenu?.previousElementSibling?.querySelector('svg');
           if (mobileMenu) {
@@ -1052,31 +2039,170 @@
     // ========================================
     function verificarAuth() {
       const userRole = sessionStorage.getItem('userRole');
-      
+
       if (!userRole) {
         window.location.href = 'index.html';
         return;
       }
-      
+
       if (userRole !== 'admin' && userRole !== 'superuser') {
         alert('Acesso negado! Apenas administradores podem acessar esta página.');
         window.location.href = 'registro-novo-caso.html';
         return;
       }
-      
+
       // Armazena o role do usuário logado para controle de permissões
       meuRole = userRole;
     }
 
     // ========================================
+    // INTERAÇÕES GENÉRICAS DE MODAL (ESC e Click Outside)
+    // ========================================
+
+    // Função unificada para fechar qualquer modal com animação
+    function fecharModalComAnimacao(modal) {
+      if (!modal) return;
+
+      // Adiciona classe de saída
+      modal.classList.add('animate-out');
+
+      // Aguarda animação terminar (200ms)
+      setTimeout(() => {
+        modal.classList.remove('show');
+        modal.classList.remove('animate-out');
+
+        // Verifica se não há outros modals abertos antes de liberar o scroll
+        if (document.querySelectorAll('.modal.show').length === 0) {
+          unlockBodyScroll();
+        }
+      }, 200);
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        const modalsAbertos = document.querySelectorAll('.modal.show');
+        modalsAbertos.forEach(modal => {
+          fecharModalComAnimacao(modal);
+        });
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
+        fecharModalComAnimacao(e.target);
+      }
+    });
+
+    // ========================================
     // INICIALIZAÇÃO
     // ========================================
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       verificarAuth();
       carregarUsuarios();
+      carregarSystemUpdates(); // Auto-carregar logs
     });
 
   </script>
 
+  <!-- Modal de Detalhes da Atualização -->
+  <div id="modalDetalhesUpdate" class="modal">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden animate-scale-in">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <span id="modalUpdateIcon">📝</span>
+          Detalhes da Atividade
+        </h3>
+        <button onclick="fecharModalDetalhesUpdate()"
+          class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+
+        <!-- Cabeçalho do Modal -->
+        <div class="flex items-start gap-4 mb-6">
+          <div id="modalUpdateAvatar"
+            class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl text-blue-600 font-bold shrink-0">
+            👤
+          </div>
+          <div>
+            <h4 id="modalUpdateResumo" class="text-xl font-bold text-gray-900 leading-tight mb-1">Resumo da ação</h4>
+            <div class="flex flex-wrap gap-2 text-sm text-gray-500">
+              <span id="modalUpdateAutor">Autor da Silva</span>
+              <span>•</span>
+              <span id="modalUpdateData">01/01/2024 12:00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid de Informações -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">Tipo de Ação</span>
+            <span id="modalUpdateTipo"
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              UPDATE
+            </span>
+          </div>
+          <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">Tabela Afetada</span>
+            <span id="modalUpdateTabela" class="font-mono text-sm text-gray-700">registros</span>
+          </div>
+        </div>
+
+        <!-- Detalhes da Alteração -->
+        <div>
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">O que mudou?</span>
+          <div id="modalUpdateDetalhes"
+            class="bg-white border border-gray-200 rounded-lg p-0 overflow-hidden shadow-sm">
+            <!-- Conteúdo será injetado aqui via JS -->
+            <div class="p-6 text-center text-gray-400 italic">
+              Nenhum detalhe disponível.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-gray-50 px-6 py-4 flex justify-end">
+        <button onclick="fecharModalDetalhesUpdate()"
+          class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 font-medium shadow-sm transition-all focus:ring-2 focus:ring-offset-1 focus:ring-blue-500">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro.js - Sistema de Onboarding -->
+  <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+  <script src="assets/js/utils/onboarding.js"></script>
+  <script>
+    // Inicializar onboarding após carregamento completo da página
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        if (window.NAAMOnboarding) {
+          NAAMOnboarding.init('gerenciar-usuarios');
+        }
+      }, 2000);
+    });
+  </script>
+
 </body>
+
+<!-- Intro.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+<!-- Onboarding Module -->
+<script src="assets/js/utils/onboarding.js"></script>
+<!-- Initialize Onboarding -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.NAAMOnboarding) {
+      window.NAAMOnboarding.init('gerenciar-usuarios');
+    }
+  });
+</script>
+
 </html>

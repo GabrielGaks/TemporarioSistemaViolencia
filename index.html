@@ -28,8 +28,15 @@
   <script src="config.js"></script>
   <script src="assets/js/utils/config-loader.js"></script>
   
+  <!-- Sistema de Cache e Pré-carregamento -->
+  <script src="assets/js/utils/data-cache.js"></script>
+  <script src="assets/js/utils/data-preloader.js"></script>
+  
   <!-- Sistema de Transições entre Páginas -->
   <script src="assets/js/utils/page-transitions.js"></script>
+  
+  <!-- Sistema de Loading Indicator Elegante -->
+  <script src="assets/js/utils/loading-indicator.js"></script>
   
   <style>
     /* Animações */
@@ -130,11 +137,6 @@
     <!-- Card de Login -->
     <div class="card-login bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/50 p-6 sm:p-8">
       
-      <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10">
-        <div class="spinner mb-4"></div>
-        <p class="text-gray-600 font-medium">Autenticando...</p>
-      </div>
       
       <!-- Formulário de Login -->
       <form id="loginForm" onsubmit="return realizarLogin(event)" class="space-y-6">
@@ -325,17 +327,29 @@
     // FUNÇÕES DE LOADING
     // ========================================
     function mostrarLoading() {
-      document.getElementById('loadingOverlay').classList.remove('hidden');
-      document.getElementById('btnEntrar').disabled = true;
-      document.getElementById('btnEntrar').classList.add('btn-loading', 'opacity-50', 'cursor-not-allowed');
-      document.getElementById('btnTexto').textContent = 'Aguarde...';
+      if (window.loadingIndicator) {
+        window.loadingIndicator.show('Autenticando...');
+      }
+      const btnEntrar = document.getElementById('btnEntrar');
+      if (btnEntrar) {
+        btnEntrar.disabled = true;
+        btnEntrar.classList.add('opacity-50', 'cursor-not-allowed');
+        const btnTexto = document.getElementById('btnTexto');
+        if (btnTexto) btnTexto.textContent = 'Aguarde...';
+      }
     }
     
     function esconderLoading() {
-      document.getElementById('loadingOverlay').classList.add('hidden');
-      document.getElementById('btnEntrar').disabled = false;
-      document.getElementById('btnEntrar').classList.remove('btn-loading', 'opacity-50', 'cursor-not-allowed');
-      document.getElementById('btnTexto').textContent = 'Entrar';
+      if (window.loadingIndicator) {
+        window.loadingIndicator.hide();
+      }
+      const btnEntrar = document.getElementById('btnEntrar');
+      if (btnEntrar) {
+        btnEntrar.disabled = false;
+        btnEntrar.classList.remove('opacity-50', 'cursor-not-allowed');
+        const btnTexto = document.getElementById('btnTexto');
+        if (btnTexto) btnTexto.textContent = 'Entrar';
+      }
     }
     
     // ========================================
@@ -427,18 +441,33 @@
         
         if (loginSucesso) {
           // Salva informações do usuário
-          sessionStorage.setItem('userEmail', resultado.email || email);
-          sessionStorage.setItem('userRole', resultado.role || 'user');
-          sessionStorage.setItem('userId', resultado.id || '');
+          const userEmail = resultado.email || email;
+          const userRole = resultado.role || 'user';
           
-          // Redireciona imediatamente baseado no role (sem delay)
-          if (resultado.role === 'admin' || resultado.role === 'superuser') {
-            window.location.href = 'gerenciar-usuarios.html';
-          } else if (resultado.role === 'visualizador') {
-            window.location.href = 'painel-casos.html';
-          } else {
-            window.location.href = 'gerenciar-casos.html';
+          sessionStorage.setItem('userEmail', userEmail);
+          sessionStorage.setItem('userRole', userRole);
+          sessionStorage.setItem('userId', resultado.id || '');
+          sessionStorage.setItem('userName', resultado.nome || '');
+          
+          // Atualiza mensagem de loading
+          const loadingText = document.querySelector('#loadingIndicator .loading-text');
+          if (loadingText) {
+            loadingText.textContent = 'Carregando dados do sistema...';
           }
+          
+          // Pré-carrega dados antes de redirecionar
+          console.log('[Login] Iniciando pré-carregamento de dados...');
+          try {
+            await window.DataPreloader.preloadAll(userEmail, userRole);
+            console.log('[Login] ✅ Dados pré-carregados com sucesso');
+          } catch (error) {
+            console.error('[Login] Erro ao pré-carregar dados:', error);
+            // Continua mesmo com erro para não bloquear login
+          }
+          
+          // Redireciona TODOS os usuarios para o Painel de Casos
+          // A navegacao por perfil e controlada pelo menu dinamico
+          window.location.href = 'painel-casos.html';
           
         } else {
           // Login falhou

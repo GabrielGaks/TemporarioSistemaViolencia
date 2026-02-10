@@ -1,0 +1,471 @@
+/* ============================================
+   ANEXOS.CSS - Estilos para Sistema de Anexos
+   ============================================ */
+
+/* Seção de Anexos no Modal */
+.secao-anexos {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+  animation: slideUp 0.4s ease-out;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+
+.secao-anexos-titulo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.secao-anexos-titulo span:first-child {
+  font-size: 24px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Lista de Anexos */
+.lista-anexos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Item de Anexo */
+.anexo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  animation: slideUp 0.3s ease-out;
+}
+
+.anexo-item:hover {
+  background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+  border-color: #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Informações do Anexo */
+.anexo-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.anexo-tipo-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.anexo-detalhes {
+  flex: 1;
+  min-width: 0;
+}
+
+.anexo-nome {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  max-width: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+.anexo-metadata {
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.anexo-metadata-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Badge de Compressão */
+.anexo-compressao {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  color: #065f46;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  animation: slideUp 0.5s ease-out;
+}
+
+.anexo-compressao::before {
+  content: '✓';
+}
+
+/* Ações do Anexo */
+.anexo-acoes {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.anexo-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.anexo-btn:hover {
+  transform: translateY(-1px);
+}
+
+.anexo-btn:active {
+  transform: translateY(0);
+}
+
+/* Botão Download (Roxo) */
+.anexo-btn-download {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.anexo-btn-download:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+/* Botão Visualizar (Azul) */
+.anexo-btn-view {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.anexo-btn-view:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Botão Excluir (Vermelho) */
+.anexo-btn-delete {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.anexo-btn-delete:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Estados Vazios */
+.anexos-vazio {
+  text-align: center;
+  padding: 32px;
+  color: #9ca3af;
+  font-size: 14px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.anexos-vazio-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* Loading de Anexos */
+.anexos-loading {
+  text-align: center;
+  padding: 24px;
+  color: #6b7280;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.anexos-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   PREVIEW DE UPLOAD
+   ============================================ */
+
+.preview-anexos {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  animation: slideUp 0.3s ease-out;
+}
+
+.preview-item.preview-ok {
+  border-left: 4px solid #10b981;
+}
+
+.preview-item.preview-erro {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.preview-icone {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.preview-nome {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-tamanho {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.preview-aviso {
+  font-size: 11px;
+  color: #dc2626;
+  font-weight: 600;
+  background: #fee2e2;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.preview-vazio {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 16px;
+}
+
+/* ============================================
+   CAMPO DE UPLOAD
+   ============================================ */
+
+.campo-anexos {
+  margin: 16px 0;
+}
+
+.campo-anexos label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.campo-anexos input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.campo-anexos input[type="file"]:hover {
+  border-color: #8b5cf6;
+  background: #faf5ff;
+}
+
+.campo-anexos input[type="file"]:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.texto-ajuda {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+/* ============================================
+   CONTADOR DE ANEXOS (Badge)
+   ============================================ */
+
+.anexos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+.anexos-badge-icon {
+  font-size: 12px;
+}
+
+/* ============================================
+   PROGRESS BAR UPLOAD
+   ============================================ */
+
+.upload-progress {
+  margin-top: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 8px;
+  border: 1px solid #fbbf24;
+  animation: slideUp 0.3s ease-out;
+}
+
+.upload-progress-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.upload-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #fef3c7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.upload-progress-texto {
+  font-size: 12px;
+  color: #78350f;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ============================================
+   RESPONSIVIDADE MOBILE
+   ============================================ */
+
+@media (max-width: 640px) {
+  .anexo-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .anexo-info {
+    width: 100%;
+  }
+  
+  .anexo-acoes {
+    width: 100%;
+  }
+  
+  .anexo-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .anexo-tipo-icon {
+    font-size: 28px;
+  }
+  
+  .secao-anexos-titulo {
+    font-size: 16px;
+  }
+}
+
+/* ============================================
+   ANIMAÇÕES
+   ============================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

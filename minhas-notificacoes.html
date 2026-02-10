@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Minhas Notificações - Sistema de Registro de Violência Escolar</title>
+
+  <!-- Esconde conteúdo IMEDIATAMENTE para evitar flash -->
+  <style>
+    html:not(.page-ready) {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
+    html.page-ready {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+  </style>
+
+  <!-- TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Estilos Elegantes Compartilhados -->
+  <link rel="stylesheet" href="assets/css/styles-elegant.css">
+
+  <!-- Intro.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+  <!-- Onboarding CSS -->
+  <link rel="stylesheet" href="assets/css/onboarding.css">
+
+  <!-- Estilos para Sistema de Anexos -->
+  <link rel="stylesheet" href="assets/css/anexos.css">
+
+  <!-- Estilos para Sistema de Atualizações -->
+  <link rel="stylesheet" href="assets/css/atualizacoes.css">
+
+  <!-- Configuração Centralizada -->
+  <script src="config.js"></script>
+  <script src="assets/js/utils/config-loader.js"></script>
+
+  <!-- Sistema de Transições entre Páginas -->
+  <script src="assets/js/utils/page-transitions.js"></script>
+
+  <!-- Sistema de Navegação por Perfil -->
+  <script src="assets/js/utils/navigation.js"></script>
+
+  <script>
+    // Verifica acesso usando o sistema de navegacao por perfil
+    // Permitido: apenas tecnico
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.NAVMNavigation) {
+        // Verifica acesso e renderiza menus
+        if (!window.NAVMNavigation.verificarAcesso(['tecnico', 'superuser'])) {
+          return; // Sera redirecionado
+        }
+        window.NAVMNavigation.renderMenus();
+      } else {
+        // Fallback caso navigation.js nao carregue
+        const role = sessionStorage.getItem('userRole');
+        if (!role) {
+          window.location.href = 'index.html';
+          return;
+        }
+        if (!['tecnico', 'superuser'].includes(role)) {
+          alert('Voce nao tem permissao para acessar esta pagina.');
+          window.location.href = 'painel-casos.html';
+        }
+      }
+    });
+  </script>
+
+  <style>
+    /* ========================================
+       ESTILOS ESPECÍFICOS - ACCORDION
+       ======================================== */
+
+    /* Menu Hamburguer Responsivo */
+    .mobile-menu-button {
+      display: none !important;
+    }
+
+    .desktop-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-button {
+        display: flex !important;
+      }
+
+      .desktop-menu {
+        display: none !important;
+      }
+
+      .mobile-menu {
+        display: block !important;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .mobile-menu.show {
+        max-height: 500px;
+      }
+    }
+
+    /* ========================================
+       ANIMAÇÕES
+       ======================================== */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse-subtle {
+
+      0%,
+      100% {
+        box-shadow: 0 10px 25px rgba(167, 139, 250, 0.1);
+      }
+
+      50% {
+        box-shadow: 0 10px 35px rgba(167, 139, 250, 0.2);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    /* ========================================
+       ZONAS DE HIERARQUIA
+       ======================================== */
+    .header-zone {
+      /* Zona A: Informações de contexto - visualmente mais leve */
+    }
+
+    .control-zone {
+      /* Zona B: Ações do usuário - destaque visual */
+    }
+
+    .filters-secondary {
+      /* Filtros como elemento secundário dentro da zona de controle */
+    }
+
+    .filters-secondary button {
+      opacity: 0.75;
+    }
+
+    .filters-secondary button:hover {
+      opacity: 1;
+    }
+
+    .results-zone {
+      /* Zona C: Resultados - container para loading e lista */
+    }
+
+    /* ========================================
+       ACCORDION GROUPS
+       ======================================== */
+    .grupo-crianca {
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .grupo-crianca:hover {
+      border-color: #a78bfa;
+      box-shadow: 0 12px 28px rgba(167, 139, 250, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .grupo-crianca:active {
+      transform: translateY(0);
+    }
+
+    .grupo-header {
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grupo-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .grupo-header:hover::before {
+      left: 100%;
+    }
+
+    .grupo-header:hover {
+      background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+      box-shadow: inset 0 1px 3px rgba(167, 139, 250, 0.1);
+    }
+
+    .grupo-header.ativo {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+    }
+
+    .grupo-header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .grupo-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+      display: inline-flex;
+      width: 48px;
+      height: 48px;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .grupo-header.ativo .grupo-icon {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      transform: scale(1.05);
+    }
+
+    .grupo-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .grupo-nome {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      margin: 0;
+      transition: color 0.3s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .grupo-header.ativo .grupo-nome {
+      color: #fef3c7;
+    }
+
+    .grupo-contador {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-top: 4px;
+      transition: color 0.3s ease;
+    }
+
+    .grupo-header.ativo .grupo-contador {
+      color: #fcd34d;
+    }
+
+    .seta {
+      font-size: 20px;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: transparent;
+      flex-shrink: 0;
+      color: #6b7280;
+    }
+
+    .grupo-header.ativo .seta {
+      color: #fcd34d;
+    }
+
+    .grupo-header:hover .seta {
+      background: rgba(167, 139, 250, 0.1);
+    }
+
+    .seta.expandido {
+      transform: rotate(90deg);
+    }
+
+    .grupo-conteudo {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 24px;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+    }
+
+    .grupo-conteudo.expandido {
+      max-height: 2000px;
+      padding: 16px 24px;
+      /* Evita "jump" visual ao expandir */
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ========================================
+       NOTIFICATION ITEMS
+       ======================================== */
+    .notif-item-list {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .notif-item-list::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .notif-item-list:hover {
+      background: linear-gradient(90deg, rgba(167, 139, 250, 0.04) 0%, transparent 100%);
+      padding-left: 19px;
+    }
+
+    .notif-item-list:hover::before {
+      opacity: 1;
+    }
+
+    .notif-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .notif-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notif-context {
+      font-size: 13px;
+      color: #4b5563;
+      margin: 4px 0 0 0;
+      font-weight: 500;
+    }
+
+    .notif-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .notif-arrow {
+      color: #d1d5db;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .notif-item-list:hover .notif-arrow {
+      color: #8b5cf6;
+      transform: translateX(3px);
+    }
+
+    /* ========================================
+       MODAL
+       ======================================== */
+    .modal-notificacao {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+      transition: all 0.3s ease;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-notificacao.visible {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-conteudo {
+      background-color: #fefefe;
+      padding: 0;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 800px;
+      max-height: 85vh;
+      overflow: hidden;
+      /* Mantém hidden no container principal */
+      animation: modalExpand 0.42s cubic-bezier(0.2, 0, 0, 1);
+      transform-origin: top center;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-body {
+      padding: 28px;
+      opacity: 0;
+      overflow-y: auto;
+      max-height: calc(85vh - 120px);
+    }
+
+    /* Esconde body durante loading */
+    .modal-loading.visible {
+      display: block;
+    }
+
+    .modal-conteudo:not(.content-ready) .modal-body {
+      opacity: 0;
+    }
+
+    /* Revela body quando conteúdo está pronto */
+    .modal-conteudo.content-ready .modal-body {
+      opacity: 1;
+      animation: modalBodyReveal 0.3s ease-out both;
+    }
+
+    /* Scrollbar customizada para modal */
+    .modal-body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 0 0 20px 0;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+      border-radius: 10px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+    }
+
+    .modal-header {
+      padding: 32px 24px;
+      padding-right: 80px;
+      /* Espaço extra para o botão de fechar */
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: white;
+      border-radius: 20px 20px 0 0;
+      position: relative;
+      overflow: visible;
+      /* Permite expansão do conteúdo sem scrollbar */
+      min-height: auto;
+      /* Permite expansão do header */
+      flex-shrink: 0;
+      /* Evita que o header seja comprimido */
+    }
+
+    /* Remove scrollbar do header (caso apareça) */
+    .modal-header::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    .modal-header {
+      -ms-overflow-style: none !important;
+      /* IE e Edge */
+      scrollbar-width: none !important;
+      /* Firefox */
+    }
+
+    /* Container para título e subtítulo com espaço adequado */
+    .modal-header>.modal-titulo,
+    .modal-header>.modal-subtitulo {
+      max-width: calc(100% - 80px);
+      /* Garante espaço para o botão de fechar */
+      padding-right: 0;
+      display: block;
+      overflow: visible !important;
+      /* Garante que não tenha scrollbar */
+    }
+
+    .modal-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      /* Garante que fique atrás do conteúdo */
+    }
+
+    .modal-titulo {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+      overflow: visible !important;
+      /* Garante que não tenha scrollbar */
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
+    }
+
+    /* Remove scrollbar do título */
+    .modal-titulo::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    .modal-subtitulo {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+      font-weight: 500;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      max-width: calc(100% - 80px);
+      /* Garante espaço para o botão de fechar */
+      line-height: 1.5;
+      padding-right: 0;
+      display: block;
+      min-height: 1.5em;
+      /* Altura mínima para evitar corte */
+      overflow: visible !important;
+      /* Garante que o texto não seja cortado e não tenha scrollbar */
+      text-overflow: clip;
+      /* Permite que o texto seja exibido completamente */
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
+    }
+
+    /* Remove scrollbar do subtítulo */
+    .modal-subtitulo::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    .modal-close {
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+    }
+
+    .modal-close:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: rotate(90deg) scale(1.05);
+    }
+
+    .modal-section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+
+    .modal-section:hover {
+      border-color: #a78bfa;
+      box-shadow: 0 4px 12px rgba(167, 139, 250, 0.1);
+    }
+
+    .modal-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .modal-section-content {
+      display: space-y-2;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+
+    .info-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    /* ========================================
+       ACCORDION LOADING
+       ======================================== */
+    .notif-item-loading {
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 600;
+      animation: slideUp 0.3s ease-out;
+      border-bottom: 1px solid #e5e7eb;
+      background: linear-gradient(90deg, #f9fafb 0%, #f3f4f6 100%);
+    }
+
+    .notif-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e5e7eb;
+      border-top-color: #8b5cf6;
+      border-right-color: #8b5cf6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    /* ========================================
+       LOADING CONTAINER
+       ======================================== */
+    .loading-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .loading-container.hidden {
+      display: none;
+    }
+
+    /* ========================================
+       BARRA DE PESQUISA
+       ======================================== */
+    .search-input {
+      background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+      font-family: inherit;
+    }
+
+    .search-input::placeholder {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .search-input:focus {
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.1);
+    }
+
+    .clear-search-btn {
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .clear-search-btn:hover {
+      background: rgba(139, 92, 246, 0.1);
+      transform: scale(1.1) rotate(90deg);
+    }
+
+    .search-highlight {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* ========================================
+       MODAL LOADING
+       ======================================== */
+    .modal-loading {
+      display: none;
+      padding: 48px 24px;
+      text-align: center;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .modal-loading.visible {
+      display: block;
+    }
+
+    .modal-spinner-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .modal-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #8b5cf6;
+      border-right-color: #8b5cf6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .modal-spinner-text {
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  </style>
+
+  <!-- Intro.js - Sistema de Onboarding -->
+  <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+  <link rel="stylesheet" href="assets/css/onboarding.css">
+</head>
+
+<body>
+
+  <!-- Container Principal -->
+  <div class="max-w-[1400px] mx-auto px-4 py-8">
+
+    <!-- Menu de Navegação -->
+    <div data-tour="header" class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
+      <div class="px-4 py-3">
+        <!-- Botão Hamburguer (Mobile) -->
+        <button onclick="toggleMobileMenu()"
+          class="mobile-menu-button w-full flex items-center justify-between text-white font-semibold">
+          <span>📱 Menu</span>
+          <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+
+        <!-- Menu Desktop (renderizado dinamicamente por navigation.js) -->
+        <nav class="desktop-menu flex flex-wrap gap-2 justify-center items-center">
+          <!-- Menu sera renderizado por NAVMNavigation.renderMenus() -->
+        </nav>
+
+        <!-- Menu Mobile (Dropdown) -->
+        <nav id="mobileMenuNav" class="mobile-menu mt-3">
+          <div class="flex flex-col gap-2">
+            <!-- Menu sera renderizado por NAVMNavigation.renderMenus() -->
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ========================================
+       ZONA A: HEADER (Context Information)
+       ======================================== -->
+    <div class="header-zone mb-10">
+      <!-- CABEÇALHO -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+        <div class="flex items-center justify-center gap-4 mb-3">
+          <div
+            class="h-14 w-14 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 text-3xl shadow-sm">
+            🔔
+          </div>
+          <div class="text-center">
+            <h1
+              class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-800">
+              Minhas Notificações
+            </h1>
+          </div>
+        </div>
+        <p class="text-center text-gray-600">Notificações agrupadas por criança/aluno</p>
+        <p class="text-center text-gray-500 text-sm mt-2">✅ Clique no nome para ver todas as notificações</p>
+      </div>
+
+      <!-- TOTAL DE NOTIFICAÇÕES -->
+      <section class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">📊</span>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-700">Total de Notificações</h3>
+            <p class="text-3xl font-bold text-purple-600" id="badge-total">0</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========================================
+       ZONA B: CONTROL ZONE (Search + Filters)
+       ======================================== -->
+    <section class="control-zone bg-white rounded-2xl shadow-xl p-6 mb-10">
+      <!-- BUSCA (Elemento Primário) -->
+      <div class="mb-4">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">🔍</span>
+          <h3 class="text-lg font-semibold text-gray-700">Pesquisar Notificação</h3>
+        </div>
+        <div class="relative">
+          <input type="text" id="search-input" placeholder="Buscar por nome do aluno, ID, tipo de violência, escola..."
+            class="search-input w-full px-5 py-4 pr-12 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+            onkeyup="filtrarNotificacoes()" />
+          <button id="clear-search" onclick="limparPesquisa()"
+            class="clear-search-btn absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+            style="display: none;">
+            ✕
+          </button>
+        </div>
+        <p class="text-sm text-gray-500 mt-2" id="search-results-count"></p>
+      </div>
+
+      <!-- FILTROS (Elemento Secundário) -->
+      <div id="filtros-section" style="display: none;" class="filters-secondary">
+        <div class="flex items-center justify-end mb-4 pt-4 border-t border-gray-100">
+          <button onclick="toggleFiltros()"
+            class="text-sm text-gray-600 hover:text-purple-600 font-medium transition-colors" id="toggle-filtros-btn">
+            <span id="toggle-filtros-text">Mostrar</span> Filtros
+          </button>
+        </div>
+
+        <div id="filtros-conteudo" style="display: none;">
+          <!-- FILTRO POR PERÍODO -->
+          <div class="mb-6 pb-6 border-b border-gray-200">
+            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <span>📅</span>
+              <span>Período da Notificação</span>
+            </h4>
+
+            <!-- Botões Rápidos -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <button onclick="aplicarFiltroPeriodo(7)"
+                class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors"
+                id="btn-periodo-7">
+                Últimos 7 dias
+              </button>
+              <button onclick="aplicarFiltroPeriodo(30)"
+                class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors"
+                id="btn-periodo-30">
+                Últimos 30 dias
+              </button>
+              <button onclick="aplicarFiltroPeriodo(90)"
+                class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors"
+                id="btn-periodo-90">
+                Últimos 90 dias
+              </button>
+              <button onclick="aplicarFiltroPeriodo(365)"
+                class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors"
+                id="btn-periodo-365">
+                Último ano
+              </button>
+              <button onclick="limparFiltroPeriodo()"
+                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                Limpar
+              </button>
+            </div>
+
+            <!-- Campos de Data -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="filter-data-inicio" class="block text-sm font-semibold text-gray-700 mb-2">
+                  Data Início
+                </label>
+                <input type="date" id="filter-data-inicio"
+                  class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/60 focus:border-purple-500 transition-all"
+                  onchange="aplicarFiltros()" />
+              </div>
+              <div>
+                <label for="filter-data-fim" class="block text-sm font-semibold text-gray-700 mb-2">
+                  Data Fim
+                </label>
+                <input type="date" id="filter-data-fim"
+                  class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/60 focus:border-purple-500 transition-all"
+                  onchange="aplicarFiltros()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- FILTRO POR TIPO DE VIOLÊNCIA -->
+          <div class="mb-6 pb-6 border-b border-gray-200">
+            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <span>⚠️</span>
+              <span>Tipo de Violência</span>
+              <span id="badge-tipo-violencia"
+                class="hidden bg-purple-600 text-white text-xs px-2 py-1 rounded-full">0</span>
+            </h4>
+
+            <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3"
+              id="filter-tipo-violencia-container">
+              <!-- Checkboxes serão inseridos via JavaScript -->
+              <div class="text-sm text-gray-500 text-center py-4">Carregando tipos de violência...</div>
+            </div>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="flex gap-3 pt-4 border-t border-gray-200">
+            <button onclick="aplicarFiltros()"
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg hover:shadow-xl">
+              🔍 Aplicar Filtros
+            </button>
+            <button onclick="limparTodosFiltros()"
+              class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+              🗑️ Limpar Tudo
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+       ZONA C: RESULTS ZONE (Loading + List)
+       ======================================== -->
+    <section class="results-zone">
+      <!-- Loading -->
+      <div class="text-center py-12" id="loading">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600 font-semibold">Carregando suas notificações...</p>
+      </div>
+
+      <!-- LISTA DE GRUPOS (ACCORDION) -->
+      <div id="lista-grupos" data-tour="lista-notificacoes" class="bg-white rounded-2xl shadow-xl p-6"
+        style="display: none;">
+        <div id="container-grupos" data-tour="accordion-criancas">
+          <!-- Grupos serão inseridos aqui via JavaScript -->
+        </div>
+
+        <!-- Estado Vazio -->
+        <div id="estado-vazio" class="text-center py-12 opacity-75" style="display: none;">
+          <div class="text-6xl mb-4">📭</div>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhuma notificação encontrada</h3>
+          <p class="text-gray-500">Você não tem notificações neste momento.</p>
+        </div>
+      </div>
+    </section>
+
+  </div> <!-- Fecha container principal -->
+
+  <!-- ========================================
+       MODAL DE DETALHES
+       ======================================== -->
+  <div class="modal-notificacao" id="modal-notificacao">
+    <div class="modal-conteudo">
+      <div class="modal-header">
+        <h3 class="modal-titulo" id="modal-titulo">Detalhes da Notificação</h3>
+        <p class="modal-subtitulo" id="modal-subtitulo"></p>
+        <button class="modal-close" onclick="fecharModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" id="modal-body">
+        <!-- Conteúdo será inserido via JavaScript -->
+      </div>
+
+      <!-- Footer com Botão de Editar -->
+      <div class="modal-footer" id="modal-footer"
+        style="display: none; padding: 1.5rem; border-top: 1px solid #e5e7eb; background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);">
+        <button id="btnEditarNotificacao" onclick="abrirModalEdicao()" disabled
+          class="w-full px-6 py-3.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 relative overflow-hidden group">
+          <span
+            class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+          <span id="btnEditarTexto" class="relative z-10 flex items-center gap-2">
+            <span class="inline-block animate-spin" style="display: inline-block;">⏳</span>
+            <span>Carregando dados...</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Loading Spinner Modal -->
+      <div class="modal-loading" id="modal-loading">
+        <div class="modal-spinner-container">
+          <div class="modal-spinner"></div>
+          <p class="modal-spinner-text">Carregando detalhes...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       SCRIPTS
+       ======================================== -->
+  <script src="assets/js/utils/security.js"></script>
+  <script src="assets/js/utils/logger.js"></script>
+  <script src="assets/js/utils/api.js"></script>
+  <!-- Sistema de Cache -->
+  <script src="assets/js/utils/data-cache.js"></script>
+
+  <script>
+    // ========================================
+    // VARIÁVEIS GLOBAIS
+    // ========================================
+    let grupos = {};
+    let gruposOriginais = {}; // Backup dos grupos originais para filtros
+    let tiposViolenciaDisponiveis = []; // Lista de tipos de violência disponíveis
+    let usuarioLogado = null;
+
+    // ========================================
+    // INICIALIZAÇÃO
+    // ========================================
+    window.addEventListener('DOMContentLoaded', async function () {
+      console.log('🚀 Inicializando página Minhas Notificações (Accordion)');
+
+      // Aguarda carregamento do config
+      if (window.ConfigLoader && typeof window.ConfigLoader.waitForConfig === 'function') {
+        await window.ConfigLoader.waitForConfig();
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Verifica autenticação
+      verificarAutenticacao();
+
+      // Verifica se há indicação de que o cache deve ser limpo (ex: após edição)
+      const limparCache = sessionStorage.getItem('limparCacheNotificacoes') === 'true';
+      const reloadRequired = sessionStorage.getItem('NOTIFICATIONS_RELOAD_REQUIRED') === 'true';
+
+      if (limparCache || reloadRequired) {
+        sessionStorage.removeItem('limparCacheNotificacoes');
+        sessionStorage.removeItem('NOTIFICATIONS_RELOAD_REQUIRED');
+        console.log('[DOMContentLoaded] Cache será limpo (Edição detectada ou Reload solicitado)');
+        // Carrega notificações forçando limpeza do cache
+        await carregarNotificacoes(false, true);
+      } else {
+        // Carrega notificações (usa cache se disponível)
+        await carregarNotificacoes(false, false);
+      }
+
+      // Marca página como pronta
+      document.documentElement.classList.add('page-ready');
+
+      // Setup listener para recarregar notificações quando novo registro for salvo
+      setupNotificacaoReloadListener();
+    });
+
+    // ========================================
+    // AUTENTICAÇÃO
+    // ========================================
+    function verificarAutenticacao() {
+      const email = sessionStorage.getItem('userEmail');
+      const role = sessionStorage.getItem('userRole');
+
+      if (!email || !role) {
+        alert('Sessão expirada. Faça login novamente.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      usuarioLogado = {
+        email: email,
+        role: role,
+        id: sessionStorage.getItem('userId')
+      };
+
+      ajustarMenuPorRole(role);
+    }
+
+    // ========================================
+    // FUNÇÕES DE MENU
+    // ========================================
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenuNav');
+      mobileMenu.classList.toggle('show');
+    }
+
+    function sair() {
+      if (confirm('Deseja realmente sair do sistema?')) {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
+    }
+
+    function ajustarMenuPorRole(role) {
+      const btnSairDesktop = document.getElementById('btnSair');
+      const btnSairMobile = document.getElementById('btnSairMobile');
+      const menuAdmin = document.getElementById('menuAdmin');
+      const menuAdminMobile = document.getElementById('menuAdminMobile');
+
+      if (btnSairDesktop) btnSairDesktop.classList.remove('hidden');
+      if (btnSairMobile) btnSairMobile.classList.remove('hidden');
+
+      if (role === 'admin' || role === 'superuser') {
+        if (menuAdmin) menuAdmin.classList.remove('hidden');
+        if (menuAdminMobile) menuAdminMobile.classList.remove('hidden');
+      }
+    }
+
+    // ========================================
+    // LISTENER PARA RECARREGAR NOTIFICAÇÕES
+    // ========================================
+    function setupNotificacaoReloadListener() {
+      // Verifica se há flag de reload ao carregar a página
+      const reloadFlag = localStorage.getItem('reload-notificacoes-on-focus');
+      if (reloadFlag === 'true') {
+        console.log('✅ [Cache] Detectada flag de reload. Limpando cache e recarregando...');
+        localStorage.removeItem('reload-notificacoes-on-focus');
+        carregarNotificacoes(true, true); // Force reload com cache limpo
+      }
+
+      // Listener para quando a página ganhar foco (aba virar visível)
+      window.addEventListener('focus', function () {
+        const reloadFlag = localStorage.getItem('reload-notificacoes-on-focus');
+        if (reloadFlag === 'true') {
+          console.log('👀 [Focus] Aba ganhou foco. Detectada flag de reload. Recarregando notificações...');
+          localStorage.removeItem('reload-notificacoes-on-focus');
+          carregarNotificacoes(true, true); // Force reload com cache limpo
+        }
+      });
+    }
+
+    // ========================================
+    // CARREGAR NOTIFICAÇÕES
+    // ========================================
+    async function carregarNotificacoes(forceReload = false, limparCache = false) {
+      try {
+        if (!window.CONFIG || !window.CONFIG.APPS_SCRIPT_CASOS) {
+          mostrarErro('Erro de configuração. Verifique config.js');
+          return;
+        }
+
+        // Limpa cache se solicitado
+        if (limparCache && window.DataCache) {
+          window.DataCache.clear('minhas_notificacoes');
+          console.log('[carregarNotificacoes] 🗑️ Cache limpo');
+        }
+
+        // Verifica cache primeiro (se não for reload forçado e cache estiver habilitado)
+        if (!forceReload && !limparCache && window.DataCache && window.CONFIG && window.CONFIG.CACHE_ENABLED) {
+          const cachedData = window.DataCache.get('minhas_notificacoes');
+          if (cachedData) {
+            console.log('[carregarNotificacoes] ✅ Dados carregados do cache');
+            grupos = cachedData.grupos || {};
+            gruposOriginais = cachedData.gruposOriginais || JSON.parse(JSON.stringify(grupos));
+            tiposViolenciaDisponiveis = cachedData.tiposViolenciaDisponiveis || [];
+
+            // Popular checkboxes de tipos de violência
+            popularTiposViolencia();
+
+            // Mostrar seção de filtros se houver dados
+            const filtrosSection = document.getElementById('filtros-section');
+            if (filtrosSection && Object.keys(grupos).length > 0) {
+              filtrosSection.style.display = 'block';
+            }
+
+            document.getElementById('badge-total').textContent = cachedData.total || 0;
+            renderizarGrupos();
+            return; // Retorna sem fazer requisição
+          }
+        }
+
+        mostrarLoading(true);
+
+        const url = window.CONFIG.APPS_SCRIPT_CASOS;
+        const dados = {
+          action: 'listarMinhasNotificacoes',
+          emailUsuario: usuarioLogado.email
+        };
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados))
+        });
+
+        const resultado = await response.json();
+
+        console.log('[carregarNotificacoes] Resultado completo:', resultado);
+
+        if (resultado.success) {
+          grupos = resultado.grupos || {};
+          // SEMPRE faz backup dos grupos originais
+          gruposOriginais = JSON.parse(JSON.stringify(grupos)); // Backup para filtros
+          console.log('[carregarNotificacoes] ✅ Grupos recebidos:', Object.keys(grupos).length, 'grupos');
+          console.log('[carregarNotificacoes] ✅ gruposOriginais criado com', Object.keys(gruposOriginais).length, 'grupos');
+          console.log('[carregarNotificacoes] Nomes dos grupos:', Object.keys(grupos));
+
+          // Extrair tipos de violência únicos para os filtros
+          tiposViolenciaDisponiveis = [];
+          Object.values(grupos).forEach(notificacoes => {
+            notificacoes.forEach(notif => {
+              if (notif.tipoViolencia) {
+                // Suporta múltiplos tipos separados por vírgula
+                const tipos = notif.tipoViolencia.split(',').map(t => t.trim()).filter(t => t);
+                tipos.forEach(tipo => {
+                  if (!tiposViolenciaDisponiveis.includes(tipo)) {
+                    tiposViolenciaDisponiveis.push(tipo);
+                  }
+                });
+              }
+            });
+          });
+          tiposViolenciaDisponiveis.sort();
+          console.log('[carregarNotificacoes] Tipos de violência encontrados:', tiposViolenciaDisponiveis);
+
+          // Salvar no cache
+          if (window.DataCache && window.CONFIG && window.CONFIG.CACHE_ENABLED) {
+            const cacheData = {
+              grupos: grupos,
+              gruposOriginais: gruposOriginais,
+              tiposViolenciaDisponiveis: tiposViolenciaDisponiveis,
+              total: resultado.total || 0,
+              timestamp: Date.now()
+            };
+            window.DataCache.set('minhas_notificacoes', cacheData);
+            console.log('[carregarNotificacoes] 💾 Dados salvos no cache');
+          }
+
+          // Popular checkboxes de tipos de violência
+          popularTiposViolencia();
+
+          // Mostrar seção de filtros se houver dados
+          const filtrosSection = document.getElementById('filtros-section');
+          if (filtrosSection && Object.keys(grupos).length > 0) {
+            filtrosSection.style.display = 'block';
+          }
+
+          // Log detalhado de cada grupo
+          Object.keys(grupos).forEach(nome => {
+            console.log(`[carregarNotificacoes] Grupo "${nome}": ${grupos[nome].length} notificação(ões)`);
+            grupos[nome].forEach((notif, idx) => {
+              console.log(`  [${idx + 1}] ID: ${notif.idNotificacao}, Tipo: ${notif.tipoViolencia}, Data: ${notif.dataNT}`);
+            });
+          });
+
+          document.getElementById('badge-total').textContent = resultado.total || 0;
+          renderizarGrupos();
+        } else {
+          console.error('[carregarNotificacoes] ❌ Erro:', resultado.message);
+          mostrarErro(resultado.message || 'Erro ao carregar notificações');
+        }
+
+      } catch (error) {
+        console.error('❌ Erro ao carregar notificações:', error);
+        mostrarErro('Erro de conexão. Tente novamente.');
+      } finally {
+        mostrarLoading(false);
+      }
+    }
+
+    // ========================================
+    // RENDERIZAR GRUPOS (ACCORDION)
+    // ========================================
+    function renderizarGrupos() {
+      const container = document.getElementById('container-grupos');
+      const section = document.getElementById('lista-grupos');
+      const estadoVazio = document.getElementById('estado-vazio');
+
+      const nomesGrupos = Object.keys(grupos);
+
+      console.log('[renderizarGrupos] Total de grupos:', nomesGrupos.length);
+      console.log('[renderizarGrupos] Nomes dos grupos:', nomesGrupos);
+
+      if (nomesGrupos.length === 0) {
+        console.log('[renderizarGrupos] Nenhum grupo encontrado, mostrando estado vazio');
+        if (container) container.style.display = 'none';
+        if (estadoVazio) estadoVazio.style.display = 'block';
+        if (section) section.style.display = 'block';
+        return;
+      }
+
+      if (section) section.style.display = 'block';
+      if (estadoVazio) estadoVazio.style.display = 'none';
+      if (container) {
+        container.style.display = 'block';
+        container.innerHTML = '';
+      }
+
+      // Renderiza cada grupo
+      nomesGrupos.forEach((nomeCrianca, index) => {
+        const notificacoes = grupos[nomeCrianca];
+        console.log(`[renderizarGrupos] Criando grupo ${index + 1}/${nomesGrupos.length}: "${nomeCrianca}" com ${notificacoes.length} notificação(ões)`);
+
+        if (!notificacoes || notificacoes.length === 0) {
+          console.warn(`[renderizarGrupos] Grupo "${nomeCrianca}" está vazio, pulando...`);
+          return;
+        }
+
+        const grupoDiv = criarGrupo(nomeCrianca, notificacoes);
+        container.appendChild(grupoDiv);
+      });
+
+      console.log('[renderizarGrupos] ✅ Grupos renderizados com sucesso');
+    }
+
+    function criarGrupo(nomeCrianca, notificacoes) {
+      const grupoDiv = document.createElement('div');
+      grupoDiv.className = 'grupo-crianca';
+
+      // Criar ID único e seguro para o grupo (remove caracteres especiais e acentos)
+      let grupoIdBase = nomeCrianca
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9-]/g, '')
+        .toLowerCase()
+        .substring(0, 50);
+
+      // Adiciona índice único baseado no hash do nome para evitar conflitos
+      let hash = 0;
+      for (let i = 0; i < nomeCrianca.length; i++) {
+        const char = nomeCrianca.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      const grupoId = 'grupo-' + grupoIdBase + '-' + Math.abs(hash);
+
+      // Sanitizar nome para exibição
+      const nomeSanitizado = window.Security ? window.Security.sanitizeHTML(nomeCrianca) : nomeCrianca.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      grupoDiv.innerHTML = `
+        <div class="grupo-header" data-grupo-id="${grupoId}">
+          <div class="flex items-center gap-3 flex-1">
+            <span class="text-2xl">👤</span>
+            <div>
+              <div class="text-xl font-bold grupo-nome">${nomeSanitizado}</div>
+              <div class="text-sm opacity-80 grupo-contador">${notificacoes.length} notificaç${notificacoes.length === 1 ? 'ão' : 'ões'}</div>
+            </div>
+          </div>
+          <span class="seta" id="${grupoId}-seta">▶</span>
+        </div>
+        <div class="grupo-conteudo" id="${grupoId}-conteudo">
+          ${renderizarNotificacoesGrupo(notificacoes)}
+        </div>
+      `;
+
+      // Adicionar event listener ao header
+      const header = grupoDiv.querySelector('.grupo-header');
+      if (header) {
+        header.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('[criarGrupo] Header clicado para grupo:', grupoId);
+          toggleGrupo(grupoId);
+        });
+        header.style.cursor = 'pointer';
+      } else {
+        console.error('[criarGrupo] Header não encontrado no grupo:', grupoId);
+      }
+
+      // Adicionar event listeners aos itens de notificação após renderizar
+      setTimeout(() => {
+        const notifItems = grupoDiv.querySelectorAll('.notif-item-list');
+        notifItems.forEach(item => {
+          const notifId = item.getAttribute('data-notif-id');
+          if (notifId) {
+            item.addEventListener('click', function (e) {
+              e.stopPropagation();
+              abrirDetalhes(notifId);
+            });
+          }
+        });
+      }, 10);
+
+      return grupoDiv;
+    }
+
+    function renderizarNotificacoesGrupo(notificacoes) {
+      if (!notificacoes || notificacoes.length === 0) {
+        return '<div class="notif-item-list"><p class="text-gray-500 text-center py-4">Nenhuma notificação neste grupo</p></div>';
+      }
+
+      let html = '';
+
+      // Ordena por data de criação (mais recente primeiro)
+      const notificacoesOrdenadas = notificacoes.slice().sort((a, b) => {
+        const dataA = a.dataCriacao ? new Date(a.dataCriacao.split(' ')[0].split('/').reverse().join('-')) : new Date(a.dataNT ? a.dataNT.split('/').reverse().join('-') : 0);
+        const dataB = b.dataCriacao ? new Date(b.dataCriacao.split(' ')[0].split('/').reverse().join('-')) : new Date(b.dataNT ? b.dataNT.split('/').reverse().join('-') : 0);
+        return dataB - dataA;
+      });
+
+      notificacoesOrdenadas.forEach(notif => {
+        const tipoResumido = (notif.tipoViolencia || 'Não especificado').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const dataNT = notif.dataNT || 'Data não informada';
+        const idNotif = notif.idNotificacao || '';
+
+        // Formata data de criação para DD/MM/YYYY
+        let dataCriacaoFormatada = 'Sem informação';
+        if (notif.dataCriacao) {
+          if (notif.dataCriacao.includes('/')) {
+            dataCriacaoFormatada = notif.dataCriacao.split(' ')[0];
+          }
+          else if (notif.dataCriacao.includes('T') || notif.dataCriacao.includes('-')) {
+            const data = new Date(notif.dataCriacao);
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            dataCriacaoFormatada = dia + '/' + mes + '/' + ano;
+          }
+        }
+
+        // Formata data de última edição para DD/MM/YYYY
+        let dataUltimaEdicaoFormatada = '';
+        if (notif.dataUltimaEdicao) {
+          if (notif.dataUltimaEdicao.includes('/')) {
+            dataUltimaEdicaoFormatada = notif.dataUltimaEdicao.split(' ')[0];
+          }
+          else if (notif.dataUltimaEdicao.includes('T') || notif.dataUltimaEdicao.includes('-')) {
+            const data = new Date(notif.dataUltimaEdicao);
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            dataUltimaEdicaoFormatada = dia + '/' + mes + '/' + ano;
+          }
+        }
+
+        html += `
+          <div class="notif-item-list group" data-notif-id="${idNotif}" 
+               style="cursor: pointer; padding: 0.875rem 1rem; transition: all 0.2s ease;"
+               title="Clique para ver detalhes completos">
+            <div class="flex-1" style="min-width: 0;">
+              <!-- Linha 1: Tipo de Violência (Principal) -->
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
+                  ${tipoResumido}
+                </span>
+              </div>
+              
+              <!-- Linha 2: ID e Data NT (Contexto) -->
+              <div class="text-sm text-gray-600 mb-1">
+                <span class="font-medium text-gray-700">ID #${idNotif}</span>
+                <span class="mx-1.5">•</span>
+                <span>Data NT: ${dataNT}</span>
+              </div>
+              
+              <!-- Linha 3: Metadados (Secundário) -->
+              <div class="text-xs text-gray-500">
+                <span>Criada em ${dataCriacaoFormatada}</span>
+                ${dataUltimaEdicaoFormatada ? `<span class="mx-1.5">•</span><span>Editada em ${dataUltimaEdicaoFormatada}</span>` : ''}
+              </div>
+            </div>
+            
+            <!-- Seta de ação -->
+            <div class="flex-shrink-0 ml-3">
+              <span class="text-purple-600 group-hover:text-purple-700 group-hover:translate-x-1 transition-all text-lg">→</span>
+            </div>
+          </div>
+        `;
+      });
+
+      return html;
+    }
+
+    function toggleGrupo(grupoId) {
+      console.log('[toggleGrupo] Toggle grupo:', grupoId);
+
+      const conteudo = document.getElementById(grupoId + '-conteudo');
+      const seta = document.getElementById(grupoId + '-seta');
+
+      if (!conteudo) {
+        console.error('[toggleGrupo] Conteúdo não encontrado para ID:', grupoId);
+        return;
+      }
+
+      if (!seta) {
+        console.error('[toggleGrupo] Seta não encontrada para ID:', grupoId);
+        return;
+      }
+
+      const header = conteudo.previousElementSibling;
+
+      if (!header) {
+        console.error('[toggleGrupo] Header não encontrado');
+        return;
+      }
+
+      const isExpandido = conteudo.classList.contains('expandido');
+
+      console.log('[toggleGrupo] Estado atual:', isExpandido ? 'expandido' : 'colapsado');
+
+      if (isExpandido) {
+        conteudo.classList.remove('expandido');
+        seta.classList.remove('expandido');
+        header.classList.remove('ativo');
+        console.log('[toggleGrupo] Grupo colapsado');
+      } else {
+        conteudo.classList.add('expandido');
+        seta.classList.add('expandido');
+        header.classList.add('ativo');
+        console.log('[toggleGrupo] Grupo expandido');
+      }
+    }
+
+    // ========================================
+    // DETALHES DA NOTIFICAÇÃO (MODAL)
+    // ========================================
+    async function abrirDetalhes(idNotificacao) {
+      try {
+        if (!window.CONFIG || !window.CONFIG.APPS_SCRIPT_CASOS) {
+          mostrarErro('Erro de configuração. Recarregue a página.');
+          return;
+        }
+
+        // Abre a modal imediatamente com loading
+        const modal = document.getElementById('modal-notificacao');
+        const modalLoading = document.getElementById('modal-loading');
+        const modalBody = document.getElementById('modal-body');
+        const modalTitulo = document.getElementById('modal-titulo');
+        const modalSubtitulo = document.getElementById('modal-subtitulo');
+
+        // Remove classe content-ready se existir (reset)
+        const modalConteudo = modal.querySelector('.modal-conteudo');
+        const modalFooter = document.getElementById('modal-footer');
+        const btnEditar = document.getElementById('btnEditarNotificacao');
+        const btnEditarTexto = document.getElementById('btnEditarTexto');
+
+        if (modalConteudo) {
+          modalConteudo.classList.remove('content-ready');
+        }
+
+        // Mantém footer visível mas desabilita botão de editar durante loading
+        // O botão aparecerá junto com as informações básicas, mas ficará desabilitado
+        // até anexos e atualizações carregarem (isso será feito em exibirModal)
+        if (modalFooter) {
+          modalFooter.style.display = 'none'; // Será mostrado em exibirModal quando infos básicas carregarem
+        }
+        if (btnEditar) {
+          btnEditar.disabled = true;
+          if (btnEditarTexto) {
+            btnEditarTexto.innerHTML = '<span class="inline-block animate-spin">⏳</span> <span>Carregando dados...</span>';
+          }
+        }
+
+        // Mostra a modal com loading
+        modal.classList.add('visible');
+        modalLoading.classList.add('visible');
+        modalBody.innerHTML = '';
+        modalTitulo.textContent = '⏳ Carregando...';
+        modalSubtitulo.textContent = 'Buscando detalhes da notificação';
+
+        const url = window.CONFIG.APPS_SCRIPT_CASOS;
+        const dados = {
+          action: 'buscarDetalhesNotificacao',
+          idNotificacao: idNotificacao,
+          emailUsuario: usuarioLogado.email
+        };
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados))
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.success) {
+          // Esconde o loading e mostra o conteúdo
+          exibirModal(resultado.notificacao);
+        } else {
+          modalTitulo.textContent = '❌ Erro';
+          modalSubtitulo.textContent = resultado.message || 'Erro ao carregar detalhes';
+          modalLoading.classList.remove('visible');
+          modalBody.innerHTML = '<div class="text-center py-8"><p class="text-red-600 font-semibold">Não foi possível carregar os detalhes da notificação.</p></div>';
+        }
+
+      } catch (error) {
+        const modal = document.getElementById('modal-notificacao');
+        const modalLoading = document.getElementById('modal-loading');
+        const modalBody = document.getElementById('modal-body');
+        const modalTitulo = document.getElementById('modal-titulo');
+        const modalSubtitulo = document.getElementById('modal-subtitulo');
+
+        modal.classList.add('visible');
+        modalTitulo.textContent = '❌ Erro';
+        modalSubtitulo.textContent = 'Falha ao carregar detalhes';
+        modalLoading.classList.remove('visible');
+        modalBody.innerHTML = '<div class="text-center py-8"><p class="text-red-600 font-semibold">Erro ao carregar detalhes da notificação</p></div>';
+      }
+    }
+
+    // Variável global para armazenar a notificação atual
+    let notificacaoAtual = null;
+
+    function exibirModal(notif) {
+      // Armazena a notificação atual para uso na edição
+      notificacaoAtual = notif;
+      const modal = document.getElementById('modal-notificacao');
+      const modalTitulo = document.getElementById('modal-titulo');
+      const modalSubtitulo = document.getElementById('modal-subtitulo');
+      const modalBody = document.getElementById('modal-body');
+      const modalLoading = document.getElementById('modal-loading');
+
+      // Atualiza o header
+      modalTitulo.textContent = window.Security ? window.Security.sanitizeHTML(notif.criancaEstudante) : notif.criancaEstudante;
+      modalSubtitulo.textContent = `ID: #${notif.idNotificacao} • ${notif.dataNT}`;
+
+      // Remove classe content-ready se existir (reset)
+      const modalConteudo = modal.querySelector('.modal-conteudo');
+      const modalFooter = document.getElementById('modal-footer');
+      const btnEditar = document.getElementById('btnEditarNotificacao');
+      const btnEditarTexto = document.getElementById('btnEditarTexto');
+
+      if (modalConteudo) {
+        modalConteudo.classList.remove('content-ready');
+      }
+
+      // Esconde footer e desabilita botão de editar inicialmente
+      if (modalFooter) {
+        modalFooter.style.display = 'none';
+      }
+      if (btnEditar) {
+        btnEditar.disabled = true;
+        if (btnEditarTexto) {
+          btnEditarTexto.innerHTML = '<span class="inline-block animate-spin">⏳</span> <span>Carregando dados...</span>';
+        }
+      }
+
+      // Esconde o loading
+      modalLoading.classList.remove('visible');
+
+      // Insere o conteúdo
+      modalBody.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <div class="text-xs font-semibold text-blue-600 uppercase mb-1">Idade</div>
+            <div class="text-lg font-bold text-blue-900">${notif.idade || 'N/I'} anos</div>
+          </div>
+          <div class="bg-pink-50 p-4 rounded-lg">
+            <div class="text-xs font-semibold text-pink-600 uppercase mb-1">Gênero</div>
+            <div class="text-lg font-bold text-pink-900">${notif.identidadeGenero || 'N/I'}</div>
+          </div>
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <div class="text-xs font-semibold text-purple-600 uppercase mb-1">Escola</div>
+            <div class="text-lg font-bold text-purple-900">${notif.cmeiEmef || 'N/I'}</div>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <div class="text-xs font-semibold text-green-600 uppercase mb-1">Região</div>
+            <div class="text-lg font-bold text-green-900">${notif.regiao || 'N/I'}</div>
+          </div>
+        </div>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-4">
+          <div class="text-xs font-semibold text-yellow-700 uppercase mb-2">Tipo de Violência</div>
+          <div class="text-base font-semibold text-yellow-900">${notif.tipoViolencia || 'Não especificado'}</div>
+        </div>
+        
+        ${notif.tipoViolencia && String(notif.tipoViolencia).toLowerCase().includes('institucional') ? `
+          <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mb-4">
+            <div class="text-xs font-semibold text-red-700 uppercase mb-2">Violência Institucional</div>
+            <div class="text-base font-semibold text-red-900">${notif.tipoViolenciaInstitucional && String(notif.tipoViolenciaInstitucional).trim() !== '' ? notif.tipoViolenciaInstitucional : 'Não informado'}</div>
+          </div>
+        ` : ''}
+        
+        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+          <div class="text-xs font-semibold text-gray-600 uppercase mb-2">Informações Adicionais</div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-600">PCD/Transtorno:</span>
+              <span class="font-semibold text-gray-900">${notif.pcdTranstorno || 'N/I'}</span>
+            </div>
+            ${notif.pcdDetalhes ? `
+              <div class="flex justify-between">
+                <span class="text-gray-600">Detalhes PCD:</span>
+                <span class="font-semibold text-gray-900">${notif.pcdDetalhes}</span>
+              </div>
+            ` : ''}
+            <div class="flex justify-between">
+              <span class="text-gray-600">Raça/Cor:</span>
+              <span class="font-semibold text-gray-900">${notif.racaCor || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Orientação Sexual:</span>
+              <span class="font-semibold text-gray-900">${notif.orientacaoSexual || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Encaminhamento:</span>
+              <span class="font-semibold text-gray-900">${notif.encaminhamento || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Responsável:</span>
+              <span class="font-semibold text-gray-900">${notif.responsavelRegistro || 'N/I'}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-indigo-50 p-4 rounded-lg">
+          <div class="text-xs font-semibold text-indigo-600 uppercase mb-2">Contexto Escolar</div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Fonte foi a escola?</span>
+              <span class="font-semibold text-gray-900">${notif.fonteEscola || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Violência ocorreu na escola?</span>
+              <span class="font-semibold text-gray-900">${notif.violenciaEscolaOcorreu || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Profissional foi autor?</span>
+              <span class="font-semibold text-gray-900">${notif.profissionalAutor || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Estudante foi autor?</span>
+              <span class="font-semibold text-gray-900">${notif.estudanteAutor || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Violência informada à escola?</span>
+              <span class="font-semibold text-gray-900">${notif.violenciaInformada || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Foi realizado estudo de caso?</span>
+              <span class="font-semibold text-gray-900">${notif.estudoCaso || 'N/I'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Foi membro familiar?</span>
+              <span class="font-semibold text-gray-900">${notif.foiMembroFamiliar || 'N/I'}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Histórico de Atualizações -->
+        <div class="secao-atualizacoes">
+          <h4>📋 Histórico de Atualizações</h4>
+          <div id="historico-atualizacoes-visualizacao" class="historico-readonly">
+            <div class="atualizacoes-loading">
+              <div class="atualizacoes-spinner"></div>
+              <p>Carregando atualizações...</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Adiciona classe content-ready após um pequeno delay para garantir que o conteúdo foi inserido
+      requestAnimationFrame(() => {
+        if (modalConteudo) {
+          modalConteudo.classList.add('content-ready');
+        }
+
+        // Mostra o botão junto com as informações básicas, mas mantém desabilitado
+        if (modalFooter) {
+          modalFooter.style.display = 'block';
+        }
+        if (btnEditar) {
+          btnEditar.disabled = true; // Mantém desabilitado até anexos e atualizações carregarem
+          if (btnEditarTexto) {
+            btnEditarTexto.innerHTML = '<span class="inline-block animate-spin">⏳</span> <span>Aguardando anexos e atualizações...</span>';
+          }
+        }
+      });
+
+      // Flags para rastrear quando anexos e atualizações terminam de carregar
+      let anexosCarregados = false;
+      let atualizacoesCarregadas = false;
+
+      // Armazenar referências dos listeners para poder removê-los se necessário
+      let listenerAnexos = null;
+      let listenerAtualizacoes = null;
+
+      // Função para verificar se pode habilitar o botão
+      function verificarSePodeHabilitarBotao() {
+        if (anexosCarregados && atualizacoesCarregadas) {
+          // Ambas as cargas terminaram, habilita o botão
+          console.log('[exibirModal] ✅ Todos os dados carregados, habilitando botão de editar');
+          if (btnEditar) {
+            btnEditar.disabled = false;
+            if (btnEditarTexto) {
+              btnEditarTexto.innerHTML = '✏️ Editar Notificação';
+            }
+          }
+
+          // Remove listeners após habilitar o botão
+          if (listenerAnexos) {
+            window.removeEventListener('anexosCarregados', listenerAnexos);
+            listenerAnexos = null;
+          }
+          if (listenerAtualizacoes) {
+            window.removeEventListener('atualizacoesCarregadas', listenerAtualizacoes);
+            listenerAtualizacoes = null;
+          }
+        }
+      }
+
+      // Listener para quando anexos terminarem de carregar
+      listenerAnexos = (event) => {
+        anexosCarregados = true;
+        console.log('[exibirModal] ✅ Anexos carregados');
+        verificarSePodeHabilitarBotao();
+      };
+      window.addEventListener('anexosCarregados', listenerAnexos);
+
+      // Listener para quando atualizações terminarem de carregar
+      listenerAtualizacoes = (event) => {
+        atualizacoesCarregadas = true;
+        console.log('[exibirModal] ✅ Atualizações carregadas');
+        verificarSePodeHabilitarBotao();
+      };
+      window.addEventListener('atualizacoesCarregadas', listenerAtualizacoes);
+
+      // Carregar atualizações da notificação (antes dos anexos)
+      carregarAtualizacoesVisualizacao(notif.idNotificacao);
+
+      // Carregar anexos da notificação (depois das atualizações)
+      carregarAnexosModal(notif.idNotificacao);
+    }
+
+    // ========================================
+    // CARREGAR ATUALIZAÇÕES PARA VISUALIZAÇÃO
+    // ========================================
+    async function carregarAtualizacoesVisualizacao(idNotificacao) {
+      const container = document.getElementById('historico-atualizacoes-visualizacao');
+      if (!container) {
+        // Se não houver container, marca como carregado para não bloquear
+        window.dispatchEvent(new CustomEvent('atualizacoesCarregadas', { detail: { success: false } }));
+        return;
+      }
+
+      try {
+        const atualizacoes = await buscarAtualizacoesNotificacao(idNotificacao);
+        renderizarAtualizacoes(atualizacoes, container);
+        // Dispara evento quando atualizações terminarem de carregar
+        window.dispatchEvent(new CustomEvent('atualizacoesCarregadas', { detail: { success: true } }));
+      } catch (error) {
+        console.error('[carregarAtualizacoesVisualizacao] Erro:', error);
+        container.innerHTML = '<p class="sem-atualizacoes">Erro ao carregar atualizações.</p>';
+        // Dispara evento mesmo em caso de erro (para não bloquear edição)
+        window.dispatchEvent(new CustomEvent('atualizacoesCarregadas', { detail: { success: false } }));
+      }
+    }
+
+    function fecharModal() {
+      const modal = document.getElementById('modal-notificacao');
+      const modalConteudo = modal.querySelector('.modal-conteudo');
+
+      // Remove classe content-ready para resetar o estado
+      if (modalConteudo) {
+        modalConteudo.classList.remove('content-ready');
+      }
+
+      // Esconde footer ao fechar
+      const modalFooter = document.getElementById('modal-footer');
+      if (modalFooter) {
+        modalFooter.style.display = 'none';
+      }
+
+      // Limpa event listeners se ainda existirem (caso o modal seja fechado antes dos dados carregarem)
+      // Os listeners são removidos automaticamente em exibirModal quando os dados terminam de carregar,
+      // mas removemos aqui como medida de segurança
+
+      modal.classList.remove('visible');
+      setTimeout(() => {
+        document.getElementById('modal-body').innerHTML = '';
+        document.getElementById('modal-loading').classList.remove('visible');
+      }, 300);
+    }
+
+    // Fechar modal ao clicar fora
+    window.onclick = function (event) {
+      const modal = document.getElementById('modal-notificacao');
+      if (event.target === modal) {
+        fecharModal();
+      }
+    };
+
+    // ========================================
+    // HELPERS
+    // ========================================
+    function mostrarLoading(mostrar) {
+      document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+      document.getElementById('lista-grupos').style.display = mostrar ? 'none' : 'block';
+    }
+
+    function mostrarErro(mensagem) {
+      alert('❌ ' + mensagem);
+      mostrarLoading(false);
+    }
+
+    // ========================================
+    // PESQUISA/FILTRO
+    // ========================================
+    function filtrarNotificacoes() {
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      const searchQuery = searchInput.value.toLowerCase().trim();
+      const container = document.getElementById('container-grupos');
+      const resultsCount = document.getElementById('search-results-count');
+
+      // Mostra/esconde botão de limpar
+      clearBtn.style.display = searchQuery ? 'flex' : 'none';
+
+      // Se não há busca, aplica apenas filtros avançados (se houver)
+      if (!searchQuery) {
+        aplicarFiltros();
+        resultsCount.textContent = '';
+        return;
+      }
+
+      // Filtra grupos e notificações
+      let totalResultados = 0;
+      let gruposVisiveis = 0;
+      container.innerHTML = '';
+
+      const nomesGrupos = Object.keys(grupos);
+
+      nomesGrupos.forEach(nomeCrianca => {
+        const notificacoes = grupos[nomeCrianca];
+
+        // Filtra notificações que correspondem à busca
+        const notificacoesFiltradas = notificacoes.filter(notif => {
+          const buscaEm = [
+            nomeCrianca,
+            notif.idNotificacao?.toString(),
+            notif.tipoViolencia,
+            notif.cmeiEmef,
+            notif.regiao,
+            notif.idade?.toString(),
+            notif.identidadeGenero,
+            notif.racaCor,
+            notif.encaminhamento,
+            notif.responsavelRegistro,
+            notif.dataNT
+          ].filter(Boolean).join(' ').toLowerCase();
+
+          return buscaEm.includes(searchQuery);
+        });
+
+        // Se há notificações correspondentes, cria o grupo
+        if (notificacoesFiltradas.length > 0) {
+          const grupoDiv = criarGrupo(nomeCrianca, notificacoesFiltradas);
+          container.appendChild(grupoDiv);
+          totalResultados += notificacoesFiltradas.length;
+          gruposVisiveis++;
+        }
+      });
+
+      // Mostra estado vazio ou resultados
+      if (totalResultados === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum resultado encontrado</h3>
+            <p class="text-gray-500">Tente buscar por outro termo ou limpe a pesquisa.</p>
+          </div>
+        `;
+        resultsCount.textContent = '';
+      } else {
+        resultsCount.textContent = `✅ ${totalResultados} notificação${totalResultados === 1 ? '' : 'ões'} encontrada${totalResultados === 1 ? '' : 's'} em ${gruposVisiveis} aluno${gruposVisiveis === 1 ? '' : 's'}`;
+        resultsCount.style.color = '#10b981';
+        resultsCount.style.fontWeight = '600';
+      }
+    }
+
+    function limparPesquisa() {
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      const resultsCount = document.getElementById('search-results-count');
+
+      searchInput.value = '';
+      clearBtn.style.display = 'none';
+      resultsCount.textContent = '';
+
+      // Re-renderiza todos os grupos (considerando filtros ativos)
+      aplicarFiltros();
+    }
+
+    // ========================================
+    // FUNÇÕES DE FILTROS AVANÇADOS
+    // ========================================
+
+    // Toggle mostrar/esconder filtros
+    function toggleFiltros() {
+      const conteudo = document.getElementById('filtros-conteudo');
+      const btnText = document.getElementById('toggle-filtros-text');
+
+      if (conteudo.style.display === 'none') {
+        conteudo.style.display = 'block';
+        btnText.textContent = 'Ocultar';
+      } else {
+        conteudo.style.display = 'none';
+        btnText.textContent = 'Mostrar';
+      }
+    }
+
+    // Popular checkboxes de tipos de violência
+    function popularTiposViolencia() {
+      const container = document.getElementById('filter-tipo-violencia-container');
+      if (!container || tiposViolenciaDisponiveis.length === 0) {
+        if (container) {
+          container.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">Nenhum tipo de violência encontrado</div>';
+        }
+        return;
+      }
+
+      let html = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">';
+      tiposViolenciaDisponiveis.forEach(tipo => {
+        const id = 'filter-tipo-' + tipo.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        html += `
+          <label class="flex items-center gap-2 p-2 hover:bg-purple-50 rounded cursor-pointer transition-colors">
+            <input 
+              type="checkbox" 
+              id="${id}"
+              value="${tipo.replace(/"/g, '&quot;')}"
+              data-tipo-violencia="${tipo.replace(/"/g, '&quot;')}"
+              onchange="atualizarBadgeTipoViolencia(); aplicarFiltros();"
+              class="w-4 h-4 text-purple-600 focus:ring-purple-500 rounded"
+            />
+            <span class="text-sm text-gray-700">${tipo}</span>
+          </label>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Atualizar badge de tipos de violência selecionados
+    function atualizarBadgeTipoViolencia() {
+      const checkboxes = document.querySelectorAll('#filter-tipo-violencia-container input[type="checkbox"]:checked');
+      const badge = document.getElementById('badge-tipo-violencia');
+      if (badge) {
+        if (checkboxes.length > 0) {
+          badge.textContent = checkboxes.length;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+
+    // Aplicar filtro de período rápido
+    function aplicarFiltroPeriodo(dias) {
+      const hoje = new Date();
+      const dataFim = new Date(hoje);
+      const dataInicio = new Date(hoje);
+      dataInicio.setDate(dataInicio.getDate() - dias);
+
+      // Formata para YYYY-MM-DD
+      const formatarData = (data) => {
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
+        return `${ano}-${mes}-${dia}`;
+      };
+
+      document.getElementById('filter-data-inicio').value = formatarData(dataInicio);
+      document.getElementById('filter-data-fim').value = formatarData(dataFim);
+
+      // Remove destaque de outros botões
+      document.querySelectorAll('[id^="btn-periodo-"]').forEach(btn => {
+        btn.classList.remove('bg-purple-600', 'text-white');
+        btn.classList.add('bg-purple-100', 'text-purple-700');
+      });
+
+      // Destaca o botão clicado
+      const btnAtivo = document.getElementById(`btn-periodo-${dias}`);
+      if (btnAtivo) {
+        btnAtivo.classList.remove('bg-purple-100', 'text-purple-700');
+        btnAtivo.classList.add('bg-purple-600', 'text-white');
+      }
+
+      aplicarFiltros();
+    }
+
+    // Limpar filtro de período
+    function limparFiltroPeriodo() {
+      document.getElementById('filter-data-inicio').value = '';
+      document.getElementById('filter-data-fim').value = '';
+
+      // Remove destaque de todos os botões
+      document.querySelectorAll('[id^="btn-periodo-"]').forEach(btn => {
+        btn.classList.remove('bg-purple-600', 'text-white');
+        btn.classList.add('bg-purple-100', 'text-purple-700');
+      });
+
+      aplicarFiltros();
+    }
+
+    // Aplicar todos os filtros
+    function aplicarFiltros() {
+      console.log('[aplicarFiltros] Iniciando aplicação de filtros...');
+      console.log('[aplicarFiltros] gruposOriginais tem', Object.keys(gruposOriginais || {}).length, 'grupos');
+
+      // Verifica se gruposOriginais está vazio ou não existe
+      if (!gruposOriginais || Object.keys(gruposOriginais).length === 0) {
+        console.warn('[aplicarFiltros] ⚠️ gruposOriginais está vazio! Restaurando de grupos...');
+        gruposOriginais = JSON.parse(JSON.stringify(grupos));
+      }
+
+      // SEMPRE começa com os grupos originais
+      let gruposFiltrados = JSON.parse(JSON.stringify(gruposOriginais));
+
+      // Coleta todos os filtros ativos
+      const dataInicio = document.getElementById('filter-data-inicio')?.value;
+      const dataFim = document.getElementById('filter-data-fim')?.value;
+      const tiposSelecionados = Array.from(
+        document.querySelectorAll('#filter-tipo-violencia-container input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
+      console.log('[aplicarFiltros] Filtros ativos:', {
+        dataInicio,
+        dataFim,
+        tiposSelecionados: tiposSelecionados.length
+      });
+
+      // Verifica se há algum filtro ativo
+      const temFiltrosAtivos = (dataInicio || dataFim) || tiposSelecionados.length > 0;
+
+      // Se não há filtros ativos, restaura grupos originais
+      if (!temFiltrosAtivos) {
+        console.log('[aplicarFiltros] Nenhum filtro ativo, restaurando grupos originais');
+        grupos = JSON.parse(JSON.stringify(gruposOriginais));
+        renderizarGrupos();
+        return;
+      }
+
+      // Aplica todos os filtros de uma vez
+      const novosGrupos = {};
+      let totalNotificacoes = 0;
+      let totalFiltradas = 0;
+
+      Object.keys(gruposFiltrados).forEach(nomeCrianca => {
+        totalNotificacoes += gruposFiltrados[nomeCrianca].length;
+
+        const notificacoesFiltradas = gruposFiltrados[nomeCrianca].filter(notif => {
+          // Filtro por período
+          if (dataInicio || dataFim) {
+            if (!notif.dataNT) return false;
+
+            // Converte data DD/MM/YYYY para Date
+            const parseDataBR = (dataStr) => {
+              const partes = dataStr.split('/');
+              if (partes.length === 3) {
+                return new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+              }
+              return null;
+            };
+
+            const dataNotif = parseDataBR(notif.dataNT);
+            if (!dataNotif || isNaN(dataNotif.getTime())) return false;
+
+            const dataInicioDate = dataInicio ? new Date(dataInicio + 'T00:00:00') : null;
+            const dataFimDate = dataFim ? new Date(dataFim + 'T23:59:59') : null;
+
+            if (dataInicioDate && dataNotif < dataInicioDate) return false;
+            if (dataFimDate && dataNotif > dataFimDate) return false;
+          }
+
+          // Filtro por tipo de violência
+          if (tiposSelecionados.length > 0) {
+            if (!notif.tipoViolencia) return false;
+
+            // Suporta múltiplos tipos separados por vírgula
+            const tiposNotif = notif.tipoViolencia.split(',').map(t => t.trim());
+            const correspondeTipo = tiposSelecionados.some(tipoSelecionado =>
+              tiposNotif.some(tipoNotif => tipoNotif === tipoSelecionado)
+            );
+
+            if (!correspondeTipo) return false;
+          }
+
+          return true;
+        });
+
+        totalFiltradas += notificacoesFiltradas.length;
+
+        if (notificacoesFiltradas.length > 0) {
+          novosGrupos[nomeCrianca] = notificacoesFiltradas;
+        }
+      });
+
+      console.log('[aplicarFiltros] Resultado:', {
+        totalNotificacoes,
+        totalFiltradas,
+        gruposAntes: Object.keys(gruposFiltrados).length,
+        gruposDepois: Object.keys(novosGrupos).length
+      });
+
+      // Atualiza grupos com os resultados filtrados
+      grupos = novosGrupos;
+
+      // Aplica também a pesquisa de texto se houver
+      const searchInput = document.getElementById('search-input');
+      if (searchInput && searchInput.value.trim()) {
+        filtrarNotificacoes();
+      } else {
+        renderizarGrupos();
+      }
+    }
+
+    // Limpar todos os filtros
+    function limparTodosFiltros() {
+      console.log('[limparTodosFiltros] Limpando todos os filtros...');
+      console.log('[limparTodosFiltros] gruposOriginais tem', Object.keys(gruposOriginais || {}).length, 'grupos');
+
+      // Verifica se gruposOriginais está vazio ou não existe
+      if (!gruposOriginais || Object.keys(gruposOriginais).length === 0) {
+        console.warn('[limparTodosFiltros] ⚠️ gruposOriginais está vazio! Tentando restaurar...');
+        // Se gruposOriginais está vazio, tenta recarregar as notificações
+        if (Object.keys(grupos).length > 0) {
+          gruposOriginais = JSON.parse(JSON.stringify(grupos));
+          console.log('[limparTodosFiltros] Restaurado gruposOriginais de grupos atuais');
+        } else {
+          console.error('[limparTodosFiltros] ❌ Não é possível restaurar grupos. Recarregando notificações...');
+          carregarNotificacoes(false, false); // Não força reload, usa cache se disponível
+          return;
+        }
+      }
+
+      // Limpa pesquisa
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) searchInput.value = '';
+      const clearBtn = document.getElementById('clear-search');
+      if (clearBtn) clearBtn.style.display = 'none';
+      const resultsCount = document.getElementById('search-results-count');
+      if (resultsCount) resultsCount.textContent = '';
+
+      // Limpa período
+      const dataInicio = document.getElementById('filter-data-inicio');
+      const dataFim = document.getElementById('filter-data-fim');
+      if (dataInicio) dataInicio.value = '';
+      if (dataFim) dataFim.value = '';
+
+      // Remove destaque de todos os botões de período
+      document.querySelectorAll('[id^="btn-periodo-"]').forEach(btn => {
+        btn.classList.remove('bg-purple-600', 'text-white');
+        btn.classList.add('bg-purple-100', 'text-purple-700');
+      });
+
+      // Limpa tipos de violência
+      document.querySelectorAll('#filter-tipo-violencia-container input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      atualizarBadgeTipoViolencia();
+
+      // Restaura grupos originais e renderiza
+      grupos = JSON.parse(JSON.stringify(gruposOriginais));
+      console.log('[limparTodosFiltros] Grupos restaurados:', Object.keys(grupos).length, 'grupos');
+      renderizarGrupos();
+    }
+  </script>
+
+  <!-- Sistema de Anexos -->
+  <script src="assets/js/modules/anexos-handler.js"></script>
+
+  <!-- Sistema de Atualizações -->
+  <script src="assets/js/modules/atualizacoes-notificacoes.js"></script>
+
+  <!-- Modal de Edição -->
+  <div id="modalEdicao" class="modal" style="display: none;">
+    <div class="bg-white rounded-xl shadow-2xl p-0 max-w-[95vw] w-full mx-4 max-h-[95vh] overflow-hidden flex flex-col">
+      <div
+        class="flex items-center justify-between p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 text-white sticky top-0 z-20">
+        <h2 class="text-2xl font-bold">✏️ Editar Registro</h2>
+        <button onclick="fecharModalEdicao()"
+          class="text-white hover:text-gray-200 text-3xl transition-colors font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20">×</button>
+      </div>
+
+      <div class="flex-1 overflow-hidden">
+        <iframe id="iframeEdicao" src="" class="w-full h-full border-0" style="min-height: 80vh;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal>div {
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+
+  <script>
+    // Função para abrir modal de edição
+    // ========================================
+    // LIMPAR CACHE DE NOTIFICAÇÕES
+    // ========================================
+    function limparCacheNotificacoes() {
+      if (window.DataCache) {
+        window.DataCache.clear('minhas_notificacoes');
+        console.log('[limparCacheNotificacoes] ✅ Cache limpo');
+      }
+    }
+
+    // ========================================
+    // ABRIR MODAL DE EDIÇÃO
+    // ========================================
+    async function abrirModalEdicao() {
+      if (!notificacaoAtual || !notificacaoAtual.idNotificacao) {
+        alert('❌ Erro: Não foi possível identificar a notificação para edição.');
+        return;
+      }
+
+      const idNotificacao = notificacaoAtual.idNotificacao;
+
+      // Fecha o modal de detalhes primeiro
+      fecharModal();
+
+      // Mostra indicador de carregamento
+      mostrarIndicadorCarregamento('Carregando dados da notificação...');
+
+      try {
+        // Busca os dados da notificação em segundo plano ANTES de redirecionar
+        const registro = await buscarDadosNotificacao(idNotificacao);
+
+        if (registro) {
+          // Armazena os dados no sessionStorage para uso imediato na página de destino
+          sessionStorage.setItem('notificacaoParaEditar', JSON.stringify({
+            idNotificacao: idNotificacao,
+            registro: registro,
+            timestamp: Date.now()
+          }));
+
+          console.log('[minhas-notificacoes] Dados da notificação carregados e armazenados:', registro);
+
+          // Atualiza indicador
+          mostrarIndicadorCarregamento('Redirecionando...');
+          await new Promise(resolve => setTimeout(resolve, 300));
+
+          // REMOVIDO: Não forçamos mais a limpeza do cache aqui.
+          // O reload será controlado pela flag NOTIFICATIONS_RELOAD_REQUIRED definida em gerenciar-casos.html APENAS se houver salvamento.
+          // sessionStorage.setItem('limparCacheNotificacoes', 'true');
+
+          // Agora sim redireciona com os dados já carregados
+          window.location.href = `gerenciar-casos.html?editar=${idNotificacao}`;
+        } else {
+          ocultarIndicadorCarregamento();
+          alert('❌ Não foi possível carregar os dados da notificação. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('[minhas-notificacoes] Erro ao carregar dados da notificação:', error);
+        ocultarIndicadorCarregamento();
+        alert('❌ Erro ao carregar dados da notificação: ' + error.message);
+      }
+    }
+
+    // Função para buscar dados de uma notificação específica
+    async function buscarDadosNotificacao(idNotificacao) {
+      return new Promise((resolve, reject) => {
+        if (!window.CONFIG || !window.CONFIG.APPS_SCRIPT_CASOS) {
+          reject(new Error('URL do Apps Script não configurada'));
+          return;
+        }
+
+        const APPS_SCRIPT_URL = window.CONFIG.APPS_SCRIPT_CASOS;
+        console.log('[minhas-notificacoes] Buscando dados da notificação:', idNotificacao);
+
+        // Cria iframe oculto para fazer a requisição (mesmo método usado em gerenciar-casos.html)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = APPS_SCRIPT_URL + '?action=list&t=' + Date.now();
+
+        // Listener para receber resposta
+        const messageHandler = function (event) {
+          // Aceita APENAS mensagens do Google Apps Script
+          if (!event.origin.includes('google')) {
+            return;
+          }
+
+          // Verifica se é a resposta esperada
+          if (!event.data || typeof event.data.success === 'undefined') {
+            return;
+          }
+
+          console.log('[minhas-notificacoes] Resposta do Apps Script recebida');
+
+          if (event.data.success && event.data.registros) {
+            console.log('[minhas-notificacoes] ✅ Registros recebidos:', event.data.registros.length);
+
+            // Busca o registro específico pelo ID da notificação
+            const registro = event.data.registros.find(r => r.idNotificacao == idNotificacao);
+
+            if (registro) {
+              console.log('[minhas-notificacoes] ✅ Registro encontrado:', registro);
+              resolve(registro);
+            } else {
+              console.warn('[minhas-notificacoes] ⚠️ Registro não encontrado para ID:', idNotificacao);
+              reject(new Error('Registro não encontrado'));
+            }
+          } else {
+            console.error('[minhas-notificacoes] ❌ Erro na resposta:', event.data.message);
+            reject(new Error(event.data.message || 'Erro ao carregar registros'));
+          }
+
+          // Limpa
+          window.removeEventListener('message', messageHandler);
+          setTimeout(() => iframe.remove(), 100);
+        };
+
+        window.addEventListener('message', messageHandler);
+        document.body.appendChild(iframe);
+
+        // Timeout de segurança
+        setTimeout(() => {
+          window.removeEventListener('message', messageHandler);
+          iframe.remove();
+          reject(new Error('Timeout ao carregar dados da notificação'));
+        }, 30000);
+      });
+    }
+
+    function mostrarIndicadorCarregamento(mensagem = 'Carregando...') {
+      // Remove indicador anterior se existir
+      const indicadorAnterior = document.getElementById('indicadorCarregamentoEdicao');
+      if (indicadorAnterior) {
+        indicadorAnterior.remove();
+      }
+
+      // Cria novo indicador
+      const indicador = document.createElement('div');
+      indicador.id = 'indicadorCarregamentoEdicao';
+      indicador.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3';
+      indicador.innerHTML = `
+        <div class="animate-spin">⏳</div>
+        <span class="font-medium">${mensagem}</span>
+      `;
+      document.body.appendChild(indicador);
+    }
+
+    function ocultarIndicadorCarregamento() {
+      const indicador = document.getElementById('indicadorCarregamentoEdicao');
+      if (indicador) {
+        indicador.remove();
+      }
+    }
+
+    // Função para fechar modal de edição
+    function fecharModalEdicao() {
+      const modal = document.getElementById('modalEdicao');
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+
+        // Limpa o iframe
+        const iframe = document.getElementById('iframeEdicao');
+        if (iframe) {
+          iframe.src = '';
+        }
+      }
+    }
+
+    // Fechar modal ao clicar fora dele
+    document.addEventListener('DOMContentLoaded', function () {
+      const modal = document.getElementById('modalEdicao');
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) {
+            fecharModalEdicao();
+          }
+        });
+      }
+
+      // Fechar modal com tecla ESC
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('modalEdicao');
+          if (modal && modal.style.display !== 'none') {
+            fecharModalEdicao();
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- Intro.js - Sistema de Onboarding -->
+  <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+  <script src="assets/js/utils/onboarding.js"></script>
+  <script>
+    // Inicializar onboarding após carregamento completo da página
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        if (window.NAAMOnboarding) {
+          NAAMOnboarding.init('minhas-notificacoes');
+        }
+      }, 3000); // 3 segundos para esperar o carregamento das notificações
+    });
+  </script>
+
+</body>
+
+<!-- Intro.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+<!-- Onboarding Module -->
+<script src="assets/js/utils/onboarding.js"></script>
+<!-- Initialize Onboarding -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.NAAMOnboarding) {
+      window.NAAMOnboarding.init('minhas-notificacoes');
+    }
+  });
+</script>
+
+</html>

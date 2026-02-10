@@ -28,11 +28,11 @@ function exportarCSV() {
       alert('Não há registros filtrados para exportar.');
       return;
     }
-    
+
     const headers = Object.keys(window.filteredData[0]);
     const linhas = [];
     linhas.push(headers.join(';'));
-    
+
     window.filteredData.forEach(row => {
       const linha = headers.map(h => {
         let val = row[h];
@@ -42,12 +42,12 @@ function exportarCSV() {
       }).join(';');
       linhas.push(linha);
     });
-    
+
     const csvContent = linhas.join('\r\n');
     const bom = '\uFEFF';
     const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.href = url;
     a.download = `casos_violencia_${new Date().toISOString().split('T')[0]}.csv`;
@@ -67,16 +67,16 @@ function exportarExcel() {
       alert('Não há registros filtrados para exportar.');
       return;
     }
-    
+
     const headers = Object.keys(window.filteredData[0]);
     let html = '<html><head><meta charset="utf-8"></head><body><table border="1">';
     html += '<tr style="background-color: #4472C4; color: white; font-weight: bold;">';
-    
+
     headers.forEach(h => {
       html += '<th style="padding: 8px; text-align: center;">' + h + '</th>';
     });
     html += '</tr>';
-    
+
     window.filteredData.forEach(row => {
       html += '<tr>';
       headers.forEach(h => {
@@ -85,13 +85,13 @@ function exportarExcel() {
       });
       html += '</tr>';
     });
-    
+
     html += '</table></body></html>';
-    
+
     const bom = '\uFEFF';
     const blob = new Blob([bom + html], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.href = url;
     a.download = `casos_violencia_${new Date().toISOString().split('T')[0]}.xls`;
@@ -116,10 +116,11 @@ function capturarGraficosComoImagens() {
     'chartAutor', 'chartOcorreuEscola', 'chartCorrelacaoTipoIdade',
     'chartComparativoTemporal', 'chartTendenciaAnual'
   ];
-  
+
   canvasIds.forEach(canvasId => {
     const canvas = document.getElementById(canvasId);
-    if (canvas) {
+    // Verifica se o canvas existe, tem dimensões e está visível (offsetParent não é null)
+    if (canvas && canvas.offsetParent !== null && canvas.width > 0 && canvas.height > 0) {
       try {
         const dataURL = canvas.toDataURL('image/png');
         imagens[canvasId] = dataURL;
@@ -128,7 +129,7 @@ function capturarGraficosComoImagens() {
       }
     }
   });
-  
+
   return imagens;
 }
 
@@ -137,7 +138,7 @@ function capturarGraficosComoImagens() {
 // ========================================
 function coletarEstatisticasDashboard() {
   const stats = {};
-  
+
   // KPIs principais
   stats.totalCasos = document.getElementById('kpiTotalCasos')?.textContent || '0';
   stats.casosFiltrados = document.getElementById('kpiCasosFiltrados')?.textContent || '0';
@@ -146,35 +147,35 @@ function coletarEstatisticasDashboard() {
   stats.topEscolaCasos = document.getElementById('kpiTopEscolaCasos')?.textContent || '-';
   stats.tipoFrequente = document.getElementById('kpiTipoFrequente')?.textContent || '-';
   stats.tipoFrequenteCasos = document.getElementById('kpiTipoFrequenteCasos')?.textContent || '-';
-  
+
   // Estatísticas descritivas (idade)
   stats.mediaIdade = document.getElementById('statMediaIdade')?.textContent || '-';
   stats.medianaIdade = document.getElementById('statMedianaIdade')?.textContent || '-';
   stats.idadeMin = document.getElementById('statIdadeMin')?.textContent || '-';
   stats.idadeMax = document.getElementById('statIdadeMax')?.textContent || '-';
   stats.desvioPadrao = document.getElementById('statDesvioPadrao')?.textContent || '-';
-  
+
   // Análise temporal
   stats.casosEsteMes = document.getElementById('statCasosEsteMes')?.textContent || '0';
   stats.casosMesAnterior = document.getElementById('statCasosMesAnterior')?.textContent || '0';
   stats.variacaoMensal = document.getElementById('statVariacaoMensal')?.textContent || '0%';
-  
+
   // Top 5 Escolas - Recalcula diretamente dos dados para evitar duplicatas
   const escolaCol = window.columnNames?.escola;
   if (escolaCol && window.filteredData) {
     const dados = {};
     const mapaNormalizado = {};
-    
+
     window.filteredData.forEach(row => {
       const escola = row[escolaCol];
       if (escola) {
         const original = String(escola).trim();
         const cleaned = original.replace(/[\s\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]+/g, ' ').trim();
         const norm = normalizeText(cleaned);
-        
+
         if (norm) {
           dados[norm] = (dados[norm] || 0) + 1;
-          
+
           if (!mapaNormalizado[norm]) {
             mapaNormalizado[norm] = cleaned;
           } else {
@@ -187,7 +188,7 @@ function coletarEstatisticasDashboard() {
         }
       }
     });
-    
+
     const escolasCount = Object.entries(dados)
       .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
       .sort((a, b) => {
@@ -195,7 +196,7 @@ function coletarEstatisticasDashboard() {
         return a[0].localeCompare(b[0], 'pt-BR');
       })
       .slice(0, 5);
-    
+
     stats.top5Escolas = escolasCount.map(([escola, count]) => ({
       escola,
       casos: count.toString()
@@ -205,9 +206,9 @@ function coletarEstatisticasDashboard() {
     const top5Element = document.getElementById('top5Escolas');
     if (top5Element) {
       // Pega apenas os divs diretos que contêm os dados (não divs aninhados)
-      const top5Items = Array.from(top5Element.children).filter(child => 
-        child.tagName === 'DIV' && 
-        child.querySelector('span.text-gray-700') && 
+      const top5Items = Array.from(top5Element.children).filter(child =>
+        child.tagName === 'DIV' &&
+        child.querySelector('span.text-gray-700') &&
         child.querySelector('span.text-blue-600')
       );
       stats.top5Escolas = top5Items.slice(0, 5).map(item => {
@@ -217,56 +218,62 @@ function coletarEstatisticasDashboard() {
       }).filter(item => item.escola && item.casos); // Remove itens vazios
     }
   }
-  
+
   return stats;
 }
 
 // ========================================
 // EXPORTAÇÃO DE PDF COMPLETA
 // ========================================
-async function exportarPDF() {
+// ========================================
+// EXPORTAÇÃO DE PDF COMPLETA
+// ========================================
+async function exportarPDF(imagensCustomizadas = null) {
   try {
     if (!window.filteredData || window.filteredData.length === 0) {
       alert('Não há registros filtrados para exportar.');
       return;
     }
-    
+
     // Verifica se html2pdf está disponível
     if (typeof html2pdf === 'undefined') {
       console.error('❌ html2pdf não está carregado!');
       alert('Erro: Biblioteca html2pdf não foi carregada. Verifique a conexão com a internet.');
       return;
     }
-    
+
     console.log('✅ html2pdf disponível');
-    
+
     // Mostra loading
     const loadingMsg = document.createElement('div');
     loadingMsg.id = 'pdfLoading';
     loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:10000;';
     loadingMsg.innerHTML = '<div style="text-align:center;"><div style="border:4px solid #f3f3f3;border-top:4px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin:0 auto 10px;"></div><p>Gerando PDF completo...</p></div>';
     document.body.appendChild(loadingMsg);
-    
+
     // Adiciona animação de spin
     const style = document.createElement('style');
     style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
     document.head.appendChild(style);
-    
+
     // Captura gráficos e estatísticas
     console.log('📸 Capturando gráficos...');
-    const imagensGraficos = capturarGraficosComoImagens();
+
+    // Se recebeu imagens customizadas (do smart export), usa elas. Senão, captura o estado atual.
+    const imagensGraficos = imagensCustomizadas || capturarGraficosComoImagens();
+
     console.log('📊 Gráficos capturados:', Object.keys(imagensGraficos).length);
-    
+
     console.log('📈 Coletando estatísticas...');
     const estatisticas = coletarEstatisticasDashboard();
     console.log('✅ Estatísticas coletadas:', estatisticas);
-    
+
     const headers = Object.keys(window.filteredData[0]);
     const dataExportacao = new Date().toLocaleString('pt-BR');
-    
+
     console.log('📋 Total de registros:', window.filteredData.length);
     console.log('📋 Headers:', headers.length);
-    
+
     // Cria HTML para o PDF (apenas conteúdo, não documento completo)
     let html = `
   <style>
@@ -632,9 +639,9 @@ async function exportarPDF() {
         ${window.filteredData.map(row => `
           <tr>
             ${headers.map(h => {
-              const val = row[h] !== null && row[h] !== undefined ? String(row[h]) : '';
-              return `<td>${val.replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 100)}</td>`;
-            }).join('')}
+      const val = row[h] !== null && row[h] !== undefined ? String(row[h]) : '';
+      return `<td>${val.replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 100)}</td>`;
+    }).join('')}
           </tr>
         `).join('')}
       </tbody>
@@ -646,17 +653,17 @@ async function exportarPDF() {
     <p>${dataExportacao}</p>
   </div>
     `;
-    
+
     // Usa window.print() que é mais confiável para conteúdo complexo
     console.log('🏗️ Criando janela de impressão...');
     console.log('📄 HTML criado, tamanho:', html.length, 'caracteres');
-    
+
     // Extrai o conteúdo HTML (sem a tag <style>)
     const htmlContent = html.replace(/<style>[\s\S]*?<\/style>/, '');
-    
+
     // Cria uma nova janela para o relatório
     const printWindow = window.open('', '_blank', 'width=1200,height=800');
-    
+
     if (!printWindow) {
       alert('Por favor, permita pop-ups para gerar o PDF.');
       if (loadingMsg && loadingMsg.parentNode) {
@@ -667,7 +674,7 @@ async function exportarPDF() {
       }
       return;
     }
-    
+
     // Escreve o HTML completo na nova janela com estilos completos
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -859,9 +866,9 @@ async function exportarPDF() {
       </body>
       </html>
     `);
-    
+
     printWindow.document.close();
-    
+
     // Aguarda o carregamento completo
     const waitForLoad = () => {
       return new Promise((resolve) => {
@@ -874,14 +881,14 @@ async function exportarPDF() {
         }
       });
     };
-    
+
     await waitForLoad();
-    
+
     console.log('✅ Conteúdo carregado na janela de impressão');
-    
+
     // Aguarda um pouco mais para garantir que as imagens carregaram
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // Remove loading
     if (loadingMsg && loadingMsg.parentNode) {
       document.body.removeChild(loadingMsg);
@@ -889,24 +896,24 @@ async function exportarPDF() {
     if (style && style.parentNode) {
       document.head.removeChild(style);
     }
-    
+
     // Abre o diálogo de impressão
     printWindow.focus();
     printWindow.print();
-    
+
     console.log('✅ Diálogo de impressão aberto. Use "Salvar como PDF" para gerar o arquivo.');
-    
+
     // Fecha a janela após impressão (ou após 30 segundos)
     setTimeout(() => {
       if (printWindow && !printWindow.closed) {
-      printWindow.close();
+        printWindow.close();
       }
     }, 30000);
-    
+
   } catch (error) {
     console.error('Erro ao exportar PDF:', error);
     alert('Erro ao exportar PDF. Verifique o console para mais detalhes.');
-    
+
     // Remove loading se ainda estiver visível
     const loading = document.getElementById('pdfLoading');
     if (loading) {
@@ -923,11 +930,11 @@ function calcularEstatisticas() {
     if (!window.filteredData || window.filteredData.length === 0) {
       return;
     }
-    
+
     if (!window.columnNames || !window.columnNames.idade) {
       return;
     }
-    
+
     const idadeCol = window.columnNames.idade;
     const idades = window.filteredData
       .map(row => {
@@ -935,9 +942,9 @@ function calcularEstatisticas() {
         return isNaN(idade) ? null : idade;
       })
       .filter(idade => idade !== null && idade >= 0 && idade <= 120);
-    
+
     if (idades.length === 0) return;
-    
+
     const idadesOrdenadas = [...idades].sort((a, b) => a - b);
     const media = idades.reduce((sum, idade) => sum + idade, 0) / idades.length;
     const mediana = idadesOrdenadas.length % 2 === 0
@@ -947,13 +954,13 @@ function calcularEstatisticas() {
     const max = Math.max(...idades);
     const variancia = idades.reduce((sum, idade) => sum + Math.pow(idade - media, 2), 0) / idades.length;
     const desvioPadrao = Math.sqrt(variancia);
-    
+
     const statMedia = document.getElementById('statMediaIdade');
     const statMediana = document.getElementById('statMedianaIdade');
     const statMin = document.getElementById('statIdadeMin');
     const statMax = document.getElementById('statIdadeMax');
     const statDesvio = document.getElementById('statDesvioPadrao');
-    
+
     if (statMedia) statMedia.textContent = media.toFixed(2) + ' anos';
     if (statMediana) statMediana.textContent = mediana.toFixed(2) + ' anos';
     if (statMin) statMin.textContent = min + ' anos';
@@ -972,32 +979,32 @@ function atualizarKPIs() {
     if (!window.originalData || window.originalData.length === 0) {
       return;
     }
-    
+
     if (!window.columnNames) {
       return;
     }
-    
+
     const escolaCol = window.columnNames.escola;
     const tipoCol = window.columnNames.tipo;
     const dataCol = window.columnNames.data || window.columnNames.dataNT;
-    
+
     const totalCasos = window.originalData.length;
     const kpiTotal = document.getElementById('kpiTotalCasos');
     if (kpiTotal) kpiTotal.textContent = totalCasos.toLocaleString('pt-BR');
-    
+
     const casosFiltrados = window.filteredData.length;
     const kpiFiltrados = document.getElementById('kpiCasosFiltrados');
     if (kpiFiltrados) kpiFiltrados.textContent = casosFiltrados.toLocaleString('pt-BR');
     const percentual = totalCasos > 0 ? ((casosFiltrados / totalCasos) * 100).toFixed(1) : 0;
     const kpiPercentual = document.getElementById('kpiCasosFiltradosPercentual');
     if (kpiPercentual) kpiPercentual.textContent = percentual + '% do total';
-    
+
     if (escolaCol) {
       // Usa normalização para agrupar escolas com nomes similares (espaços, maiúsculas, etc)
       const dados = {};
       const mapaNormalizado = {};
       const debugMap = {}; // Para debug: mostra todas as variações agrupadas
-      
+
       window.filteredData.forEach(row => {
         const escola = row[escolaCol];
         if (escola) {
@@ -1005,10 +1012,10 @@ function atualizarKPIs() {
           // Remove espaços extras e caracteres invisíveis
           const cleaned = original.replace(/[\s\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]+/g, ' ').trim();
           const norm = normalizeText(cleaned);
-          
+
           if (norm) {
             dados[norm] = (dados[norm] || 0) + 1;
-            
+
             // Mantém o nome original mais limpo (sem espaços extras) para exibição
             if (!mapaNormalizado[norm]) {
               mapaNormalizado[norm] = cleaned;
@@ -1017,13 +1024,13 @@ function atualizarKPIs() {
               // Prefere o nome mais curto (sem espaços extras) ou mais completo se tiver mais informação
               const currentLength = mapaNormalizado[norm].replace(/\s+/g, '').length;
               const newLength = cleaned.replace(/\s+/g, '').length;
-              
+
               // Se o novo nome tem mais conteúdo (ignorando espaços), usa ele
               // Caso contrário, prefere o mais curto (mais limpo)
               if (newLength > currentLength || (newLength === currentLength && cleaned.length < mapaNormalizado[norm].length)) {
                 mapaNormalizado[norm] = cleaned;
               }
-              
+
               // Guarda todas as variações para debug
               if (!debugMap[norm].includes(cleaned)) {
                 debugMap[norm].push(cleaned);
@@ -1032,11 +1039,11 @@ function atualizarKPIs() {
           }
         }
       });
-      
+
       // Log para debug (pode remover depois)
       console.log('🔍 Debug Top 5 Escolas - Agrupamentos:', debugMap);
       console.log('📊 Contagens normalizadas:', dados);
-      
+
       // Converte de volta para nomes originais e ordena
       const escolasCount = Object.entries(dados)
         .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
@@ -1045,9 +1052,9 @@ function atualizarKPIs() {
           if (b[1] !== a[1]) return b[1] - a[1];
           return a[0].localeCompare(b[0], 'pt-BR');
         });
-      
+
       console.log('✅ Top 5 Escolas final:', escolasCount.slice(0, 5));
-      
+
       const topEscola = escolasCount[0];
       if (topEscola) {
         const kpiTopEscola = document.getElementById('kpiTopEscola');
@@ -1055,18 +1062,18 @@ function atualizarKPIs() {
         if (kpiTopEscola) kpiTopEscola.textContent = topEscola[0];
         if (kpiTopEscolaCasos) kpiTopEscolaCasos.textContent = topEscola[1] + ' casos';
       }
-      
+
       const top5 = escolasCount.slice(0, 5);
       const top5Html = top5.map(([escola, count], index) => {
         return '<div class="flex items-center justify-between py-2' + (index < top5.length - 1 ? ' border-b border-gray-200' : '') + '"><div class="flex items-center gap-2"><span class="text-lg font-bold text-gray-400">' + (index + 1) + 'º</span><span class="text-gray-700 font-medium">' + escola + '</span></div><span class="text-lg font-bold text-blue-600">' + count + '</span></div>';
       }).join('');
-      
+
       const top5Element = document.getElementById('top5Escolas');
       if (top5Element) {
         top5Element.innerHTML = top5Html || '<div class="text-gray-400 text-center py-4">Sem dados</div>';
       }
     }
-    
+
     if (tipoCol) {
       const tiposCount = {};
       window.filteredData.forEach(row => {
@@ -1075,7 +1082,7 @@ function atualizarKPIs() {
           tiposCount[tipo] = (tiposCount[tipo] || 0) + 1;
         });
       });
-      
+
       const topTipo = Object.entries(tiposCount).sort((a, b) => b[1] - a[1])[0];
       if (topTipo) {
         const kpiTipo = document.getElementById('kpiTipoFrequente');
@@ -1084,7 +1091,7 @@ function atualizarKPIs() {
         if (kpiTipoCasos) kpiTipoCasos.textContent = topTipo[1] + ' casos';
       }
     }
-    
+
     if (dataCol) {
       // Função auxiliar para parsear datas do Google Sheets
       function parseDateCell(value) {
@@ -1107,12 +1114,12 @@ function atualizarKPIs() {
             const dia = partes[0];
             const mes = partes[1];
             let ano = partes[2];
-            
+
             // Se o ano tiver apenas 2 dígitos, assume 20XX
             if (ano < 100) {
               ano = ano < 50 ? 2000 + ano : 1900 + ano;
             }
-            
+
             // Validação básica
             if (dia >= 1 && dia <= 31 && mes >= 1 && mes <= 12 && ano >= 1900 && ano <= 2100) {
               return new Date(ano, mes - 1, dia);
@@ -1134,47 +1141,47 @@ function atualizarKPIs() {
       const anoAtual = agora.getFullYear();
       const mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
       const anoAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
-      
+
       let casosEsteMes = 0;
       let casosMesAnterior = 0;
-      
+
       window.filteredData.forEach(row => {
         const rawData = row[dataCol];
         if (!rawData) return;
-        
+
         const data = parseDateCell(rawData);
         if (!data || isNaN(data.getTime())) return;
-        
+
         const rowMes = data.getMonth();
         const rowAno = data.getFullYear();
-        
+
         if (rowMes === mesAtual && rowAno === anoAtual) {
           casosEsteMes++;
         } else if (rowMes === mesAnterior && rowAno === anoAnterior) {
           casosMesAnterior++;
         }
       });
-      
+
       const statEsteMes = document.getElementById('statCasosEsteMes');
       const statMesAnterior = document.getElementById('statCasosMesAnterior');
       if (statEsteMes) statEsteMes.textContent = casosEsteMes.toLocaleString('pt-BR');
       if (statMesAnterior) statMesAnterior.textContent = casosMesAnterior.toLocaleString('pt-BR');
-      
-      const variacao = casosMesAnterior > 0 
+
+      const variacao = casosMesAnterior > 0
         ? (((casosEsteMes - casosMesAnterior) / casosMesAnterior) * 100).toFixed(1)
         : casosEsteMes > 0 ? '100.0' : '0.0';
-      
+
       const variacaoElement = document.getElementById('statVariacaoMensal');
       if (variacaoElement) {
         variacaoElement.textContent = (variacao > 0 ? '+' : '') + variacao + '%';
-        variacaoElement.className = variacao > 0 
-          ? 'text-3xl font-bold text-red-600' 
-          : variacao < 0 
+        variacaoElement.className = variacao > 0
+          ? 'text-3xl font-bold text-red-600'
+          : variacao < 0
             ? 'text-3xl font-bold text-green-600'
             : 'text-3xl font-bold text-gray-600';
       }
     }
-    
+
     calcularEstatisticas();
   } catch (error) {
     console.error('Erro ao atualizar KPIs:', error);

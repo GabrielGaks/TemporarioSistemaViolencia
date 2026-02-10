@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python replace_filters_complete.py:*)"
+    ]
+  }
+}

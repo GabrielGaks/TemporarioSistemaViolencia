@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - Sistema de Registro</title>
+
+  <!-- Esconde conteudo IMEDIATAMENTE para evitar flash -->
+  <style>
+    html:not(.page-ready) {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
+    html.page-ready {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+  </style>
+
+  <!-- TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Estilos Elegantes Compartilhados -->
+  <link rel="stylesheet" href="assets/css/styles-elegant.css">
+
+  <!-- Intro.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+  <!-- Onboarding CSS -->
+  <link rel="stylesheet" href="assets/css/onboarding.css">
+
+  <!-- Configuracao Centralizada -->
+  <script src="config.js"></script>
+  <script src="assets/js/utils/config-loader.js"></script>
+
+  <!-- Sistema de Transicoes entre Paginas -->
+  <script src="assets/js/utils/page-transitions.js"></script>
+
+  <!-- Sistema de Loading Indicator Elegante -->
+  <script src="assets/js/utils/loading-indicator.js"></script>
+
+  <!-- Sistema de Navegacao por Perfil -->
+  <script src="assets/js/utils/navigation.js"></script>
+
+  <!-- Seguranca -->
+  <script src="assets/js/utils/security.js"></script>
+
+  <script>
+    // Verifica acesso - todos os roles permitidos
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.NAVMNavigation) {
+        if (!window.NAVMNavigation.verificarAcesso(['visualizador', 'estagiario', 'user', 'tecnico', 'admin', 'superuser'])) {
+          return;
+        }
+        window.NAVMNavigation.renderMenus();
+      } else {
+        var role = sessionStorage.getItem('userRole');
+        if (!role) {
+          window.location.href = 'index.html';
+          return;
+        }
+      }
+      initMinhaConta();
+    });
+  </script>
+
+  <style>
+    /* Tabs */
+    .tab-btn {
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #6b7280;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #3b82f6;
+    }
+
+    .tab-btn.active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Tabs container - scroll horizontal em mobile */
+    .tabs-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .tabs-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tabs-container .tab-btn {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+    }
+
+    /* FAQ Accordion */
+    details.faq-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    details.faq-item summary {
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #374151;
+      background: #f9fafb;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    details.faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.faq-item summary::before {
+      content: '\25B6';
+      font-size: 10px;
+      transition: transform 0.2s ease;
+      color: #9ca3af;
+    }
+
+    details.faq-item[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    details.faq-item .faq-answer {
+      padding: 12px 16px;
+      color: #4b5563;
+      line-height: 1.6;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    /* Video cards */
+    .video-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .video-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-thumb {
+      position: relative;
+      padding-bottom: 56.25%;
+      background: #f3f4f6;
+    }
+
+    .video-thumb img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-play-icon::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 8px 0 8px 16px;
+      border-color: transparent transparent transparent white;
+      margin-left: 3px;
+    }
+
+    /* Video Modal */
+    .video-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-modal.show {
+      display: flex;
+    }
+
+    .video-modal-content {
+      width: 90%;
+      max-width: 800px;
+      position: relative;
+    }
+
+    .video-modal-content .close-btn {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px 8px;
+    }
+
+    .video-modal-content .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      background: black;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .video-modal-content iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Category filter chips */
+    .cat-chip {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 20px;
+      border: 1px solid #d1d5db;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .cat-chip:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .cat-chip.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    /* Tour reset items */
+    .tour-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    /* Desktop menu / mobile menu */
+    .desktop-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    .mobile-menu.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .desktop-menu {
+        display: none !important;
+      }
+
+      .mobile-menu {
+        display: none;
+      }
+
+      .mobile-menu.show {
+        display: block;
+      }
+    }
+
+    /* Alert */
+    .mc-alert {
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Glossary */
+    .glossary-term {
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .glossary-term:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-5xl mx-auto px-4 py-6">
+
+    <!-- Menu de Navegacao -->
+    <div data-tour="header" class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg mb-6">
+      <div class="px-4 py-3">
+        <!-- Botao Hamburguer (Mobile) -->
+        <button onclick="toggleMobileMenu()"
+          class="md:hidden w-full flex items-center justify-center gap-2 text-white py-2 rounded-lg hover:bg-blue-800/30 transition-all">
+          <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span class="text-sm font-semibold">Menu</span>
+        </button>
+
+        <!-- Menu Desktop -->
+        <nav class="desktop-menu flex flex-wrap gap-2 justify-center items-center">
+        </nav>
+
+        <!-- Menu Mobile -->
+        <nav id="mobileMenuNav" class="mobile-menu mt-3">
+          <div class="flex flex-col gap-2">
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Alerta -->
+    <div id="alertContainer" class="mb-4"></div>
+
+    <!-- Titulo da Pagina -->
+    <div class="mb-6" data-tour="profile">
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <span class="text-3xl">👤</span> Minha Conta
+      </h1>
+      <p class="text-gray-500 text-sm mt-1">Gerencie seu perfil, acesse ajuda e tutoriais</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" data-tour="tabs">
+      <!-- Tab Bar -->
+      <div class="border-b border-gray-200">
+        <div class="tabs-container px-4">
+          <button class="tab-btn active" data-tab="perfil">Meu Perfil</button>
+          <button class="tab-btn" data-tab="ajuda">Central de Ajuda</button>
+          <button class="tab-btn" data-tab="tutoriais">Tutoriais</button>
+          <button class="tab-btn" data-tab="tours">Tours</button>
+        </div>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="p-6">
+
+        <!-- TAB 1: Meu Perfil -->
+        <div id="tab-perfil" class="tab-content active">
+
+          <!-- Informacoes Pessoais -->
+          <div class="mb-8">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span>📋</span> Informações Pessoais
+            </h2>
+            <div class="bg-gray-50 rounded-xl p-5 space-y-3">
+              <div class="flex items-center gap-3">
+                <span class="text-gray-500 font-medium w-28 text-sm">Nome:</span>
+                <span id="perfilNome" class="text-gray-800 font-semibold">Carregando...</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-gray-500 font-medium w-28 text-sm">E-mail:</span>
+                <span id="perfilEmail" class="text-gray-800">Carregando...</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-gray-500 font-medium w-28 text-sm">Perfil:</span>
+                <span id="perfilRole"
+                  class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">Carregando...</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-gray-500 font-medium w-28 text-sm">Membro desde:</span>
+                <span id="perfilDesde" class="text-gray-600 text-sm">Carregando...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alterar Senha -->
+          <div class="mb-8" data-tour="change-password">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span>🔒</span> Alterar Senha
+            </h2>
+            <div class="max-w-md">
+              <form id="formAlterarSenha" onsubmit="alterarSenha(event)" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Senha atual</label>
+                  <input type="password" id="senhaAtual" required placeholder="Digite sua senha atual"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nova senha</label>
+                  <input type="password" id="novaSenha" required minlength="6" placeholder="Mínimo 6 caracteres"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar nova senha</label>
+                  <input type="password" id="confirmarSenha" required minlength="6" placeholder="Repita a nova senha"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                <button type="submit" id="btnAlterarSenha"
+                  class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                  Alterar Senha
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Informacoes do Sistema -->
+          <div>
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span>ℹ️</span> Sistema
+            </h2>
+            <div class="bg-gray-50 rounded-xl p-5 flex flex-wrap gap-6 text-sm text-gray-600">
+              <span>Versão: <strong id="sistemaVersao">-</strong></span>
+              <span>Suporte: <strong id="sistemaSuporteEmail">-</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Central de Ajuda -->
+        <div id="tab-ajuda" class="tab-content">
+
+          <!-- Busca -->
+          <div class="mb-6">
+            <input type="text" id="buscaAjuda" placeholder="Buscar ajuda..."
+              class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              oninput="filtrarFAQ()">
+          </div>
+
+          <!-- FAQ -->
+          <div class="mb-8">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span>❓</span> Perguntas Frequentes
+            </h2>
+            <div id="faqContainer"></div>
+          </div>
+
+          <!-- Glossario -->
+          <div>
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span>📖</span> Glossário de Termos
+            </h2>
+            <div class="mb-3">
+              <input type="text" id="buscaGlossario" placeholder="Filtrar termos..."
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                oninput="filtrarGlossario()">
+            </div>
+            <div id="glossarioContainer" class="bg-gray-50 rounded-xl p-4"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Tutoriais (Videos) -->
+        <div id="tab-tutoriais" class="tab-content">
+          <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span>🎥</span> Vídeos Explicativos
+          </h2>
+
+          <!-- Filtro por categoria -->
+          <div class="flex flex-wrap gap-2 mb-6" id="videoCategorias"></div>
+
+          <!-- Grid de Videos -->
+          <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+          <div id="videoVazio" class="hidden text-center py-8 text-gray-500">
+            Nenhum vídeo disponível para esta categoria.
+          </div>
+        </div>
+
+        <!-- TAB 4: Tours Interativos -->
+        <div id="tab-tours" class="tab-content">
+          <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span>🎯</span> Tours Interativos
+          </h2>
+          <p class="text-gray-500 text-sm mb-6">Reinicie os tours de qualquer página para revê-los como se fosse a
+            primeira vez.</p>
+
+          <div id="toursContainer" class="mb-6"></div>
+
+          <button onclick="resetarTodosTours()"
+            class="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+            Reiniciar TODOS os Tours
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de Video -->
+  <div id="videoModal" class="video-modal" onclick="fecharVideoModal(event)">
+    <div class="video-modal-content">
+      <button class="close-btn" onclick="fecharVideoModal()">&times;</button>
+      <div class="video-wrapper">
+        <iframe id="videoIframe" src="" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+  <!-- Onboarding -->
+  <script src="assets/js/utils/onboarding.js"></script>
+
+  <script>
+    // ========================================
+    // VARIÁVEIS GLOBAIS
+    // ========================================
+    var currentVideoCategoria = 'todos';
+
+    // ========================================
+    // INICIALIZAÇÃO
+    // ========================================
+    function initMinhaConta() {
+      carregarPerfil();
+      renderizarFAQ();
+      renderizarGlossario();
+      renderizarVideos();
+      renderizarTours();
+      carregarInfoSistema();
+      initTabs();
+
+      // Inicializa onboarding se disponivel
+      setTimeout(function () {
+        if (window.NAAMOnboarding) {
+          window.NAAMOnboarding.init('minha-conta');
+        }
+      }, 1000);
+    }
+
+    // ========================================
+    // TABS
+    // ========================================
+    function initTabs() {
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tabId = this.getAttribute('data-tab');
+          switchTab(tabId);
+        });
+      });
+
+      // Verificar hash da URL para deep link
+      var hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById('tab-' + hash)) {
+        switchTab(hash);
+      }
+    }
+
+    function switchTab(tabId) {
+      // Desativar todas as tabs
+      document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(function (content) {
+        content.classList.remove('active');
+      });
+
+      // Ativar tab selecionada
+      var btn = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+      var content = document.getElementById('tab-' + tabId);
+      if (btn) btn.classList.add('active');
+      if (content) content.classList.add('active');
+
+      // Atualizar hash da URL
+      history.replaceState(null, null, '#' + tabId);
+    }
+
+    // ========================================
+    // PERFIL
+    // ========================================
+    function carregarPerfil() {
+      var userName = sessionStorage.getItem('userName') || '';
+      var userEmail = sessionStorage.getItem('userEmail') || '';
+      var userRole = sessionStorage.getItem('userRole') || '';
+      var userId = sessionStorage.getItem('userId') || '';
+
+      // Exibir dados do sessionStorage imediatamente
+      document.getElementById('perfilEmail').textContent = userEmail;
+      document.getElementById('perfilRole').textContent = formatarRole(userRole);
+      document.getElementById('perfilNome').textContent = userName || userEmail.split('@')[0] || '-';
+
+      // Se temos userId, buscar dados completos do backend (inclui created_at)
+      if (userId && userEmail) {
+        buscarDadosCompletos(userId, userEmail);
+      } else {
+        document.getElementById('perfilDesde').textContent = '-';
+      }
+    }
+
+    async function buscarDadosCompletos(userId, userEmail) {
+      try {
+        var dados = {
+          action: 'get_user_info',
+          user_id: userId,
+          caller_email: userEmail
+        };
+
+        var response = await fetch(CONFIG.APPS_SCRIPT_AUTH, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+
+        var resultado = await response.json();
+
+        if (resultado.sucesso && resultado.data) {
+          var data = resultado.data;
+          document.getElementById('perfilNome').textContent = data.nome || data.email.split('@')[0];
+          document.getElementById('perfilRole').textContent = formatarRole(data.role);
+
+          if (data.created_at) {
+            var dt = new Date(data.created_at);
+            document.getElementById('perfilDesde').textContent = dt.toLocaleDateString('pt-BR');
+          }
+
+          // Atualizar sessionStorage se nome veio do backend
+          if (data.nome) {
+            sessionStorage.setItem('userName', data.nome);
+          }
+        } else {
+          document.getElementById('perfilDesde').textContent = '-';
+        }
+      } catch (e) {
+        // Fallback silencioso - dados do sessionStorage ja estao exibidos
+        document.getElementById('perfilDesde').textContent = '-';
+      }
+    }
+
+    function formatarRole(role) {
+      var roles = {
+        'superuser': '\uD83D\uDD31 Superuser',
+        'admin': '\uD83D\uDC54 Admin',
+        'tecnico': '\uD83D\uDD14 T\u00e9cnico',
+        'estagiario': '\uD83D\uDCDD Estagi\u00e1rio',
+        'user': '\uD83D\uDC64 Usu\u00e1rio',
+        'visualizador': '\uD83D\uDC41\uFE0F Visualizador'
+      };
+      return roles[role] || role;
+    }
+
+    // ========================================
+    // ALTERAR SENHA
+    // ========================================
+    async function alterarSenha(event) {
+      event.preventDefault();
+
+      var senhaAtual = document.getElementById('senhaAtual').value;
+      var novaSenha = document.getElementById('novaSenha').value;
+      var confirmarSenha = document.getElementById('confirmarSenha').value;
+      var userId = sessionStorage.getItem('userId');
+      var userEmail = sessionStorage.getItem('userEmail');
+
+      // Validacoes frontend
+      if (novaSenha !== confirmarSenha) {
+        mostrarAlerta('As senhas n\u00e3o coincidem', 'erro');
+        return;
+      }
+
+      if (novaSenha.length < 6) {
+        mostrarAlerta('A nova senha deve ter no m\u00ednimo 6 caracteres', 'erro');
+        return;
+      }
+
+      if (senhaAtual === novaSenha) {
+        mostrarAlerta('A nova senha deve ser diferente da atual', 'erro');
+        return;
+      }
+
+      if (!userId || !userEmail) {
+        mostrarAlerta('Sess\u00e3o expirada. Fa\u00e7a login novamente.', 'erro');
+        return;
+      }
+
+      // Desabilitar botao
+      var btn = document.getElementById('btnAlterarSenha');
+      btn.disabled = true;
+      btn.textContent = 'Alterando...';
+
+      try {
+        var dados = {
+          action: 'change_password',
+          user_id: userId,
+          caller_email: userEmail,
+          current_password: senhaAtual,
+          new_password: novaSenha
+        };
+
+        var response = await fetch(CONFIG.APPS_SCRIPT_AUTH, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+
+        var resultado = await response.json();
+
+        if (resultado.sucesso) {
+          mostrarAlerta('Senha alterada com sucesso!', 'sucesso');
+          document.getElementById('formAlterarSenha').reset();
+        } else {
+          mostrarAlerta(resultado.mensagem || 'Erro ao alterar senha', 'erro');
+        }
+      } catch (e) {
+        mostrarAlerta('Erro ao conectar com o servidor. Verifique sua internet.', 'erro');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Alterar Senha';
+      }
+    }
+
+    // ========================================
+    // FAQ
+    // ========================================
+    function renderizarFAQ() {
+      var container = document.getElementById('faqContainer');
+      var faq = (typeof CONFIG !== 'undefined' && CONFIG.FAQ) ? CONFIG.FAQ : [];
+      var categorias = (typeof CONFIG !== 'undefined' && CONFIG.FAQ_CATEGORIAS) ? CONFIG.FAQ_CATEGORIAS : [];
+
+      if (faq.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">Nenhuma pergunta disponível.</p>';
+        return;
+      }
+
+      var html = '';
+      categorias.forEach(function (cat) {
+        var perguntas = faq.filter(function (f) { return f.categoria === cat.id; });
+        if (perguntas.length === 0) return;
+
+        html += '<h3 class="text-sm font-bold text-gray-600 uppercase tracking-wide mt-6 mb-3">' + cat.label + '</h3>';
+        perguntas.forEach(function (f) {
+          html += '<details class="faq-item" data-faq-text="' + (f.pergunta + ' ' + f.resposta).toLowerCase() + '">';
+          html += '<summary>' + f.pergunta + '</summary>';
+          html += '<div class="faq-answer">' + f.resposta + '</div>';
+          html += '</details>';
+        });
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filtrarFAQ() {
+      var busca = document.getElementById('buscaAjuda').value.toLowerCase().trim();
+      var items = document.querySelectorAll('.faq-item');
+      items.forEach(function (item) {
+        var texto = item.getAttribute('data-faq-text') || '';
+        item.style.display = (!busca || texto.includes(busca)) ? '' : 'none';
+      });
+    }
+
+    // ========================================
+    // GLOSSÁRIO
+    // ========================================
+    function renderizarGlossario() {
+      var container = document.getElementById('glossarioContainer');
+      var termos = (typeof CONFIG !== 'undefined' && CONFIG.GLOSSARY) ? CONFIG.GLOSSARY : [];
+
+      if (termos.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">Nenhum termo dispon\u00edvel.</p>';
+        return;
+      }
+
+      // Ordenar alfabeticamente
+      termos.sort(function (a, b) { return a.termo.localeCompare(b.termo); });
+
+      var html = '';
+      termos.forEach(function (t) {
+        html += '<div class="glossary-term" data-glossary-text="' + (t.termo + ' ' + t.definicao).toLowerCase() + '">';
+        html += '<strong class="text-blue-700">' + t.termo + '</strong>';
+        html += '<span class="text-gray-500"> \u2014 </span>';
+        html += '<span class="text-gray-600">' + t.definicao + '</span>';
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filtrarGlossario() {
+      var busca = document.getElementById('buscaGlossario').value.toLowerCase().trim();
+      var items = document.querySelectorAll('.glossary-term');
+      items.forEach(function (item) {
+        var texto = item.getAttribute('data-glossary-text') || '';
+        item.style.display = (!busca || texto.includes(busca)) ? '' : 'none';
+      });
+    }
+
+    // ========================================
+    // VÍDEOS
+    // ========================================
+    function renderizarVideos() {
+      renderizarCategoriasFiltro();
+      renderizarVideoGrid();
+    }
+
+    function renderizarCategoriasFiltro() {
+      var container = document.getElementById('videoCategorias');
+      var categorias = (typeof CONFIG !== 'undefined' && CONFIG.VIDEO_CATEGORIAS) ? CONFIG.VIDEO_CATEGORIAS : [];
+
+      var html = '<button class="cat-chip active" onclick="filtrarVideos(\'todos\', this)">Todos</button>';
+      categorias.forEach(function (cat) {
+        html += '<button class="cat-chip" onclick="filtrarVideos(\'' + cat.id + '\', this)">' + cat.icon + ' ' + cat.label + '</button>';
+      });
+      container.innerHTML = html;
+    }
+
+    function renderizarVideoGrid() {
+      var container = document.getElementById('videoGrid');
+      var vazioEl = document.getElementById('videoVazio');
+      var videos = getVideosFiltrados();
+
+      if (videos.length === 0) {
+        container.innerHTML = '';
+        vazioEl.classList.remove('hidden');
+        return;
+      }
+
+      vazioEl.classList.add('hidden');
+
+      var html = '';
+      videos.forEach(function (v) {
+        var thumb = 'https://img.youtube.com/vi/' + v.youtubeId + '/mqdefault.jpg';
+        html += '<div class="video-card" onclick="abrirVideo(\'' + v.youtubeId + '\')">';
+        html += '<div class="video-thumb">';
+        html += '<img src="' + thumb + '" alt="' + v.titulo + '" loading="lazy">';
+        html += '<div class="video-play-icon"></div>';
+        html += '</div>';
+        html += '<div class="p-3">';
+        html += '<h3 class="font-semibold text-gray-800 text-sm mb-1">' + v.titulo + '</h3>';
+        html += '<p class="text-gray-500 text-xs mb-2">' + (v.descricao || '') + '</p>';
+        html += '<span class="text-xs text-blue-600 font-medium">' + (v.duracao || '') + '</span>';
+        html += '</div>';
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    function getVideosFiltrados() {
+      var videos = (typeof CONFIG !== 'undefined' && CONFIG.VIDEOS) ? CONFIG.VIDEOS : [];
+      var userRole = sessionStorage.getItem('userRole') || '';
+
+      // Filtrar por role do usuario
+      videos = videos.filter(function (v) {
+        return !v.roles || v.roles.length === 0 || v.roles.indexOf(userRole) !== -1;
+      });
+
+      // Filtrar por categoria
+      if (currentVideoCategoria !== 'todos') {
+        videos = videos.filter(function (v) { return v.categoria === currentVideoCategoria; });
+      }
+
+      return videos;
+    }
+
+    function filtrarVideos(categoria, btn) {
+      currentVideoCategoria = categoria;
+
+      // Atualizar chips ativos
+      document.querySelectorAll('.cat-chip').forEach(function (c) { c.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+
+      renderizarVideoGrid();
+    }
+
+    function abrirVideo(youtubeId) {
+      var iframe = document.getElementById('videoIframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + youtubeId + '?autoplay=1';
+      document.getElementById('videoModal').classList.add('show');
+    }
+
+    function fecharVideoModal(event) {
+      if (event && event.target !== event.currentTarget && !event.target.classList.contains('close-btn')) return;
+      document.getElementById('videoIframe').src = '';
+      document.getElementById('videoModal').classList.remove('show');
+    }
+
+    // ========================================
+    // TOURS
+    // ========================================
+    function renderizarTours() {
+      var container = document.getElementById('toursContainer');
+      var userRole = sessionStorage.getItem('userRole') || '';
+
+      var tourPages = [
+        { page: 'painel-casos', label: '\uD83D\uDCCA Painel de Casos', roles: ['visualizador', 'estagiario', 'user', 'tecnico', 'admin', 'superuser'] },
+        { page: 'registro-novo-caso', label: '\uD83D\uDCDD Novo Registro', roles: ['estagiario', 'user', 'tecnico', 'superuser'] },
+        { page: 'gerenciar-casos', label: '\uD83D\uDCCB Gerenciar Registros', roles: ['estagiario', 'user', 'superuser'] },
+        { page: 'minhas-notificacoes', label: '\uD83D\uDD14 Notifica\u00e7\u00f5es', roles: ['tecnico', 'superuser'] },
+        { page: 'gerenciar-usuarios', label: '\uD83D\uDD27 Painel Admin', roles: ['admin', 'superuser'] }
+      ];
+
+      var html = '';
+      tourPages.forEach(function (tp) {
+        if (tp.roles.indexOf(userRole) === -1) return;
+
+        html += '<div class="tour-item">';
+        html += '<span class="font-medium text-gray-700">' + tp.label + '</span>';
+        html += '<button onclick="resetarTour(\'' + tp.page + '\')" class="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-lg text-sm transition-all">Reiniciar</button>';
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    function resetarTour(pageName) {
+      var userRole = sessionStorage.getItem('userRole') || '';
+      var storageKey = 'naam_onboarding_' + pageName + '_' + userRole;
+      localStorage.removeItem(storageKey);
+      // Tambem tentar com _default
+      localStorage.removeItem('naam_onboarding_' + pageName + '__default');
+      mostrarAlerta('Tour de "' + pageName + '" reiniciado! Visite a p\u00e1gina para ver o tour.', 'sucesso');
+    }
+
+    function resetarTodosTours() {
+      if (window.NAAMOnboarding && typeof window.NAAMOnboarding.resetAll === 'function') {
+        window.NAAMOnboarding.resetAll();
+      } else {
+        // Fallback manual
+        var keys = Object.keys(localStorage);
+        keys.forEach(function (key) {
+          if (key.startsWith('naam_onboarding_')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      mostrarAlerta('Todos os tours foram reiniciados!', 'sucesso');
+    }
+
+    // ========================================
+    // INFO DO SISTEMA
+    // ========================================
+    function carregarInfoSistema() {
+      var versao = (typeof CONFIG !== 'undefined' && CONFIG.APP_VERSION) ? CONFIG.APP_VERSION : '-';
+      var suporte = (typeof CONFIG !== 'undefined' && CONFIG.SUPPORT_EMAIL) ? CONFIG.SUPPORT_EMAIL : '-';
+
+      document.getElementById('sistemaVersao').textContent = versao;
+      document.getElementById('sistemaSuporteEmail').textContent = suporte;
+    }
+
+    // ========================================
+    // ALERTA
+    // ========================================
+    function mostrarAlerta(mensagem, tipo) {
+      var container = document.getElementById('alertContainer');
+      var bgClass = tipo === 'sucesso'
+        ? 'bg-green-100 border-green-500 text-green-800'
+        : 'bg-red-100 border-red-500 text-red-800';
+      var icon = tipo === 'sucesso' ? '\u2705' : '\u274C';
+
+      container.innerHTML = '<div class="mc-alert p-4 rounded-xl border-l-4 ' + bgClass + ' flex items-center gap-3">' +
+        '<span class="text-lg">' + icon + '</span>' +
+        '<span class="font-medium">' + mensagem + '</span>' +
+        '<button onclick="this.parentElement.remove()" class="ml-auto text-lg font-bold opacity-50 hover:opacity-100">&times;</button>' +
+        '</div>';
+
+      // Auto-dismiss apos 5 segundos
+      setTimeout(function () {
+        var alert = container.querySelector('.mc-alert');
+        if (alert) alert.remove();
+      }, 5000);
+    }
+
+    // ========================================
+    // MENU MOBILE
+    // ========================================
+    function toggleMobileMenu() {
+      var mobileMenu = document.getElementById('mobileMenuNav');
+      var menuIcon = mobileMenu && mobileMenu.previousElementSibling ? mobileMenu.previousElementSibling.querySelector('svg') : null;
+      if (mobileMenu) {
+        mobileMenu.classList.toggle('show');
+        if (menuIcon) {
+          menuIcon.style.transform = mobileMenu.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+      }
+    }
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 768) {
+        var mobileMenu = document.getElementById('mobileMenuNav');
+        if (mobileMenu && mobileMenu.classList.contains('show')) {
+          mobileMenu.classList.remove('show');
+        }
+      }
+    });
+
+    // ESC fecha video modal
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        fecharVideoModal();
+      }
+    });
+  </script>
+</body>
+
+</html>

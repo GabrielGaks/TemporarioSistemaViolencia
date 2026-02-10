@@ -63,14 +63,35 @@
      * @returns {boolean} True se válido
      */
     validateURL: function(url) {
+      console.log('[Security] validateURL chamada com:', url);
+      
       if (!url || typeof url !== 'string') {
+        console.error('[Security] URL não é string ou está vazia');
         return false;
       }
       
       try {
         const urlObj = new URL(url);
-        return ['http:', 'https:'].includes(urlObj.protocol);
+        console.log('[Security] URL parseada:', {
+          protocol: urlObj.protocol,
+          hostname: urlObj.hostname,
+          href: urlObj.href
+        });
+        
+        // Aceita https: e http: (Google Apps Script usa https)
+        // Também aceita domínios do Google
+        const isHTTP = ['http:', 'https:'].includes(urlObj.protocol);
+        const isGoogleDomain = urlObj.hostname.includes('google.com') || urlObj.hostname.includes('googleapis.com');
+        
+        console.log('[Security] Validação:', {
+          isHTTP: isHTTP,
+          isGoogleDomain: isGoogleDomain,
+          resultado: isHTTP && (isGoogleDomain || urlObj.protocol === 'https:')
+        });
+        
+        return isHTTP && (isGoogleDomain || urlObj.protocol === 'https:');
       } catch (e) {
+        console.error('[Security] Erro ao fazer parse da URL:', url, e);
         return false;
       }
     },
@@ -78,9 +99,10 @@
     /**
      * Sanitiza objeto removendo propriedades perigosas
      * @param {Object} obj - Objeto a ser sanitizado
+     * @param {Array<string>} skipKeys - Chaves que não devem ser sanitizadas
      * @returns {Object} Objeto sanitizado
      */
-    sanitizeObject: function(obj) {
+    sanitizeObject: function(obj, skipKeys = []) {
       if (!obj || typeof obj !== 'object') {
         return {};
       }
@@ -93,9 +115,10 @@
           const value = obj[key];
           
           if (typeof value === 'string') {
-            sanitized[key] = this.sanitizeString(value);
+            // Se a chave está na lista de skip, não sanitiza
+            sanitized[key] = skipKeys.includes(key) ? value : this.sanitizeString(value);
           } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            sanitized[key] = this.sanitizeObject(value);
+            sanitized[key] = this.sanitizeObject(value, skipKeys);
           } else if (Array.isArray(value)) {
             sanitized[key] = value.map(item => 
               typeof item === 'string' ? this.sanitizeString(item) : item
