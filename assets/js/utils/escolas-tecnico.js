@@ -200,6 +200,39 @@ window.NAVMEscolasTecnico = (function () {
       .replace(/[\u0300-\u036f]/g, '');
   }
 
+  function normalizarEscola(escola) {
+    if (!escola) return null;
+
+    const nomeOriginal = escola.nomeOriginal || escola.school_name || '';
+    const tipo = escola.tipo || escola.school_type || '';
+
+    return {
+      ...escola,
+      nomeOriginal,
+      tipo,
+      regiao: escola.regiao || escola.school_region || '',
+      sigla: escola.sigla || escola.school_sigla || '',
+      ti: escola.ti === true || escola.TI === true,
+      eja: escola.eja === true || escola.EJA === true
+    };
+  }
+
+  function normalizarListaEscolas(escolas) {
+    if (!Array.isArray(escolas)) return [];
+    return escolas.map(normalizarEscola).filter(Boolean);
+  }
+
+  function normalizarMapaEscolasPorTecnico(mapa) {
+    if (!mapa || typeof mapa !== 'object') return {};
+
+    const normalizado = {};
+    Object.keys(mapa).forEach(chave => {
+      normalizado[chave] = normalizarListaEscolas(mapa[chave]);
+    });
+
+    return normalizado;
+  }
+
   /**
    * Identifica o técnico pelo nome diretamente
    * @param {string} nome - Nome do usuário (ex: "Darison")
@@ -294,7 +327,11 @@ window.NAVMEscolasTecnico = (function () {
    * @returns {Array} Array de escolas filtradas
    */
   async function getEscolasUsuario(emailOuNome, role, verTodas = false, nome = null) {
-    const sortEscolas = (arr) => [...arr].sort((a, b) => a.nomeOriginal.localeCompare(b.nomeOriginal));
+    const sortEscolas = (arr) => [...arr].sort((a, b) => {
+      const nomeA = (a && a.nomeOriginal) ? a.nomeOriginal : '';
+      const nomeB = (b && b.nomeOriginal) ? b.nomeOriginal : '';
+      return nomeA.localeCompare(nomeB);
+    });
 
     // Helper: retorna todas escolas do DB, aguardando cache se necessario
     async function getTodasEscolas() {
@@ -454,6 +491,22 @@ window.NAVMEscolasTecnico = (function () {
     if (!nomeEscola) return null;
 
     const nomeNorm = normalizar(nomeEscola);
+
+    // Prioriza dados do DB/cache se disponíveis
+    if (todasEscolasDB && todasEscolasDB.length > 0) {
+      for (const escola of todasEscolasDB) {
+        if (normalizar(escola.nomeOriginal) === nomeNorm) {
+          return escola.regiao || null;
+        }
+      }
+
+      for (const escola of todasEscolasDB) {
+        const escolaNorm = normalizar(escola.nomeOriginal);
+        if (escolaNorm.includes(nomeNorm) || nomeNorm.includes(escolaNorm)) {
+          return escola.regiao || null;
+        }
+      }
+    }
 
     // Busca exata primeiro
     for (const escola of TODAS_ESCOLAS) {
@@ -898,16 +951,16 @@ window.NAVMEscolasTecnico = (function () {
         const resultado = await response.json();
 
         if (resultado.sucesso && resultado.data) {
-          escolasPorTecnicoDB = resultado.data;
-          todasEscolasDB = resultado.todasEscolas || null;
+          escolasPorTecnicoDB = normalizarMapaEscolasPorTecnico(resultado.data);
+          todasEscolasDB = normalizarListaEscolas(resultado.todasEscolas || []);
           cacheCarregado = true;
           usandoFallback = false;
 
           // Salva backup no localStorage
           try {
             localStorage.setItem('cache_escolas_tecnico', JSON.stringify({
-              data: resultado.data,
-              todasEscolas: resultado.todasEscolas || [],
+              data: escolasPorTecnicoDB,
+              todasEscolas: todasEscolasDB,
               timestamp: Date.now()
             }));
           } catch (e) {
@@ -939,8 +992,8 @@ window.NAVMEscolasTecnico = (function () {
         const idade = Date.now() - backup.timestamp;
 
         if (idade < maxIdade) {
-          escolasPorTecnicoDB = backup.data;
-          todasEscolasDB = backup.todasEscolas || null;
+          escolasPorTecnicoDB = normalizarMapaEscolasPorTecnico(backup.data);
+          todasEscolasDB = normalizarListaEscolas(backup.todasEscolas || []);
           cacheCarregado = true;
           usandoFallback = false;
           const horasIdade = Math.floor(idade / 3600000);
@@ -972,7 +1025,7 @@ window.NAVMEscolasTecnico = (function () {
       nomeTecnico.toLowerCase().includes(k.toLowerCase())
     );
 
-    return chave ? escolasPorTecnicoDB[chave] : null;
+    return chave ? normalizarListaEscolas(escolasPorTecnicoDB[chave]) : null;
   }
 
   /**
