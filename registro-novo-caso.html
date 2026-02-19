@@ -4556,14 +4556,19 @@
         cmeiEmefInput.disabled = false;
         cmeiEmefInput.placeholder = 'Digite para buscar...';
         cmeiEmefInput.value = '';
-        cmeiEmefInput.focus();
 
-        // Filtra instituições pelo tipo (usa sistema de escolas por técnico se disponível)
+        // Filtra instituições pelo tipo ANTES do focus (senão focus vê lista vazia)
         instituicoesFiltradas = getInstituicoesFiltradas(tipoSelecionado);
         console.log('[Escolas] Tipo selecionado:', tipoSelecionado, '| Instituições:', instituicoesFiltradas.length);
 
         // Atualiza indicador com quantidade filtrada por tipo
         atualizarIndicadorFiltro();
+
+        // Agora faz focus e mostra a lista (instituicoesFiltradas ja esta populado)
+        cmeiEmefInput.focus();
+        if (instituicoesFiltradas.length > 0) {
+          renderizarSugestoes(instituicoesFiltradas);
+        }
 
         // Limpa região ao trocar tipo
         const regiaoDisplay = document.getElementById('regiao-display');
@@ -4703,19 +4708,17 @@
         return;
       }
 
-      // Cabeçalho informativo quando mostrar muitas escolas
-      const MAX_EXIBIR = 50;
+      // Mostra todas as escolas, sem limite de exibicao
       const totalResultados = resultados.length;
-      const resultadosExibir = resultados.slice(0, MAX_EXIBIR);
 
       if (totalResultados > 5) {
         const header = document.createElement('div');
         header.className = 'autocomplete-header text-xs text-gray-500 px-3 py-2 bg-gray-50 border-b';
-        header.innerHTML = `📋 ${totalResultados} escola${totalResultados > 1 ? 's' : ''} disponíve${totalResultados > 1 ? 'is' : 'l'}${totalResultados > MAX_EXIBIR ? ` (mostrando ${MAX_EXIBIR})` : ''} - digite para filtrar`;
+        header.innerHTML = `📋 ${totalResultados} escola${totalResultados > 1 ? 's' : ''} disponíve${totalResultados > 1 ? 'is' : 'l'} - digite para filtrar`;
         autocompleteList.appendChild(header);
       }
 
-      resultadosExibir.forEach((inst, index) => {
+      resultados.forEach((inst, index) => {
         const item = document.createElement('div');
         item.className = 'autocomplete-item';
 
@@ -4770,22 +4773,26 @@
       cmeiEmefInput.classList.remove('field-error');
 
       // ====== AUTO-PREENCHIMENTO DE REGIÃO ======
-      // Busca a região da escola usando o módulo NAVMEscolasTecnico
-      if (window.NAVMEscolasTecnico) {
-        const regiao = window.NAVMEscolasTecnico.getRegiaoEscola(inst.nomeOriginal);
-        const regiaoDisplay = document.getElementById('regiao-display');
-        const regiaoHidden = document.getElementById('regiao');
+      // Prioriza a região que vem do banco de dados (inst.regiao = school_region)
+      let regiao = inst.regiao || '';
 
-        if (regiao) {
-          if (regiaoDisplay) regiaoDisplay.value = regiao;
-          if (regiaoHidden) regiaoHidden.value = regiao;
-          console.log('[Escolas] Região preenchida automaticamente:', regiao);
-        } else {
-          // Se não encontrar região, limpa os campos
-          if (regiaoDisplay) regiaoDisplay.value = '';
-          if (regiaoHidden) regiaoHidden.value = '';
-          console.warn('[Escolas] Região não encontrada para:', inst.nomeOriginal);
-        }
+      // Fallback: busca região via módulo caso inst.regiao esteja vazio
+      if (!regiao && window.NAVMEscolasTecnico) {
+        regiao = window.NAVMEscolasTecnico.getRegiaoEscola(inst.nomeOriginal) || '';
+        if (regiao) console.log('[Escolas] Região obtida via fallback (getRegiaoEscola):', regiao);
+      }
+
+      const regiaoDisplay = document.getElementById('regiao-display');
+      const regiaoHidden = document.getElementById('regiao');
+
+      if (regiao) {
+        if (regiaoDisplay) regiaoDisplay.value = regiao;
+        if (regiaoHidden) regiaoHidden.value = regiao;
+        console.log('[Escolas] Região preenchida do banco de dados:', regiao);
+      } else {
+        if (regiaoDisplay) regiaoDisplay.value = '';
+        if (regiaoHidden) regiaoHidden.value = '';
+        console.warn('[Escolas] Região não encontrada para:', inst.nomeOriginal);
       }
     }
 
@@ -4812,23 +4819,65 @@
     /**
      * Inicializa o sistema de filtro de escolas por técnico
      */
-    function inicializarFiltroEscolas() {
+    /**
+     * Mostra/atualiza indicador de status do carregamento de escolas
+     */
+    function mostrarStatusEscolas(mensagem, tipo) {
+      let statusEl = document.getElementById('status-carregamento-escolas');
+      if (!statusEl) {
+        // Cria o elemento na primeira vez, inserido abaixo do autocomplete-wrapper
+        const wrapper = document.querySelector('.autocomplete-wrapper');
+        if (!wrapper) return;
+        statusEl = document.createElement('div');
+        statusEl.id = 'status-carregamento-escolas';
+        statusEl.className = 'mt-1.5 text-xs flex items-center gap-1.5 transition-all duration-300';
+        wrapper.parentNode.insertBefore(statusEl, wrapper.nextSibling);
+      }
+
+      if (tipo === 'loading') {
+        statusEl.className = 'mt-1.5 text-xs flex items-center gap-1.5 transition-all duration-300 text-blue-600';
+        statusEl.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></span>' + mensagem;
+        statusEl.style.opacity = '1';
+      } else if (tipo === 'success') {
+        statusEl.className = 'mt-1.5 text-xs flex items-center gap-1.5 transition-all duration-300 text-green-600';
+        statusEl.innerHTML = '<span>&#10003;</span> ' + mensagem;
+        statusEl.style.opacity = '1';
+        setTimeout(() => { statusEl.style.opacity = '0'; }, 4000);
+      } else if (tipo === 'error') {
+        statusEl.className = 'mt-1.5 text-xs flex items-center gap-1.5 transition-all duration-300 text-amber-600';
+        statusEl.innerHTML = '<span>&#9888;</span> ' + mensagem;
+        statusEl.style.opacity = '1';
+        setTimeout(() => { statusEl.style.opacity = '0'; }, 6000);
+      }
+    }
+
+    async function inicializarFiltroEscolas() {
       const userEmail = sessionStorage.getItem('userEmail');
       const userRole = sessionStorage.getItem('userRole');
-      const userName = sessionStorage.getItem('userName'); // PRIORIDADE: usar nome do usuário
+      const userName = sessionStorage.getItem('userName'); // PRIORIDADE: usar nome do usuario
 
       console.log('[Escolas] Inicializando filtro de escolas...');
       console.log('[Escolas] Nome:', userName, '| Email:', userEmail, '| Role:', userRole);
 
-      // Verifica se o módulo está disponível
+      // Verifica se o modulo esta disponivel
       if (!window.NAVMEscolasTecnico) {
-        console.warn('[Escolas] Módulo NAVMEscolasTecnico não carregado. Usando lista padrão.');
+        console.warn('[Escolas] Modulo NAVMEscolasTecnico nao carregado. Usando lista padrao.');
         return;
       }
 
-      // Carrega escolas do usuário - PRIORIZA NOME sobre EMAIL
-      escolasDisponiveis = window.NAVMEscolasTecnico.getEscolasUsuario(userEmail, userRole, mostrandoTodasEscolas, userName);
-      console.log('[Escolas] Total de escolas disponíveis:', escolasDisponiveis.length);
+      // Feedback visual: carregando
+      mostrarStatusEscolas('Carregando escolas...', 'loading');
+
+      // Carrega escolas do usuario (agora async) - PRIORIZA NOME sobre EMAIL
+      escolasDisponiveis = await window.NAVMEscolasTecnico.getEscolasUsuario(userEmail, userRole, mostrandoTodasEscolas, userName);
+      console.log('[Escolas] Total de escolas disponiveis:', escolasDisponiveis.length);
+
+      // Feedback visual: resultado
+      if (escolasDisponiveis.length > 0) {
+        mostrarStatusEscolas(escolasDisponiveis.length + ' escolas carregadas', 'success');
+      } else {
+        mostrarStatusEscolas('Nenhuma escola encontrada', 'error');
+      }
 
       // Verifica se é técnico para mostrar botão "Ver Todas"
       const isTecnico = userRole === 'tecnico';
@@ -4862,20 +4911,36 @@
       if (btnVerTodas) {
         btnVerTodas.addEventListener('click', toggleVerTodasEscolas);
       }
+
+      // Se um tipo ja estava selecionado (ex: rascunho restaurado antes do async),
+      // re-popula a lista de instituicoes agora que escolasDisponiveis esta carregado
+      const tipoAtual = tipoInstituicaoSelect ? tipoInstituicaoSelect.value : '';
+      if (tipoAtual && escolasDisponiveis.length > 0) {
+        tipoSelecionado = tipoAtual;
+        instituicoesFiltradas = getInstituicoesFiltradas(tipoAtual);
+        console.log(`[Escolas] Re-sync pos-load: tipo="${tipoAtual}", ${instituicoesFiltradas.length} instituicoes`);
+        atualizarIndicadorFiltro();
+      }
     }
 
     /**
      * Alterna entre ver todas as escolas e apenas as do técnico
      */
-    function toggleVerTodasEscolas() {
+    async function toggleVerTodasEscolas() {
       mostrandoTodasEscolas = !mostrandoTodasEscolas;
 
       const userEmail = sessionStorage.getItem('userEmail');
       const userRole = sessionStorage.getItem('userRole');
-      const userName = sessionStorage.getItem('userName'); // Usa nome do usuário
+      const userName = sessionStorage.getItem('userName'); // Usa nome do usuario
 
-      // Recarrega escolas com o novo estado - PRIORIZA NOME sobre EMAIL
-      escolasDisponiveis = window.NAVMEscolasTecnico.getEscolasUsuario(userEmail, userRole, mostrandoTodasEscolas, userName);
+      // Feedback visual
+      mostrarStatusEscolas(mostrandoTodasEscolas ? 'Carregando todas as escolas...' : 'Carregando suas escolas...', 'loading');
+
+      // Recarrega escolas com o novo estado (agora async) - PRIORIZA NOME sobre EMAIL
+      escolasDisponiveis = await window.NAVMEscolasTecnico.getEscolasUsuario(userEmail, userRole, mostrandoTodasEscolas, userName);
+
+      // Feedback visual: resultado
+      mostrarStatusEscolas(escolasDisponiveis.length + ' escolas ' + (mostrandoTodasEscolas ? 'totais' : 'atribuidas'), 'success');
 
       // Atualiza UI do botão
       const btnTexto = document.getElementById('btnVerTodasText');
@@ -4944,18 +5009,10 @@
       let escolasFiltradas;
 
       if (!window.NAVMEscolasTecnico) {
-        // Fallback para lista local se módulo não estiver disponível
+        // Fallback para lista local se modulo nao estiver disponivel
         escolasFiltradas = instituicoes.filter(inst => inst.tipo === tipo);
-      } else if (escolasDisponiveis.length === 0) {
-        // Se escolasDisponiveis não foi inicializado, busca do módulo diretamente
-        const userEmail = sessionStorage.getItem('userEmail');
-        const userRole = sessionStorage.getItem('userRole');
-        const userName = sessionStorage.getItem('userName'); // PRIORIZA NOME
-        escolasDisponiveis = window.NAVMEscolasTecnico.getEscolasUsuario(userEmail, userRole, mostrandoTodasEscolas, userName);
-        escolasFiltradas = escolasDisponiveis.filter(inst => inst.tipo === tipo);
-        console.log('[Escolas] Carregadas sob demanda:', escolasDisponiveis.length, 'escolas');
       } else {
-        // Filtra escolas disponíveis pelo tipo
+        // Filtra escolas disponiveis pelo tipo (ja carregadas via async inicializarFiltroEscolas)
         escolasFiltradas = escolasDisponiveis.filter(inst => inst.tipo === tipo);
       }
 

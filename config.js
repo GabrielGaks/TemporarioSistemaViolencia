@@ -43,7 +43,7 @@ const CONFIG = {
       return window.CONFIG_LOCAL.APPS_SCRIPT_AUTH;
     }
     // Valor padrão (substitua em produção)
-    return 'https://script.google.com/macros/s/AKfycbz_me5BGoNrycd43urfq43NOQw1n9qne4-97xl2t6tQ9ULr16-JvqvmQX3YDpH7pNhc/exec';
+    return 'https://script.google.com/macros/s/AKfycbwWlfky0mso6bOdYBvTS0wsOgk29dWGJeZc2D-_kZWMFZsQbgm8uf7DURoyzGC3ZypD/exec';
   })()),
 
   // URL para CASOS (Cadastro, Edição e Listagem de Casos)
@@ -217,6 +217,16 @@ const CONFIG = {
     WARNING: '#f59e0b',      // Amarelo aviso
     INFO: '#06b6d4'          // Ciano informação
   },
+
+  // ========================================
+  // FEATURE FLAGS - Sistema de Escolas
+  // ========================================
+  // Permite usar dados hardcoded se API falhar (true = modo compatibilidade)
+  USE_HARDCODED_SCHOOLS: true,
+  // Numero maximo de tentativas para carregar cache do Supabase
+  CACHE_MAX_RETRIES: 3,
+  // Idade maxima do backup local em ms (24 horas)
+  CACHE_MAX_AGE: 86400000,
 
   // ========================================
   // DEBUG

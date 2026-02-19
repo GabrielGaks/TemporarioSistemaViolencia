@@ -1,252 +1,298 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Sistema de Registro</title>
-  
+
   <!-- Esconde conteúdo IMEDIATAMENTE para evitar flash -->
   <style>
     html:not(.page-ready) {
       opacity: 0 !important;
       visibility: hidden !important;
     }
+
     html.page-ready {
       opacity: 1 !important;
       visibility: visible !important;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
   </style>
-  
+
   <!-- TailwindCSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- Estilos Elegantes Compartilhados -->
   <link rel="stylesheet" href="assets/css/styles-elegant.css">
-  
+
   <!-- Configuração Centralizada (DEVE VIR ANTES DOS SCRIPTS QUE USAM CONFIG) -->
   <script src="config.js"></script>
   <script src="assets/js/utils/config-loader.js"></script>
-  
+
   <!-- Sistema de Cache e Pré-carregamento -->
   <script src="assets/js/utils/data-cache.js"></script>
   <script src="assets/js/utils/data-preloader.js"></script>
-  
+
   <!-- Sistema de Transições entre Páginas -->
   <script src="assets/js/utils/page-transitions.js"></script>
-  
+
   <!-- Sistema de Loading Indicator Elegante -->
   <script src="assets/js/utils/loading-indicator.js"></script>
-  
+
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* Animações */
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
+    body {
+      font-family: 'Inter', sans-serif;
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
       }
-      to {
-        opacity: 1;
-        transform: scale(1);
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
       }
     }
-    
-    @keyframes slideDown {
+
+    /* Input Styles */
+    .input-group {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9CA3AF;
+      /* gray-400 */
+      transition: color 0.2s ease;
+      pointer-events: none;
+    }
+
+    .modern-input {
+      padding-left: 3rem;
+      /* Space for icon */
+      padding-right: 1rem;
+      padding-top: 1.5rem;
+      padding-bottom: 0.5rem;
+      transition: all 0.2s ease-in-out;
+      background-color: #F9FAFB;
+      /* gray-50 */
+    }
+
+    .modern-input:focus {
+      background-color: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      /* blue-500 with opacity */
+    }
+
+    .modern-input:focus+.input-icon {
+      color: #3B82F6;
+      /* blue-500 */
+    }
+
+    /* Floating Label mimic */
+    .input-label {
+      position: absolute;
+      left: 3rem;
+      top: 1rem;
+      font-size: 0.875rem;
+      color: #6B7280;
+      /* gray-500 */
+      pointer-events: none;
+      transition: all 0.2s ease;
+      transform-origin: left top;
+    }
+
+    .modern-input:focus~.input-label,
+    .modern-input:not(:placeholder-shown)~.input-label {
+      transform: translateY(-0.6rem) scale(0.85);
+      color: #3B82F6;
+      font-weight: 500;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: #374151;
+    }
+
+    /* Button Animation */
+    .btn-animated {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-animated:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-animated:active {
+      transform: translateY(0);
+    }
+
+    /* Loading Spinner */
+    .spinner-border {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 2px solid #fff;
+      width: 1.25rem;
+      height: 1.25rem;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Smooth alerts */
+    .alert-enter {
+      animation: slideDownFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideDownFade {
       from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .card-login {
-      animation: fadeInScale 0.4s ease-out;
-    }
-    
-    .alert {
-      animation: slideDown 0.3s ease-out;
-    }
-    
-    /* Loading spinner */
-    .spinner {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #3b82f6;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    
-    /* Botão toggle senha */
-    .password-toggle {
-      cursor: pointer;
-      user-select: none;
-    }
-    
-    /* Efeito de pulso no botão */
-    @keyframes pulse-subtle {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.8;
-      }
-    }
-    
-    .btn-loading {
-      animation: pulse-subtle 1.5s ease-in-out infinite;
-    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen flex items-center justify-center py-10 px-4">
-  
-  <!-- Container Principal -->
-  <div class="w-full max-w-lg">
-    
-    <!-- Cabeçalho -->
-    <div class="bg-gradient-to-r from-white to-blue-50/30 rounded-xl sm:rounded-2xl shadow-xl border border-white/60 backdrop-blur-sm p-6 sm:p-8 mb-6 sm:mb-8">
-      <div class="flex flex-col items-center justify-center gap-3 sm:gap-4 mb-3">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 sm:p-5 rounded-xl sm:rounded-2xl shadow-lg">
-          <span class="text-5xl sm:text-6xl">👤</span>
-        </div>
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 text-center">
-          Bem-vindo
-        </h1>
+
+<body
+  class="bg-gray-100 min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-blue-100 selection:text-blue-900">
+
+  <!-- Main Card Container -->
+  <div
+    class="w-full max-w-[420px] bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 transition-all duration-300">
+
+    <!-- Header Section -->
+    <div class="px-8 pt-10 pb-6 text-center">
+      <div
+        class="mx-auto w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-blue-100">
+        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+          </path>
+        </svg>
       </div>
-      <div class="flex flex-col items-center gap-2">
-        <p class="text-gray-600 text-center text-sm sm:text-base max-w-md">
-          Sistema de Registro de Violência Escolar
-        </p>
-        <p class="text-gray-500 text-center text-xs sm:text-sm">
-          Faça login para acessar o sistema
-        </p>
-      </div>
+
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight mb-2">Sistema de Registro</h1>
+      <p class="text-sm text-gray-500 font-medium">Acesso restrito a usuários autorizados</p>
     </div>
-    
-    <!-- Área de Alertas -->
-    <div id="alertContainer" class="mb-4"></div>
-    
-    <!-- Card de Login -->
-    <div class="card-login bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/50 p-6 sm:p-8">
-      
-      
-      <!-- Formulário de Login -->
-      <form id="loginForm" onsubmit="return realizarLogin(event)" class="space-y-6">
-        
-        <div class="text-center mb-6">
-          <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-            Entrar no Sistema
-          </h2>
-          <div class="h-1 w-20 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full mx-auto"></div>
+
+    <!-- Alert Area -->
+    <div id="alertContainer" class="px-8"></div>
+
+    <!-- Form Section -->
+    <div class="px-8 pb-10">
+      <form id="loginForm" onsubmit="return realizarLogin(event)" class="space-y-5">
+
+        <!-- Email Input -->
+        <div class="input-group">
+          <input type="email" id="email" name="email" required placeholder=" " autocomplete="email"
+            class="peer modern-input w-full border-gray-200 rounded-xl text-gray-900 text-sm focus:border-blue-500 outline-none">
+          <label for="email" class="input-label bg-transparent">E-mail institucional</label>
+          <svg class="input-icon w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+            </path>
+          </svg>
         </div>
-        
-        <!-- Campo E-mail -->
-        <div>
-          <label for="email" class="block text-sm font-bold text-gray-700 mb-2">
-            📧 E-mail <span class="text-red-500">*</span>
-          </label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email"
-            required
-            placeholder="seu@email.com"
-            autocomplete="email"
-            class="input-elegant w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-            aria-label="Campo de e-mail">
-        </div>
-        
-        <!-- Campo Senha -->
-        <div>
-          <label for="password" class="block text-sm font-bold text-gray-700 mb-2">
-            🔒 Senha <span class="text-red-500">*</span>
-          </label>
-          <div class="relative">
-            <input 
-              type="password" 
-              id="password" 
-              name="password"
-              required
-              placeholder="Digite sua senha"
-              autocomplete="current-password"
-              class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
-              aria-label="Campo de senha">
-            <button 
-              type="button"
-              onclick="toggleMostrarSenha()"
-              class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-100"
-              aria-label="Mostrar/ocultar senha"
-              tabindex="-1">
-              <span id="iconeSenha" class="text-xl">👁️</span>
-            </button>
+
+        <!-- Password Input -->
+        <div class="input-group">
+          <input type="password" id="password" name="password" required placeholder=" " autocomplete="current-password"
+            class="peer modern-input w-full border-gray-200 rounded-xl text-gray-900 text-sm focus:border-blue-500 outline-none pr-10">
+          <label for="password" class="input-label bg-transparent">Sua senha</label>
+          <svg class="input-icon w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+            </path>
+          </svg>
+
+          <div class="password-toggle" onclick="toggleMostrarSenha()" role="button" tabindex="0">
+            <span id="iconeSenhaIcon" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                </path>
+              </svg>
+            </span>
           </div>
         </div>
-        
-        <!-- Checkbox Mostrar Senha -->
-        <div class="flex items-center">
-          <input 
-            type="checkbox" 
-            id="checkMostrarSenha"
-            onchange="toggleMostrarSenhaCheckbox()"
-            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-          <label for="checkMostrarSenha" class="ml-2 text-sm text-gray-700 cursor-pointer select-none hover:text-gray-900">
-            Mostrar senha
-          </label>
+
+        <!-- Action Buttons -->
+        <div class="pt-2">
+          <button type="submit" id="btnEntrar"
+            class="btn-animated group w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md">
+            <span id="btnIcon" class="mr-2">Entrar</span>
+            <span id="loadingSpinner" class="spinner-border hidden"></span>
+          </button>
         </div>
-        
-        <!-- Botão Entrar -->
-        <button 
-          type="submit"
-          id="btnEntrar"
-          class="btn-elegant btn-primary-elegant w-full text-white font-bold py-3 sm:py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-2"
-          aria-label="Entrar no sistema">
-          <span class="text-lg">🔓</span>
-          <span id="btnTexto">Entrar</span>
-        </button>
-        
-        <!-- Link para recuperar senha -->
-        <div class="text-center mt-4">
-          <a href="recuperar-senha.html" class="text-sm text-blue-600 hover:text-blue-700 hover:underline transition-colors">
-            🔑 Esqueci minha senha
+
+        <div class="text-center pt-2">
+          <a href="recuperar-senha.html"
+            class="text-xs font-medium text-gray-500 hover:text-blue-600 transition-colors">
+            Esqueceu sua senha?
           </a>
         </div>
-        
+
       </form>
-      
-      <!-- Informações Adicionais -->
-      <div class="mt-6 pt-6 border-t border-gray-200">
-        <p class="text-xs text-center text-gray-500">
-          🔒 Acesso restrito a usuários autorizados
-        </p>
-      </div>
-      
     </div>
-    
-    <!-- Rodapé -->
-    <div class="text-center mt-6 sm:mt-8">
-      <div class="inline-block bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-md border border-white/60 px-4 sm:px-6 py-3 sm:py-4">
-        <p class="text-xs sm:text-sm text-gray-600">
-          <span class="font-semibold text-blue-700">Sistema de Registro de Violência Escolar</span>
-          <span class="mx-2 hidden sm:inline">•</span>
-          <br class="sm:hidden">
-          <span class="text-gray-500">v1.0</span>
-        </p>
-      </div>
+
+    <!-- Footer Section (Inside Card) -->
+    <div class="bg-gray-50 px-8 py-4 border-t border-gray-100 flex justify-center">
+      <p class="text-[0.7rem] text-gray-400 uppercase tracking-wider font-semibold">
+        Segurança e Monitoramento Escolar
+      </p>
     </div>
-    
   </div>
-  
+
+  <!-- External Footer (Discreet) -->
+  <div class="mt-8 text-center">
+    <p class="text-xs text-slate-400">
+      &copy; 2024 Secretaria de Educação. v1.0
+    </p>
+  </div>
+
   <!-- Hidden iframe para envio de dados (evita CORS) -->
   <iframe id="hidden_iframe" name="hidden_iframe" style="display:none;"></iframe>
-  
+
   <!-- =============================================== -->
   <!-- JAVASCRIPT -->
   <!-- =============================================== -->
@@ -256,7 +302,7 @@
     // ========================================
     // Aguarda o CONFIG estar disponível
     let APPS_SCRIPT_URL;
-    
+
     if (typeof CONFIG !== 'undefined' && CONFIG.APPS_SCRIPT_AUTH) {
       APPS_SCRIPT_URL = CONFIG.APPS_SCRIPT_AUTH;
       console.log('✅ Usando APPS_SCRIPT_AUTH do config.js:', APPS_SCRIPT_URL.substring(0, 50) + '...');
@@ -265,136 +311,156 @@
       APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUXV0q7XBz8Tdt4RuU7Qt-eSBrtOjM3ZyOpS905B2Qplp0_w0qsPBzebqVq4qi5_o/exec';
       console.warn('⚠️ CONFIG não encontrado, usando URL padrão');
     }
-    
+
     // Validação: Verifica se está configurado
     if (APPS_SCRIPT_URL.includes('SEU_ID_AQUI')) {
       console.error('❌ ERRO: Configure APPS_SCRIPT_AUTH em config.js para usar o sistema de login');
     }
-    
+
     // ========================================
     // FUNÇÕES DE ALERTA
     // ========================================
     function mostrarAlerta(mensagem, tipo) {
       const container = document.getElementById('alertContainer');
-      
+
       // Remove alertas anteriores
       container.innerHTML = '';
-      
+
       const alertDiv = document.createElement('div');
-      
+
       const cores = {
-        sucesso: 'from-green-500 to-green-600',
-        erro: 'from-red-500 to-red-600',
-        aviso: 'from-yellow-500 to-yellow-600',
-        info: 'from-blue-500 to-blue-600'
+        sucesso: 'bg-green-50 text-green-700 border-green-200',
+        erro: 'bg-red-50 text-red-700 border-red-200',
+        aviso: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+        info: 'bg-blue-50 text-blue-700 border-blue-200'
       };
-      
-      const icones = {
-        sucesso: '✅',
-        erro: '❌',
-        aviso: '⚠️',
-        info: 'ℹ️'
+
+      const icons = {
+        sucesso: '<svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+        erro: '<svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>',
+        aviso: '<svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+        info: '<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>'
       };
-      
-      alertDiv.className = `alert bg-gradient-to-r ${cores[tipo]} text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg flex items-center gap-3`;
+
+      alertDiv.className = `alert-enter mb-4 p-4 rounded-xl border ${cores[tipo]} flex items-start gap-3 shadow-sm`;
       alertDiv.innerHTML = `
-        <span class="text-xl sm:text-2xl">${icones[tipo]}</span>
-        <span class="flex-1 font-medium text-sm sm:text-base">${mensagem}</span>
-        <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-all" aria-label="Fechar alerta">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex-shrink-0 mt-0.5">
+          ${icons[tipo]}
+        </div>
+        <div class="flex-1 text-sm font-medium">
+          ${mensagem}
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       `;
-      
+
       container.appendChild(alertDiv);
-      
+
       // Remove automaticamente após 5 segundos (exceto erros)
       if (tipo !== 'erro') {
         setTimeout(() => {
-          alertDiv.style.transition = 'all 0.3s ease-out';
+          alertDiv.style.transition = 'all 0.5s ease-out';
           alertDiv.style.opacity = '0';
-          alertDiv.style.transform = 'translateY(-20px)';
-          setTimeout(() => alertDiv.remove(), 300);
+          alertDiv.style.transform = 'translateY(-10px)';
+          setTimeout(() => alertDiv.remove(), 500);
         }, 5000);
       }
-      
-      // Scroll suave para o alerta
-      alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    
+
     // ========================================
     // FUNÇÕES DE LOADING
     // ========================================
     function mostrarLoading() {
+      // Usa o loading indicator global se disponível (mas este é apenas visual overlay)
       if (window.loadingIndicator) {
-        window.loadingIndicator.show('Autenticando...');
+        window.loadingIndicator.show('Autenticando acesso...');
       }
+
       const btnEntrar = document.getElementById('btnEntrar');
+      const btnIcon = document.getElementById('btnIcon');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
       if (btnEntrar) {
         btnEntrar.disabled = true;
-        btnEntrar.classList.add('opacity-50', 'cursor-not-allowed');
-        const btnTexto = document.getElementById('btnTexto');
-        if (btnTexto) btnTexto.textContent = 'Aguarde...';
+        btnEntrar.classList.add('cursor-not-allowed', 'opacity-80');
+
+        if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+        if (btnIcon) btnIcon.textContent = 'Verificando...';
       }
     }
-    
+
     function esconderLoading() {
       if (window.loadingIndicator) {
         window.loadingIndicator.hide();
       }
+
       const btnEntrar = document.getElementById('btnEntrar');
+      const btnIcon = document.getElementById('btnIcon');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
       if (btnEntrar) {
         btnEntrar.disabled = false;
-        btnEntrar.classList.remove('opacity-50', 'cursor-not-allowed');
-        const btnTexto = document.getElementById('btnTexto');
-        if (btnTexto) btnTexto.textContent = 'Entrar';
+        btnEntrar.classList.remove('cursor-not-allowed', 'opacity-80');
+
+        if (loadingSpinner) loadingSpinner.classList.add('hidden');
+        if (btnIcon) btnIcon.textContent = 'Entrar';
       }
     }
-    
+
     // ========================================
     // TOGGLE MOSTRAR/OCULTAR SENHA
     // ========================================
     function toggleMostrarSenha() {
       const senhaInput = document.getElementById('password');
-      const icone = document.getElementById('iconeSenha');
-      const checkbox = document.getElementById('checkMostrarSenha');
-      
+      const iconSpan = document.getElementById('iconeSenhaIcon');
+
       if (senhaInput.type === 'password') {
         senhaInput.type = 'text';
-        icone.textContent = '🙈';
-        checkbox.checked = true;
+        // Ícone de "ocultar"
+        iconSpan.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+          </svg>
+        `;
+        iconSpan.classList.add('text-blue-500');
+        iconSpan.classList.remove('text-gray-400');
       } else {
         senhaInput.type = 'password';
-        icone.textContent = '👁️';
-        checkbox.checked = false;
+        // Ícone de "mostrar" (olho normal)
+        iconSpan.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+        `;
+        iconSpan.classList.remove('text-blue-500');
+        iconSpan.classList.add('text-gray-400');
       }
     }
-    
-    function toggleMostrarSenhaCheckbox() {
-      toggleMostrarSenha();
-    }
-    
+
     // ========================================
     // REALIZAR LOGIN
     // ========================================
     async function realizarLogin(event) {
       event.preventDefault();
       event.stopPropagation();
-      
+
       // Coleta dados
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      
+
       // Validação básica
       if (!email || !password) {
         mostrarAlerta('Por favor, preencha todos os campos.', 'erro');
         return false;
       }
-      
+
       // Mostra loading
       mostrarLoading();
-      
+
       try {
         // Prepara dados para envio
         const dados = {
@@ -402,8 +468,7 @@
           email: email,
           password: password
         };
-        
-        // Faz requisição POST simples (sem logs para melhor performance)
+
         console.log('🔄 Enviando requisição para:', APPS_SCRIPT_URL.substring(0, 50) + '...');
         const response = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
@@ -413,117 +478,74 @@
           body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
           redirect: 'follow'
         });
-        
+
         console.log('📥 Resposta recebida, status:', response.status);
-        
-        // Verifica se a resposta é OK
+
         if (!response.ok) {
           throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
         }
-        
-        // Lê a resposta como texto primeiro para debug
+
         const responseText = await response.text();
-        console.log('📄 Resposta (texto):', responseText.substring(0, 200));
-        
-        // Tenta parsear como JSON
+
         let resultado;
         try {
           resultado = JSON.parse(responseText);
         } catch (parseError) {
           console.error('❌ Erro ao parsear JSON:', parseError);
-          console.error('Resposta completa:', responseText);
           throw new Error('Resposta inválida do servidor');
         }
-        
-        // Processa o resultado
-        // Verifica tanto 'sucesso' quanto 'success' (compatibilidade)
+
         const loginSucesso = resultado.sucesso || resultado.success;
-        
+
         if (loginSucesso) {
           // Salva informações do usuário
           const userEmail = resultado.email || email;
           const userRole = resultado.role || 'user';
-          
+
           sessionStorage.setItem('userEmail', userEmail);
           sessionStorage.setItem('userRole', userRole);
           sessionStorage.setItem('userId', resultado.id || '');
           sessionStorage.setItem('userName', resultado.nome || '');
-          
-          // Atualiza mensagem de loading
-          const loadingText = document.querySelector('#loadingIndicator .loading-text');
-          if (loadingText) {
-            loadingText.textContent = 'Carregando dados do sistema...';
-          }
-          
-          // Pré-carrega dados antes de redirecionar
-          console.log('[Login] Iniciando pré-carregamento de dados...');
+
+          // Feedback de sucesso
+          mostrarAlerta('Login realizado com sucesso!', 'sucesso');
+
+          // Pré-carrega dados
           try {
-            await window.DataPreloader.preloadAll(userEmail, userRole);
-            console.log('[Login] ✅ Dados pré-carregados com sucesso');
+            if (window.DataPreloader) {
+              await window.DataPreloader.preloadAll(userEmail, userRole);
+            }
           } catch (error) {
             console.error('[Login] Erro ao pré-carregar dados:', error);
-            // Continua mesmo com erro para não bloquear login
           }
-          
-          // Redireciona TODOS os usuarios para o Painel de Casos
-          // A navegacao por perfil e controlada pelo menu dinamico
+
+          // Redireciona
           window.location.href = 'painel-casos.html';
-          
+
         } else {
           // Login falhou
           esconderLoading();
           const mensagemErro = resultado.mensagem || resultado.message || 'E-mail ou senha incorretos.';
-          
-          // Verifica se é erro de script errado
+
           if (mensagemErro.includes('autenticação') || mensagemErro.includes('APPS_SCRIPT_AUTH')) {
-            mostrarAlerta('❌ Erro de configuração: A URL do script de autenticação está incorreta. Verifique config.js', 'erro');
-            console.error('❌ URL do script de autenticação pode estar apontando para o script errado');
+            mostrarAlerta('Erro de configuração do sistema.', 'erro');
           } else {
             mostrarAlerta(mensagemErro, 'erro');
           }
-          
+
           document.getElementById('password').value = '';
           document.getElementById('password').focus();
         }
-        
+
       } catch (erro) {
         console.error('❌ Erro ao realizar login:', erro);
         esconderLoading();
-        mostrarAlerta('Erro ao conectar com o servidor. Tente novamente.', 'erro');
-        document.getElementById('password').value = '';
+        mostrarAlerta('Erro de conexão. Verifique sua internet.', 'erro');
       }
-      
+
       return false;
     }
-    
-    // ========================================
-    // TECLA ENTER NOS CAMPOS
-    // ========================================
-    document.addEventListener('DOMContentLoaded', function() {
-      // Focus automático no campo de email
-      document.getElementById('email').focus();
-      
-      // Enter nos campos submete o form
-      document.getElementById('email').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          document.getElementById('password').focus();
-        }
-      });
-      
-      document.getElementById('password').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-        }
-      });
-    });
-    
-    // ========================================
-    // PREVINE MÚLTIPLOS SUBMITS
-    // ========================================
-    // A prevenção agora é feita via estado do botão (disabled) na função mostrarLoading()
   </script>
-  
 </body>
+
 </html>

@@ -973,7 +973,7 @@
       toast.innerHTML = `
         <div class="toast-content">
           <span class="toast-icon">✅</span>
-          <span class="toast-text">Tutorial concluído! Use o botão <strong>"Ajuda"</strong> para rever a qualquer momento.</span>
+          <span class="toast-text">Tutorial concluído! Use o botão <strong>"?"</strong> no canto inferior para rever a qualquer momento.</span>
         </div>
       `;
 
@@ -1021,7 +1021,7 @@
     },
 
     /**
-     * Criar botão de ajuda flutuante
+     * Criar botão de ajuda flutuante (minimalista)
      */
     createHelpButton: function (pageName) {
       // Verificar se já existe
@@ -1029,17 +1029,180 @@
         return;
       }
 
+      const self = this;
+
+      // --- FAB Button ---
       const btn = document.createElement('button');
       btn.id = 'btnAjuda';
       btn.className = 'btn-ajuda-flutuante';
-      btn.title = 'Rever tutorial';
-      btn.innerHTML = '<span class="icon">❓</span> <span>Ajuda</span>';
+      btn.title = 'Ajuda desta página';
+      btn.setAttribute('aria-label', 'Ajuda desta página');
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
 
-      btn.addEventListener('click', () => {
-        this.restart(pageName);
+      btn.addEventListener('click', function () {
+        self.openHelpDrawer();
       });
 
       document.body.appendChild(btn);
+
+      // --- Drawer ---
+      this._pageName = pageName;
+      this.createHelpDrawer(pageName);
+    },
+
+    /**
+     * Criar drawer lateral de ajuda
+     */
+    createHelpDrawer: function (pageName) {
+      if (document.getElementById('helpDrawer')) return;
+
+      const self = this;
+
+      // Mapa de nomes amigáveis para cada página
+      const pageLabels = {
+        'painel-casos': 'Painel de Casos',
+        'registro-novo-caso': 'Novo Registro',
+        'gerenciar-casos': 'Gerenciar Casos',
+        'minhas-notificacoes': 'Notificações',
+        'gerenciar-usuarios': 'Gerenciar Usuários',
+        'minha-conta': 'Minha Conta'
+      };
+
+      const pageDescriptions = {
+        'painel-casos': 'O Painel de Casos é o centro de visualização e análise do sistema NAAM. Aqui você pode consultar todos os registros de violência escolar, aplicar filtros avançados, ver gráficos interativos e exportar dados para análise externa.',
+        'registro-novo-caso': 'Nesta página você pode registrar um novo caso de violência escolar, preenchendo informações sobre a vítima, tipo de violência, escola envolvida e detalhes do ocorrido.',
+        'gerenciar-casos': 'Aqui você pode editar ou excluir os casos que você registrou no sistema. Use os filtros para localizar rapidamente um registro específico.',
+        'minhas-notificacoes': 'Acompanhe os casos das suas escolas que precisam de atenção. As notificações são agrupadas por criança/adolescente para facilitar o acompanhamento.',
+        'gerenciar-usuarios': 'Gerencie os usuários do sistema — crie, edite perfis e atribua papéis (administrador, técnico, estagiário, visualizador).',
+        'minha-conta': 'Gerencie seu perfil pessoal, altere sua senha e acesse a central de ajuda e tutoriais do sistema.'
+      };
+
+      const pageTips = {
+        'painel-casos': [
+          { icon: '🔍', text: '<strong>Filtros:</strong> Use os filtros no topo para segmentar por escola, período, tipo de violência e região.' },
+          { icon: '📊', text: '<strong>Gráficos:</strong> Clique nas fatias ou barras dos gráficos para filtrar a tabela automaticamente.' },
+          { icon: '👁️', text: '<strong>Detalhes:</strong> Clique no ícone de detalhes em qualquer linha para ver informações completas do caso.' },
+          { icon: '📥', text: '<strong>Exportar:</strong> Use o botão de exportação para baixar os dados filtrados em CSV ou Excel.' },
+          { icon: '📃', text: '<strong>Paginação:</strong> Navegue entre as páginas de registros usando os controles na parte inferior.' }
+        ],
+        'registro-novo-caso': [
+          { icon: '📝', text: '<strong>Campos obrigatórios:</strong> Preencha todos os campos marcados com asterisco (*) antes de enviar.' },
+          { icon: '🏫', text: '<strong>Escola:</strong> Digite o nome da escola para buscar no autocomplete.' },
+          { icon: '📋', text: '<strong>Detalhes:</strong> Seja o mais detalhado possível na descrição do ocorrido.' }
+        ],
+        'gerenciar-casos': [
+          { icon: '✏️', text: '<strong>Editar:</strong> Clique em "Editar" para modificar os dados de um caso existente.' },
+          { icon: '🗑️', text: '<strong>Excluir:</strong> A exclusão é permanente — confirme antes de prosseguir.' }
+        ],
+        '_default': [
+          { icon: '💡', text: '<strong>Dica:</strong> Use o botão "Rever Tutorial" acima para um tour guiado pela página.' },
+          { icon: '❓', text: '<strong>Precisa de mais ajuda?</strong> Acesse a Central de Ajuda em "Minha Conta".' }
+        ]
+      };
+
+      const label = pageLabels[pageName] || 'Sistema NAAM';
+      const description = pageDescriptions[pageName] || 'Explore as funcionalidades desta página usando o tutorial interativo.';
+      const tips = pageTips[pageName] || pageTips['_default'];
+
+      // Backdrop
+      const backdrop = document.createElement('div');
+      backdrop.id = 'helpDrawerBackdrop';
+      backdrop.className = 'help-drawer-backdrop';
+      backdrop.addEventListener('click', function () {
+        self.closeHelpDrawer();
+      });
+
+      // Drawer
+      const drawer = document.createElement('div');
+      drawer.id = 'helpDrawer';
+      drawer.className = 'help-drawer';
+      drawer.setAttribute('role', 'dialog');
+      drawer.setAttribute('aria-label', 'Painel de ajuda');
+
+      // Build tips HTML
+      let tipsHtml = '';
+      tips.forEach(function (tip) {
+        tipsHtml += `
+          <li class="help-drawer-tip">
+            <span class="help-drawer-tip-icon">${tip.icon}</span>
+            <span class="help-drawer-tip-text">${tip.text}</span>
+          </li>`;
+      });
+
+      drawer.innerHTML = `
+        <div class="help-drawer-header">
+          <h2 class="help-drawer-title">Ajuda <span>— ${label}</span></h2>
+          <button class="help-drawer-close" id="helpDrawerClose" aria-label="Fechar painel de ajuda">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="help-drawer-body">
+          <button class="help-drawer-tour-btn" id="helpDrawerTourBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Rever Tutorial Interativo
+          </button>
+
+          <div class="help-drawer-section">
+            <h3 class="help-drawer-section-title">Sobre esta página</h3>
+            <p>${description}</p>
+          </div>
+
+          <div class="help-drawer-section">
+            <h3 class="help-drawer-section-title">Dicas Rápidas</h3>
+            <ul class="help-drawer-tips">
+              ${tipsHtml}
+            </ul>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(drawer);
+
+      // Close button
+      document.getElementById('helpDrawerClose').addEventListener('click', function () {
+        self.closeHelpDrawer();
+      });
+
+      // Tour button
+      document.getElementById('helpDrawerTourBtn').addEventListener('click', function () {
+        self.closeHelpDrawer();
+        setTimeout(function () {
+          self.restart(pageName);
+        }, 350);
+      });
+
+      // Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) {
+          self.closeHelpDrawer();
+        }
+      });
+    },
+
+    /**
+     * Abrir drawer de ajuda
+     */
+    openHelpDrawer: function () {
+      const backdrop = document.getElementById('helpDrawerBackdrop');
+      const drawer = document.getElementById('helpDrawer');
+      if (backdrop) backdrop.classList.add('open');
+      if (drawer) drawer.classList.add('open');
+    },
+
+    /**
+     * Fechar drawer de ajuda
+     */
+    closeHelpDrawer: function () {
+      const backdrop = document.getElementById('helpDrawerBackdrop');
+      const drawer = document.getElementById('helpDrawer');
+      if (drawer) drawer.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
     },
 
     /**

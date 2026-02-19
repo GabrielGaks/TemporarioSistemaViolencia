@@ -989,88 +989,116 @@ function atualizarKPIs() {
     const dataCol = window.columnNames.data || window.columnNames.dataNT;
 
     const totalCasos = window.originalData.length;
-    const kpiTotal = document.getElementById('kpiTotalCasos');
-    if (kpiTotal) kpiTotal.textContent = totalCasos.toLocaleString('pt-BR');
-
     const casosFiltrados = window.filteredData.length;
-    const kpiFiltrados = document.getElementById('kpiCasosFiltrados');
-    if (kpiFiltrados) kpiFiltrados.textContent = casosFiltrados.toLocaleString('pt-BR');
     const percentual = totalCasos > 0 ? ((casosFiltrados / totalCasos) * 100).toFixed(1) : 0;
-    const kpiPercentual = document.getElementById('kpiCasosFiltradosPercentual');
-    if (kpiPercentual) kpiPercentual.textContent = percentual + '% do total';
+
+    // --- KPI 1: Casos em Análise (Foco Principal) ---
+    const kpiTotal = document.getElementById('kpiTotalCasos');
+    const kpiSubtext = document.getElementById('kpiTotalCasosSubtext');
+
+    if (kpiTotal) {
+      kpiTotal.textContent = casosFiltrados.toLocaleString('pt-BR');
+    }
+
+    if (kpiSubtext) {
+      const temFiltroAtivo = casosFiltrados < totalCasos;
+      if (temFiltroAtivo) {
+        kpiSubtext.textContent = 'Resultados filtrados';
+        kpiSubtext.className = 'kpi-subtext-saas font-medium text-amber-600'; // Destaque visual
+      } else {
+        kpiSubtext.textContent = 'Base completa';
+        kpiSubtext.className = 'kpi-subtext-saas font-medium text-blue-600'; // Cor padrão
+      }
+    }
+
+    // --- LINHA 2: Universo Total (Contexto) ---
+    const kpiUniverso = document.getElementById('kpiUniversoTotal');
+    const kpiUniversoPerc = document.getElementById('kpiUniversoPercentual');
+
+    if (kpiUniverso) kpiUniverso.textContent = totalCasos.toLocaleString('pt-BR');
+    if (kpiUniversoPerc) {
+      kpiUniversoPerc.textContent = percentual + '% exibido';
+      // Ajusta cor do badge se for filtrado
+      if (parseFloat(percentual) < 100) {
+        kpiUniversoPerc.className = 'text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-200';
+      } else {
+        kpiUniversoPerc.className = 'text-xs font-medium text-slate-500 bg-slate-200 px-2 py-0.5 rounded border border-slate-300';
+      }
+    }
+
+    // Mantém compatibilidade com elementos antigos se existirem (para evitar erros)
+    const kpiFiltradosOld = document.getElementById('kpiCasosFiltrados');
+    if (kpiFiltradosOld) kpiFiltradosOld.textContent = casosFiltrados.toLocaleString('pt-BR');
+    const kpiPercentualOld = document.getElementById('kpiCasosFiltradosPercentual');
+    if (kpiPercentualOld) kpiPercentualOld.textContent = percentual + '%';
 
     if (escolaCol) {
-      // Usa normalização para agrupar escolas com nomes similares (espaços, maiúsculas, etc)
+      // Usa normalização para agrupar escolas
       const dados = {};
       const mapaNormalizado = {};
-      const debugMap = {}; // Para debug: mostra todas as variações agrupadas
 
       window.filteredData.forEach(row => {
         const escola = row[escolaCol];
         if (escola) {
           const original = String(escola).trim();
-          // Remove espaços extras e caracteres invisíveis
           const cleaned = original.replace(/[\s\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]+/g, ' ').trim();
           const norm = normalizeText(cleaned);
 
           if (norm) {
             dados[norm] = (dados[norm] || 0) + 1;
-
-            // Mantém o nome original mais limpo (sem espaços extras) para exibição
             if (!mapaNormalizado[norm]) {
               mapaNormalizado[norm] = cleaned;
-              debugMap[norm] = [cleaned];
             } else {
-              // Prefere o nome mais curto (sem espaços extras) ou mais completo se tiver mais informação
               const currentLength = mapaNormalizado[norm].replace(/\s+/g, '').length;
               const newLength = cleaned.replace(/\s+/g, '').length;
-
-              // Se o novo nome tem mais conteúdo (ignorando espaços), usa ele
-              // Caso contrário, prefere o mais curto (mais limpo)
               if (newLength > currentLength || (newLength === currentLength && cleaned.length < mapaNormalizado[norm].length)) {
                 mapaNormalizado[norm] = cleaned;
-              }
-
-              // Guarda todas as variações para debug
-              if (!debugMap[norm].includes(cleaned)) {
-                debugMap[norm].push(cleaned);
               }
             }
           }
         }
       });
 
-      // Log para debug (pode remover depois)
-      console.log('🔍 Debug Top 5 Escolas - Agrupamentos:', debugMap);
-      console.log('📊 Contagens normalizadas:', dados);
-
-      // Converte de volta para nomes originais e ordena
       const escolasCount = Object.entries(dados)
         .map(([norm, count]) => [mapaNormalizado[norm] || norm, count])
         .sort((a, b) => {
-          // Ordena por contagem (decrescente), depois por nome (alfabético)
           if (b[1] !== a[1]) return b[1] - a[1];
           return a[0].localeCompare(b[0], 'pt-BR');
         });
-
-      console.log('✅ Top 5 Escolas final:', escolasCount.slice(0, 5));
 
       const topEscola = escolasCount[0];
       if (topEscola) {
         const kpiTopEscola = document.getElementById('kpiTopEscola');
         const kpiTopEscolaCasos = document.getElementById('kpiTopEscolaCasos');
         if (kpiTopEscola) kpiTopEscola.textContent = topEscola[0];
-        if (kpiTopEscolaCasos) kpiTopEscolaCasos.textContent = topEscola[1] + ' casos';
+        if (kpiTopEscolaCasos) kpiTopEscolaCasos.textContent = topEscola[1] + ' casos detectados';
       }
 
+      // Ranking Visual Top 5
       const top5 = escolasCount.slice(0, 5);
+      const maxCasos = top5.length > 0 ? top5[0][1] : 1; // Para calcular a barra de progresso relativa
+
       const top5Html = top5.map(([escola, count], index) => {
-        return '<div class="flex items-center justify-between py-2' + (index < top5.length - 1 ? ' border-b border-gray-200' : '') + '"><div class="flex items-center gap-2"><span class="text-lg font-bold text-gray-400">' + (index + 1) + 'º</span><span class="text-gray-700 font-medium">' + escola + '</span></div><span class="text-lg font-bold text-blue-600">' + count + '</span></div>';
+        const percentage = Math.round((count / maxCasos) * 100);
+        return `
+        <div class="relative group">
+          <div class="flex justify-between items-center mb-1 text-xs">
+            <span class="font-bold text-slate-700 flex items-center gap-2 max-w-[80%]">
+              <span class="w-5 h-5 rounded-full ${index === 0 ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'} flex items-center justify-center text-[10px] font-bold flex-shrink-0">${index + 1}</span>
+              <span class="truncate" title="${escola}">${escola}</span>
+            </span>
+            <span class="font-bold text-slate-800">${count}</span>
+          </div>
+          <div class="w-full bg-slate-50 rounded-full h-1.5 overflow-hidden">
+            <div class="h-1.5 rounded-full transition-all duration-500 ease-out ${index === 0 ? 'bg-amber-500' : 'bg-blue-500'}" style="width: ${percentage}%"></div>
+          </div>
+        </div>
+        `;
       }).join('');
 
       const top5Element = document.getElementById('top5Escolas');
       if (top5Element) {
-        top5Element.innerHTML = top5Html || '<div class="text-gray-400 text-center py-4">Sem dados</div>';
+        top5Element.innerHTML = top5Html || '<div class="text-slate-400 text-center py-4 text-sm">Sem dados suficientes</div>';
       }
     }
 
@@ -1088,52 +1116,33 @@ function atualizarKPIs() {
         const kpiTipo = document.getElementById('kpiTipoFrequente');
         const kpiTipoCasos = document.getElementById('kpiTipoFrequenteCasos');
         if (kpiTipo) kpiTipo.textContent = topTipo[0];
-        if (kpiTipoCasos) kpiTipoCasos.textContent = topTipo[1] + ' casos';
+        if (kpiTipoCasos) kpiTipoCasos.textContent = topTipo[1] + ' casos detectados';
       }
     }
 
     if (dataCol) {
-      // Função auxiliar para parsear datas do Google Sheets
+      // Função auxiliar para parsear datas
       function parseDateCell(value) {
         const str = String(value || '').trim();
         if (!str) return null;
 
-        // Formato Date(YYYY,M,D) do Google Sheets (mês já vem base-0)
+        // Date(YYYY,M,D) do Google Sheets
         const dateMatch = str.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})\)$/);
         if (dateMatch) {
-          const ano = parseInt(dateMatch[1], 10);
-          const mes = parseInt(dateMatch[2], 10); // Já está em base-0 (0=janeiro, 11=dezembro)
-          const dia = parseInt(dateMatch[3], 10);
-          return new Date(ano, mes, dia);
+          return new Date(parseInt(dateMatch[1]), parseInt(dateMatch[2]), parseInt(dateMatch[3]));
         }
 
-        // Tenta parsear formato DD/MM/YYYY ou DD/MM/YY
         if (str.includes('/')) {
-          const partes = str.split('/').map(p => parseInt(p.trim(), 10)).filter(p => !isNaN(p));
+          const partes = str.split('/').map(p => parseInt(p.trim()));
           if (partes.length === 3) {
-            const dia = partes[0];
-            const mes = partes[1];
             let ano = partes[2];
-
-            // Se o ano tiver apenas 2 dígitos, assume 20XX
-            if (ano < 100) {
-              ano = ano < 50 ? 2000 + ano : 1900 + ano;
-            }
-
-            // Validação básica
-            if (dia >= 1 && dia <= 31 && mes >= 1 && mes <= 12 && ano >= 1900 && ano <= 2100) {
-              return new Date(ano, mes - 1, dia);
-            }
+            if (ano < 100) ano += ano < 50 ? 2000 : 1900;
+            return new Date(ano, partes[1] - 1, partes[0]);
           }
         }
 
-        // Tenta parsear como Date ISO ou outros formatos
         const parsed = new Date(str);
-        if (!isNaN(parsed.getTime())) {
-          return parsed;
-        }
-
-        return null;
+        return isNaN(parsed.getTime()) ? null : parsed;
       }
 
       const agora = new Date();
@@ -1150,7 +1159,7 @@ function atualizarKPIs() {
         if (!rawData) return;
 
         const data = parseDateCell(rawData);
-        if (!data || isNaN(data.getTime())) return;
+        if (!data) return;
 
         const rowMes = data.getMonth();
         const rowAno = data.getFullYear();
@@ -1167,19 +1176,57 @@ function atualizarKPIs() {
       if (statEsteMes) statEsteMes.textContent = casosEsteMes.toLocaleString('pt-BR');
       if (statMesAnterior) statMesAnterior.textContent = casosMesAnterior.toLocaleString('pt-BR');
 
-      const variacao = casosMesAnterior > 0
-        ? (((casosEsteMes - casosMesAnterior) / casosMesAnterior) * 100).toFixed(1)
-        : casosEsteMes > 0 ? '100.0' : '0.0';
+      // Cálculo de variação e contexto
+      let variacao = 0;
+      let contextoClass = '';
+      let contextoTexto = '';
+      let iconeSeta = '';
 
-      const variacaoElement = document.getElementById('statVariacaoMensal');
-      if (variacaoElement) {
-        variacaoElement.textContent = (variacao > 0 ? '+' : '') + variacao + '%';
-        variacaoElement.className = variacao > 0
-          ? 'text-3xl font-bold text-red-600'
-          : variacao < 0
-            ? 'text-3xl font-bold text-green-600'
-            : 'text-3xl font-bold text-gray-600';
+      if (casosMesAnterior > 0) {
+        variacao = ((casosEsteMes - casosMesAnterior) / casosMesAnterior) * 100;
+      } else if (casosEsteMes > 0) {
+        variacao = 100; // Novo volume vs zero anterior
+      } else {
+        variacao = 0; // Zero vs Zero
       }
+
+      const valVariacao = variacao.toFixed(1);
+      const variacaoElement = document.getElementById('statVariacaoMensal');
+      const indicadorSeta = document.getElementById('indicadorSeta');
+      const textoContexto = document.getElementById('textoContextoTemporal');
+
+      if (variacao > 0) {
+        // Aumento (Vermelho/Alerta em contexto de violência, ou Neutro?)
+        // Geralmente aumento de casos de violência é 'ruim', então usaremos cores de alerta ou neutras.
+        // No layout 'clean', vamos usar cores semânticas de dado:
+
+        // Aumento
+        variacaoElement.textContent = `+${valVariacao}%`;
+        variacaoElement.className = 'text-lg font-bold text-rose-600';
+        contextoTexto = 'Aumento em relação ao mês anterior';
+        iconeSeta = `<svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>`;
+        indicadorSeta.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-rose-50 border border-rose-100';
+
+      } else if (variacao < 0) {
+        // Redução
+        variacaoElement.textContent = `${valVariacao}%`;
+        variacaoElement.className = 'text-lg font-bold text-emerald-600';
+        contextoTexto = 'Redução em relação ao mês anterior';
+        iconeSeta = `<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>`;
+        indicadorSeta.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-emerald-50 border border-emerald-100';
+
+      } else {
+        // Estável
+        variacaoElement.textContent = `0.0%`;
+        variacaoElement.className = 'text-lg font-bold text-slate-500';
+        contextoTexto = 'Estável em relação ao mês anterior';
+        iconeSeta = `<svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path></svg>`;
+        indicadorSeta.className = 'w-10 h-10 rounded-full flex items-center justify-center bg-slate-50 border border-slate-100';
+      }
+
+      if (indicadorSeta) indicadorSeta.innerHTML = iconeSeta;
+      if (textoContexto) textoContexto.textContent = contextoTexto;
+
     }
 
     calcularEstatisticas();

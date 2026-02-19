@@ -26,6 +26,9 @@
   <!-- Estilos Elegantes Compartilhados -->
   <link rel="stylesheet" href="assets/css/styles-elegant.css">
 
+  <!-- SweetAlert2 - Alertas Premium -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- Intro.js CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
   <!-- Onboarding CSS -->
@@ -121,7 +124,7 @@
       bottom: 0;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
-      z-index: 9999;
+      z-index: 9998;
       animation: fadeIn 0.2s ease-out;
     }
 
@@ -133,6 +136,18 @@
 
     .modal.show>div {
       animation: fadeInScale 0.3s ease-out;
+    }
+
+    /* Garante que SweetAlert fica acima do modal */
+    .swal2-container {
+      z-index: 10000 !important;
+    }
+
+    /* Estilo aprimorado do card do modal de escolas */
+    #modalGerenciarEscolas > div {
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border-radius: 1rem;
     }
 
     @keyframes fadeIn {
@@ -185,6 +200,77 @@
       }
     }
 
+    /* Estilos elegantes para modal de escolas */
+    #modalGerenciarEscolas > div > div:first-child {
+      background: linear-gradient(135deg, #f0f4ff 0%, #f9fbff 100%);
+    }
+
+    /* Botões do header do modal */
+    #modalGerenciarEscolas button[onclick*="fechar"] {
+      transition: all 0.2s ease;
+    }
+
+    #modalGerenciarEscolas button[onclick*="fechar"]:hover {
+      background-color: #f3f4f6;
+      transform: rotate(90deg);
+    }
+
+    /* Scrollbar estilizada para listas de escolas */
+    .scrollbar-elegant {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(59, 130, 246, 0.5) transparent;
+    }
+
+    .scrollbar-elegant::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scrollbar-elegant::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scrollbar-elegant::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.5);
+      border-radius: 3px;
+    }
+
+    .scrollbar-elegant::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.7);
+    }
+
+    /* Estilo para items de escolas */
+    .escola-item {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .escola-item:hover {
+      transform: translateX(4px);
+    }
+
+    .escola-item.selected {
+      animation: slideInLeft 0.2s ease-out;
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Melhor visual para modal em mobile */
+    @media (max-width: 768px) {
+      #modalGerenciarEscolas > div {
+        max-width: 95vw;
+        width: 95vw;
+        max-height: 95vh;
+      }
+    }
+
     .modal.animate-out {
       animation: fadeOut 0.2s ease-out forwards;
     }
@@ -208,6 +294,7 @@
         transform: scale(0.85);
         opacity: 0;
       }
+
       to {
         transform: scale(1);
         opacity: 1;
@@ -223,9 +310,11 @@
       0% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(1.08);
       }
+
       100% {
         transform: scale(1);
       }
@@ -240,9 +329,11 @@
       0% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(0.92);
       }
+
       100% {
         transform: scale(1);
       }
@@ -258,6 +349,7 @@
         transform: scale(0.85);
         opacity: 0;
       }
+
       to {
         transform: scale(1);
         opacity: 1;
@@ -273,9 +365,11 @@
       0% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(1.08);
       }
+
       100% {
         transform: scale(1);
       }
@@ -290,9 +384,11 @@
       0% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(0.92);
       }
+
       100% {
         transform: scale(1);
       }
@@ -310,9 +406,11 @@
       0% {
         transform: scale(1);
       }
+
       40% {
         transform: scale(1.05);
       }
+
       100% {
         transform: scale(1);
       }
@@ -328,6 +426,7 @@
         opacity: 1;
         transform: scale(1);
       }
+
       100% {
         opacity: 0.3;
         transform: scale(0.95);
@@ -339,6 +438,7 @@
         opacity: 0.3;
         transform: scale(0.95);
       }
+
       100% {
         opacity: 1;
         transform: scale(1);
@@ -377,6 +477,7 @@
       from {
         opacity: 0;
       }
+
       to {
         opacity: 1;
       }
@@ -384,11 +485,23 @@
 
     .table-container {
       animation: tableContainerFade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      overflow-x: hidden;
     }
 
     html.no-scroll {
       scroll-behavior: auto !important;
       /* Evita animação suave ao restaurar scroll */
+    }
+
+    /* SweetAlert2 Z-Index Fix */
+    div:where(.swal2-container) {
+      z-index: 99999 !important;
+    }
+
+    #alertContainer {
+      position: fixed;
+      width: 100%;
+      overflow: hidden;
     }
 
     body.no-scroll {
@@ -397,56 +510,97 @@
       overflow: hidden;
     }
 
-    /* CUSTOM SCROLLBAR (SMART & ELEGANT) */
+    /* CUSTOM SCROLLBAR (SMART & ELEGANT) - OVERLAY MODE */
     .custom-scrollbar {
       overflow-y: auto;
-      scrollbar-width: none;
-      /* Firefox: Oculto por padrão */
+      /* Tenta usar overlay mode quando disponível */
+      overflow-y: overlay;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
       -ms-overflow-style: none;
-      /* IE/Edge */
+      transition: scrollbar-color 0.3s ease;
     }
 
-    /* Oculta scrollbar no Chrome/Safari por padrão */
+    /* Chrome/Safari - Scrollbar em modo overlay */
     .custom-scrollbar::-webkit-scrollbar {
-      width: 0px;
+      width: 10px;
       background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+      margin: 2px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      transition: background 0.3s ease;
     }
 
     /* MOSTRA no HOVER com estilo ELEGANT */
     .custom-scrollbar:hover {
-      scrollbar-width: thin;
-      /* Firefox */
-      scrollbar-color: #3b82f6 #f1f5f9;
-      /* Blue Thumb, Gray Track */
-    }
-
-    .custom-scrollbar:hover::-webkit-scrollbar {
-      width: 8px;
-      /* Largura do elegant */
-      display: block;
+      scrollbar-color: rgba(59, 130, 246, 0.9) rgba(241, 245, 249, 0.3);
     }
 
     .custom-scrollbar:hover::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 10px;
+      background: rgba(241, 245, 249, 0.2);
     }
 
     .custom-scrollbar:hover::-webkit-scrollbar-thumb {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      /* Blue Gradient */
-      border-radius: 10px;
-      transition: background 0.3s ease;
+      background-clip: padding-box;
+      border: 2px solid transparent;
     }
 
     .custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      /* Darker Blue */
+      background-clip: padding-box;
     }
 
     .table-wrapper {
       /* overflow-x: auto; - Removido a pedido */
       overflow-x: hidden;
       border-radius: 0.5rem;
+    }
+
+    /* Estrutura de tabela com header fixo */
+    .table-fixed-header {
+      display: block;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .table-fixed-header thead {
+      display: block;
+      width: 100%;
+      /* Adiciona espaço à direita para compensar scrollbar (10px) */
+      padding-right: 10px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    .table-fixed-header thead tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .table-fixed-header tbody {
+      display: block;
+      max-height: 600px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    .table-fixed-header tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
     }
 
     table {
@@ -811,9 +965,9 @@
         </div>
       </div>
 
-      <!-- Tabela com Scroll -->
-      <div class="table-wrapper table-container max-h-[600px] overflow-y-auto custom-scrollbar">
-        <table class="table-elegant w-full">
+      <!-- Tabela com Header Fixo e Scroll no Body -->
+      <div class="table-wrapper table-container">
+        <table class="table-elegant table-fixed-header w-full">
           <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
             <tr>
               <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -1034,6 +1188,129 @@
         <button onclick="confirmarExclusao()"
           class="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
           🗑️ Excluir
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================
+       MODAL - GERENCIAR ESCOLAS (TÉCNICO)
+       ======================================== -->
+  <div id="modalGerenciarEscolas" class="modal">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full mx-4 flex flex-col max-h-[90vh]">
+
+      <!-- Cabeçalho -->
+      <div
+        class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl">
+        <div>
+          <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <span>🏫</span>
+            <span>Gerenciar Escolas</span>
+          </h3>
+          <p class="text-sm text-gray-600 mt-1">
+            <span id="escolasTecnicoNome" class="font-semibold"></span> ·
+            <span id="escolasTecnicoEmail" class="text-gray-500"></span>
+          </p>
+        </div>
+        <button onclick="fecharModalEscolas()"
+          class="text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg p-2 transition-all">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Instruções -->
+      <div class="px-6 py-3 bg-blue-50/50 border-b border-blue-100">
+        <p class="text-sm text-blue-800 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Selecione escolas da lista à esquerda e clique em "Adicionar" para atribuí-las ao técnico.</span>
+        </p>
+        <div id="escolasStatus" class="hidden mt-2 text-sm"></div>
+      </div>
+
+      <!-- Conteúdo Principal -->
+      <div class="flex-1 overflow-hidden flex flex-col md:flex-row">
+
+        <!-- Escolas Disponíveis (Esquerda) -->
+        <div class="flex-1 flex flex-col border-r border-gray-200">
+          <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h4 class="font-bold text-gray-700 flex items-center gap-2 mb-3">
+              <span>📚</span>
+              <span>Escolas Disponíveis</span>
+              <span id="totalDisponiveisCount"
+                class="ml-auto px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs font-bold">0</span>
+            </h4>
+            <!-- Busca -->
+            <div class="relative">
+              <input type="text" id="buscaEscolasDisponiveis" placeholder="Buscar escola..."
+                class="w-full px-4 py-2 pl-10 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm">
+              <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 bg-gray-50/30 scrollbar-elegant" id="listaEscolasDisponiveis">
+            <!-- Loading State -->
+            <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+              <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+              <p>Carregando escolas...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação (Centro) -->
+        <div class="flex md:flex-col items-center justify-center gap-3 p-4 bg-white">
+          <button onclick="adicionarEscolasSelecionadas()"
+            class="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            id="btnAdicionarEscolas" disabled>
+            <span class="hidden md:inline">Adicionar →</span>
+            <span class="md:hidden">↓ Adicionar</span>
+          </button>
+          <button onclick="removerEscolasSelecionadas()"
+            class="px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            id="btnRemoverEscolas" disabled>
+            <span class="hidden md:inline">← Remover</span>
+            <span class="md:hidden">↑ Remover</span>
+          </button>
+        </div>
+
+        <!-- Escolas Atribuídas (Direita) -->
+        <div class="flex-1 flex flex-col">
+          <div class="px-6 py-4 bg-green-50 border-b border-green-200">
+            <h4 class="font-bold text-gray-700 flex items-center gap-2">
+              <span>✅</span>
+              <span>Escolas Atribuídas</span>
+              <span id="totalAtribuidasCount"
+                class="ml-auto px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs font-bold">0</span>
+            </h4>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 bg-green-50/20 scrollbar-elegant" id="listaEscolasAtribuidas">
+            <!-- Loading State -->
+            <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+              <div class="text-5xl mb-3">📭</div>
+              <p>Nenhuma escola atribuída</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rodapé com Botões -->
+      <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl flex gap-3">
+        <button onclick="fecharModalEscolas()"
+          class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
+          Cancelar
+        </button>
+        <button id="btnSalvarEscolas" onclick="salvarEscolasAtribuidas(this)"
+          class="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+          💾 Salvar Alterações
         </button>
       </div>
 
@@ -1495,6 +1772,10 @@
       fecharModalComAnimacao(document.getElementById('modalDetalhesUpdate'));
     }
 
+    function fecharModalSystemUpdates() {
+      fecharModalComAnimacao(document.getElementById('modalSystemUpdates'));
+    }
+
     // ATENÇÃO: copiarDetalhes removido da UI
 
     function renderizarSystemUpdates(updates) {
@@ -1663,14 +1944,14 @@
       container.innerHTML = abas.map(aba => {
         const isActive = activeTab === aba.id;
         const count = contagemPorRole[aba.id] || 0;
-        
+
         // Estilos condicionais baseados em estado ativo/inativo
         const baseClasses = 'tab-button px-4 py-2 rounded-lg font-medium flex items-center gap-2 cursor-pointer transform';
-        
-        const stateClasses = isActive ? 
-          'bg-blue-500 text-white shadow-lg hover:shadow-xl hover:bg-blue-600' : 
+
+        const stateClasses = isActive ?
+          'bg-blue-500 text-white shadow-lg hover:shadow-xl hover:bg-blue-600' :
           'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md';
-        
+
         return `
           <button 
             onclick="mudarAbaComAnimacao('${aba.id}', event)"
@@ -1694,30 +1975,30 @@
     // ========================================
     function mudarAbaComAnimacao(novaAba, event) {
       if (activeTab === novaAba) return; // Evita re-render desnecessário
-      
+
       // 1. Encontra o botão atualmente ativo (antes da mudança)
       const container = document.getElementById('containerAbas');
       const botaoAtivoAnterior = container?.querySelector(`[data-tab-id="${activeTab}"]`);
       const novoBotao = event?.currentTarget;
-      
+
       // 2. Aplica fade-out no botão ativo anterior
       if (botaoAtivoAnterior) {
         botaoAtivoAnterior.classList.add('tab-fade-out');
       }
-      
+
       // 3. Aplica pulse no botão clicado
       if (novoBotao) {
         novoBotao.classList.add('tab-activating');
         setTimeout(() => novoBotao.classList.remove('tab-activating'), 400);
       }
-      
+
       activeTab = novaAba;
-      
+
       // 4. Aguarda fade-out completar antes de re-renderizar (200ms)
       setTimeout(() => {
         // Renderiza abas com novo estado ativo
         renderizarAbas(todosUsuarios);
-        
+
         // 5. Aplica fade-in no novo botão ativo
         const novoBotaoAtivo = container?.querySelector(`[data-tab-id="${novaAba}"]`);
         if (novoBotaoAtivo) {
@@ -1725,12 +2006,12 @@
           setTimeout(() => novoBotaoAtivo.classList.remove('tab-fade-in'), 300);
         }
       }, 200);
-      
+
       // Renderiza tabela com filtro (com delay para sincronizar)
       setTimeout(() => {
         const tbody = document.getElementById('tabelaUsuarios');
         const wrapper = tbody?.closest('.table-wrapper');
-        
+
         if (wrapper) {
           // Remove animação anterior se existir
           wrapper.classList.remove('table-container');
@@ -1739,7 +2020,7 @@
           // Aplica animação
           wrapper.classList.add('table-container');
         }
-        
+
         renderizarTabelaComFiltro();
       }, 200);
     }
@@ -1748,7 +2029,7 @@
 
     function renderizarTabelaComFiltro() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
-      
+
       // Começa com todos os usuários
       let usuariosFiltrados = todosUsuarios;
 
@@ -1855,6 +2136,14 @@
                     🔒
                   </button>
                 `}
+                ${usuario.role === 'tecnico' && ['admin', 'superuser'].includes(meuRole) ? `
+                  <button 
+                    onclick="abrirModalEscolas('${usuario.id}', '${usuario.nome}', '${usuario.email}'); this.classList.add('btn-action-click');"
+                    class="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-medium transition-all transform cursor-pointer"
+                    title="Gerenciar Escolas">
+                    🏫
+                  </button>
+                ` : ''}
                 ${podeExcluir ? `
                   <button 
                     onclick="abrirModalExcluir('${usuario.id}'); this.classList.add('btn-action-click');"
@@ -2102,7 +2391,8 @@
     // FECHAR MODAL
     // ========================================
     function fecharModal() {
-      document.getElementById('modalUsuario').classList.remove('show');
+      const modal = document.getElementById('modalUsuario');
+      fecharModalComAnimacao(modal);
     }
 
     // ========================================
@@ -2225,7 +2515,8 @@
     }
 
     function fecharModalExcluir() {
-      document.getElementById('modalExcluir').classList.remove('show');
+      const modal = document.getElementById('modalExcluir');
+      fecharModalComAnimacao(modal);
       usuarioExcluirId = null;
     }
 
@@ -2265,6 +2556,577 @@
         mostrarAlerta('Erro ao conectar com o servidor', 'erro');
       }
     }
+
+    // ========================================
+    // GERENCIAMENTO DE ESCOLAS (TÉCNICOS)
+    // ========================================
+    let escolasGerenciamento = {
+      userId: null,
+      disponiveis: [],
+      atribuidas: [],
+      atribuidasGlobais: [],
+      selecionadasDisponiveis: new Set(),
+      selecionadasAtribuidas: new Set()
+    };
+
+    /**
+     * Abre modal de gerenciamento de escolas para um técnico
+     */
+    async function abrirModalEscolas(userId, nome, email) {
+      try {
+        // Reset estado
+        escolasGerenciamento.userId = userId;
+        escolasGerenciamento.disponiveis = [];
+        escolasGerenciamento.atribuidas = [];
+        escolasGerenciamento.atribuidasGlobais = [];
+        escolasGerenciamento.selecionadasDisponiveis.clear();
+        escolasGerenciamento.selecionadasAtribuidas.clear();
+
+        // Atualiza info no modal
+        document.getElementById('escolasTecnicoNome').textContent = nome;
+        document.getElementById('escolasTecnicoEmail').textContent = email;
+
+        // Abre modal com loading
+        const modal = document.getElementById('modalGerenciarEscolas');
+        lockBodyScroll();
+        modal.classList.add('show', 'modal-enter');
+        setTimeout(() => modal.classList.remove('modal-enter'), 300);
+
+        setEscolasStatus('Carregando escolas...', 'info');
+        setLoadingEscolas(true);
+
+        // Carrega dados em paralelo
+        await Promise.all([
+          carregarTodasEscolasDisponiveis(),
+          carregarEscolasAtribuidas(userId),
+          carregarEscolasAtribuidasGlobais()
+        ]);
+
+        // Renderiza listas
+        renderizarListaEscolas();
+        setEscolasStatus('', 'clear');
+        setLoadingEscolas(false);
+
+      } catch (erro) {
+        console.error('Erro ao abrir modal de escolas:', erro);
+        mostrarAlerta('Erro ao carregar escolas', 'erro');
+        setEscolasStatus('Erro ao carregar escolas.', 'erro');
+        setLoadingEscolas(false);
+        fecharModalEscolas();
+      }
+    }
+
+    /**
+     * Fecha modal de gerenciamento de escolas
+     */
+    function fecharModalEscolas() {
+      const modal = document.getElementById('modalGerenciarEscolas');
+      
+      // Limpa status antes de fechar
+      setEscolasStatus('', 'clear');
+      
+      // Limpa botão de salvar
+      const btnSalvar = document.getElementById('btnSalvarEscolas');
+      if (btnSalvar) {
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = '💾 Salvar Alterações';
+      }
+      
+      // Anima fechamento
+      fecharModalComAnimacao(modal);
+
+      // Limpa estado após animação
+      setTimeout(() => {
+        escolasGerenciamento = {
+          userId: null,
+          disponiveis: [],
+          atribuidas: [],
+          atribuidasGlobais: [],
+          selecionadasDisponiveis: new Set(),
+          selecionadasAtribuidas: new Set()
+        };
+      }, 300);
+    }
+
+    function setLoadingEscolas(isLoading) {
+      const listaDisponiveis = document.getElementById('listaEscolasDisponiveis');
+      const listaAtribuidas = document.getElementById('listaEscolasAtribuidas');
+      if (!listaDisponiveis || !listaAtribuidas) return;
+
+      if (isLoading) {
+        listaDisponiveis.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+            <p>Carregando escolas...</p>
+          </div>
+        `;
+        listaAtribuidas.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-green-500 mb-3"></div>
+            <p>Carregando atribuições...</p>
+          </div>
+        `;
+      }
+    }
+
+    function setEscolasStatus(mensagem, tipo) {
+      const statusEl = document.getElementById('escolasStatus');
+      if (!statusEl) return;
+
+      if (tipo === 'clear' || !mensagem) {
+        statusEl.className = 'hidden mt-2 text-sm';
+        statusEl.textContent = '';
+        statusEl.innerHTML = '';
+        return;
+      }
+
+      const icones = {
+        info: 'ℹ️',
+        sucesso: '✅',
+        erro: '❌'
+      };
+
+      const classes = {
+        info: 'bg-blue-50 border border-blue-200 text-blue-800 py-2 px-3 rounded-lg flex items-center gap-2',
+        sucesso: 'bg-green-50 border border-green-200 text-green-800 py-2 px-3 rounded-lg flex items-center gap-2 font-medium',
+        erro: 'bg-red-50 border border-red-200 text-red-800 py-2 px-3 rounded-lg flex items-center gap-2 font-medium'
+      };
+
+      statusEl.className = `mt-2 text-sm ${classes[tipo] || classes.info}`;
+      statusEl.innerHTML = `<span>${icones[tipo] || 'ℹ️'}</span><span>${mensagem}</span>`;
+    }
+
+    /**
+     * Carrega todas as escolas disponíveis no sistema
+     */
+    async function carregarTodasEscolasDisponiveis() {
+      try {
+        const dados = { action: 'get_all_available_schools' };
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          escolasGerenciamento.disponiveis = resultado.data || [];
+        } else {
+          throw new Error(resultado.mensagem || 'Erro ao carregar escolas');
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar escolas disponíveis:', erro);
+        throw erro;
+      }
+    }
+
+    /**
+     * Carrega escolas já atribuídas ao técnico
+     */
+    async function carregarEscolasAtribuidas(userId) {
+      try {
+        const dados = {
+          action: 'list_technician_schools',
+          user_id: userId
+        };
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          escolasGerenciamento.atribuidas = resultado.data || [];
+        } else {
+          throw new Error(resultado.mensagem || 'Erro ao carregar escolas atribuídas');
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar escolas atribuídas:', erro);
+        throw erro;
+      }
+    }
+
+    /**
+     * Carrega escolas já atribuídas a qualquer técnico
+     */
+    async function carregarEscolasAtribuidasGlobais() {
+      try {
+        const dados = { action: 'list_assigned_schools' };
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          escolasGerenciamento.atribuidasGlobais = resultado.data || [];
+        } else {
+          throw new Error(resultado.mensagem || 'Erro ao carregar escolas atribuídas (global)');
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar escolas atribuídas (global):', erro);
+        throw erro;
+      }
+    }
+
+    /**
+     * Renderiza listas de escolas (disponíveis e atribuídas)
+     */
+    function renderizarListaEscolas() {
+      const listaDisponiveis = document.getElementById('listaEscolasDisponiveis');
+      const listaAtribuidas = document.getElementById('listaEscolasAtribuidas');
+      const buscaInput = document.getElementById('buscaEscolasDisponiveis');
+
+      const normalizarNome = (nome) => (nome || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/^(cmeiti|cmei\s*ti|emef\s*ti|cmei|emef)\s+/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      // Filtra nomes já atribuídos (locais + globais)
+      const nomesAtribuidos = new Set(
+        escolasGerenciamento.atribuidas.map(e => normalizarNome(e.school_name))
+      );
+
+      const nomesAtribuidosOutros = new Set(
+        escolasGerenciamento.atribuidasGlobais
+          .filter(e => e.user_id && e.user_id !== escolasGerenciamento.userId)
+          .map(e => normalizarNome(e.school_name))
+      );
+
+      // Filtra escolas disponíveis (remove as já atribuídas)
+      const busca = buscaInput ? buscaInput.value.toLowerCase() : '';
+      const escolasDisponiveis = escolasGerenciamento.disponiveis.filter(escola => {
+        const nome = escola.nomeOriginal || escola.school_name || '';
+        const nomeNormalizado = normalizarNome(nome);
+        const jaAtribuida = nomesAtribuidos.has(nomeNormalizado) || nomesAtribuidosOutros.has(nomeNormalizado);
+        const matchBusca = nome.toLowerCase().includes(busca);
+        return !jaAtribuida && matchBusca;
+      });
+
+      // Atualiza contadores
+      document.getElementById('totalDisponiveisCount').textContent = escolasDisponiveis.length;
+      document.getElementById('totalAtribuidasCount').textContent = escolasGerenciamento.atribuidas.length;
+
+      // Renderiza disponíveis
+      if (escolasDisponiveis.length === 0) {
+        listaDisponiveis.innerHTML = `
+          <div class="text-center py-12 text-gray-400">
+            <div class="text-5xl mb-3">🔍</div>
+            <p>${busca ? 'Nenhuma escola encontrada' : 'Todas as escolas já foram atribuídas'}</p>
+          </div>
+        `;
+      } else {
+        listaDisponiveis.innerHTML = escolasDisponiveis.map(escola => {
+          const nome = escola.nomeOriginal || escola.school_name;
+          const tipo = escola.tipo || escola.school_type;
+          const regiao = escola.regiao || escola.school_region;
+          const isSelected = escolasGerenciamento.selecionadasDisponiveis.has(nome);
+
+          return `
+              <div onclick="toggleSelecaoDisponivel('${nome.replace(/'/g, "\\'")}')" 
+                 class="cursor-pointer border-2 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-3 mb-2 hover:shadow-md transition-all group">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 w-6 h-6 rounded-full border-2 ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'} flex items-center justify-center">
+                  ${isSelected ? '<span class="text-white text-xs">✓</span>' : ''}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h5 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors text-sm">
+                    ${nome}
+                  </h5>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="px-2 py-0.5 bg-${tipo === 'CMEI' ? 'purple' : 'blue'}-100 text-${tipo === 'CMEI' ? 'purple' : 'blue'}-700 rounded text-xs font-semibold">
+                      ${tipo || 'N/A'}
+                    </span>
+                    <span class="text-xs text-gray-500">📍 ${regiao || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Renderiza atribuídas
+      if (escolasGerenciamento.atribuidas.length === 0) {
+        listaAtribuidas.innerHTML = `
+          <div class="text-center py-12 text-gray-400">
+            <div class="text-5xl mb-3">📭</div>
+            <p>Nenhuma escola atribuída</p>
+          </div>
+        `;
+      } else {
+        listaAtribuidas.innerHTML = escolasGerenciamento.atribuidas.map(escola => {
+          const isSelected = escolasGerenciamento.selecionadasAtribuidas.has(escola.school_name);
+
+          return `
+            <div onclick="toggleSelecaoAtribuida('${escola.school_name.replace(/'/g, "\\'")}')" 
+                 class="cursor-pointer border-2 ${isSelected ? 'border-red-500 bg-red-50' : 'border-green-200 bg-green-50'} rounded-lg p-3 mb-2 hover:shadow-md transition-all group">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 w-6 h-6 rounded-full border-2 ${isSelected ? 'border-red-500 bg-red-500' : 'border-green-300'} flex items-center justify-center">
+                  ${isSelected ? '<span class="text-white text-xs">✓</span>' : ''}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h5 class="font-semibold text-gray-800 group-hover:text-red-600 transition-colors text-sm">
+                    ${escola.school_name}
+                  </h5>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="px-2 py-0.5 bg-${escola.school_type === 'CMEI' ? 'purple' : 'blue'}-100 text-${escola.school_type === 'CMEI' ? 'purple' : 'blue'}-700 rounded text-xs font-semibold">
+                      ${escola.school_type || 'N/A'}
+                    </span>
+                    <span class="text-xs text-gray-500">📍 ${escola.school_region || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Atualiza botões
+      atualizarBotoesEscolas();
+
+      // MOSTRA BOTÃO DE SALVAR SE HOUVER ALTERAÇÕES PENDENTES? 
+      // Por enquanto mostra sempre para garantir, ou poderíamos comparar com estado inicial.
+      // Vamos deixar visível no rodapé do modal (implementado no HTML)
+    }
+
+    /**
+     * Toggle seleção de escola disponível
+     */
+    function toggleSelecaoDisponivel(nomeEscola) {
+      if (escolasGerenciamento.selecionadasDisponiveis.has(nomeEscola)) {
+        escolasGerenciamento.selecionadasDisponiveis.delete(nomeEscola);
+      } else {
+        escolasGerenciamento.selecionadasDisponiveis.add(nomeEscola);
+      }
+      renderizarListaEscolas();
+    }
+
+    /**
+     * Toggle seleção de escola atribuída
+     */
+    function toggleSelecaoAtribuida(nomeEscola) {
+      if (escolasGerenciamento.selecionadasAtribuidas.has(nomeEscola)) {
+        escolasGerenciamento.selecionadasAtribuidas.delete(nomeEscola);
+      } else {
+        escolasGerenciamento.selecionadasAtribuidas.add(nomeEscola);
+      }
+      renderizarListaEscolas();
+    }
+
+    /**
+     * Adiciona escolas selecionadas à lista de atribuídas (APENAS LOCAL)
+     */
+    function adicionarEscolasSelecionadas() {
+      if (escolasGerenciamento.selecionadasDisponiveis.size === 0) return;
+
+      // Move escolas para atribuídas localmente
+      escolasGerenciamento.selecionadasDisponiveis.forEach(nomeEscola => {
+        const escola = escolasGerenciamento.disponiveis.find(
+          e => (e.nomeOriginal || e.school_name) === nomeEscola
+        );
+
+        if (escola) {
+          escolasGerenciamento.atribuidas.push({
+            school_name: escola.nomeOriginal || escola.school_name,
+            school_type: escola.tipo || escola.school_type,
+            school_region: escola.regiao || escola.school_region
+          });
+        }
+      });
+
+      // Limpa seleção
+      escolasGerenciamento.selecionadasDisponiveis.clear();
+
+      // Re-renderiza para atualizar UI
+      renderizarListaEscolas();
+
+      // Feedback visual (opcional)
+      mostrarAlerta('Escolas movidas para atribuídas. Clique em "Salvar Alterações" para confirmar.', 'info');
+
+      // Habilita botão de salvar (se estiver desabilitado)
+      const btnSalvar = document.getElementById('btnSalvarEscolas');
+      if (btnSalvar) btnSalvar.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+    }
+
+    /**
+     * Remove escolas selecionadas da lista de atribuídas (APENAS LOCAL)
+     */
+    function removerEscolasSelecionadas() {
+      if (escolasGerenciamento.selecionadasAtribuidas.size === 0) return;
+
+      // Remove escolas localmente
+      escolasGerenciamento.atribuidas = escolasGerenciamento.atribuidas.filter(
+        escola => !escolasGerenciamento.selecionadasAtribuidas.has(escola.school_name)
+      );
+
+      // Limpa seleção
+      escolasGerenciamento.selecionadasAtribuidas.clear();
+
+      // Re-renderiza para atualizar UI
+      renderizarListaEscolas();
+
+      // Feedback visual
+      mostrarAlerta('Escolas removidas da lista. Clique em "Salvar Alterações" para confirmar.', 'info');
+
+      // Habilita/Destaca botão de salvar
+      const btnSalvar = document.getElementById('btnSalvarEscolas');
+      if (btnSalvar) btnSalvar.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+    }
+
+    /**
+     * Atualiza estado dos botões de adicionar/remover
+     */
+    function atualizarBotoesEscolas() {
+      const btnAdicionar = document.getElementById('btnAdicionarEscolas');
+      const btnRemover = document.getElementById('btnRemoverEscolas');
+
+      if (btnAdicionar) btnAdicionar.disabled = escolasGerenciamento.selecionadasDisponiveis.size === 0;
+      if (btnRemover) btnRemover.disabled = escolasGerenciamento.selecionadasAtribuidas.size === 0;
+    }
+
+    /**
+     * Salva alterações de escolas no backend (CLIQUE EXPLÍCITO)
+     */
+    async function salvarEscolasAtribuidas() {
+      try {
+        // Validação
+        if (!escolasGerenciamento.userId) {
+          mostrarAlerta('Erro: usuário não identificado', 'erro');
+          return;
+        }
+
+        const btnSalvar = document.getElementById('btnSalvarEscolas');
+        const conteudoOriginal = btnSalvar ? btnSalvar.innerHTML : '💾 Salvar Alterações';
+
+        // Estado de Loading
+        if (btnSalvar) {
+          btnSalvar.disabled = true;
+          btnSalvar.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Salvando...
+          `;
+        }
+        setEscolasStatus('Salvando alterações...', 'info');
+
+        // Prepara payload
+        const dados = {
+          action: 'save_technician_schools',
+          user_id: escolasGerenciamento.userId,
+          schools: escolasGerenciamento.atribuidas, // Envia lista completa atual
+          caller_role: meuRole,
+          caller_id: sessionStorage.getItem('userId')
+        };
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(JSON.stringify(dados)),
+          redirect: 'follow'
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          setEscolasStatus('Alterações salvas com sucesso.', 'sucesso');
+
+          // Remove destaque do botão
+          if (btnSalvar) btnSalvar.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+
+          // Atualiza lista global para refletir mudanças
+          await carregarEscolasAtribuidasGlobais();
+
+          // Exibe feedback de sucesso DEPOIS de atualizar os dados
+          Swal.fire({
+            title: 'Sucesso! ✅',
+            text: resultado.mensagem || 'Escolas atualizadas com sucesso!',
+            icon: 'success',
+            timer: 1800,
+            showConfirmButton: false,
+            background: '#ffffff',
+            customClass: {
+              popup: 'rounded-xl shadow-2xl border-2 border-green-200',
+              title: 'text-2xl font-bold text-green-600',
+              content: 'text-gray-700 font-medium',
+              timerProgressBar: 'bg-green-500'
+            },
+            didOpen: (modal) => {
+              // Adiciona z-index inline para garantir que fica acima
+              modal.style.zIndex = '10001';
+            }
+          });
+
+          // Fecha modal APÓS o SweetAlert desaparecer
+          setTimeout(() => {
+            fecharModalEscolas();
+          }, 2000);
+        } else {
+          throw new Error(resultado.mensagem || 'Erro ao salvar escolas');
+        }
+
+      } catch (erro) {
+        console.error('Erro ao salvar escolas:', erro);
+
+        // Feedback de Erro Premium com melhor styling
+        Swal.fire({
+          title: 'Erro! ❌',
+          text: 'Não foi possível salvar as alterações: ' + erro.message,
+          icon: 'error',
+          confirmButtonText: 'Entendi',
+          confirmButtonColor: '#ef4444',
+          background: '#ffffff',
+          customClass: {
+            popup: 'rounded-xl shadow-2xl border-2 border-red-200',
+            title: 'text-2xl font-bold text-red-600',
+            content: 'text-gray-700 font-medium',
+            confirmButton: 'px-6 py-2.5 rounded-lg font-bold'
+          },
+          didOpen: (modal) => {
+            // Adiciona z-index inline para garantir que fica acima
+            modal.style.zIndex = '10001';
+          }
+        });
+
+        setEscolasStatus('Erro ao salvar: ' + erro.message, 'erro');
+      } finally {
+        // Restaura botão
+        const btnSalvar = document.getElementById('btnSalvarEscolas');
+        if (btnSalvar) {
+          btnSalvar.disabled = false;
+          btnSalvar.innerHTML = '💾 Salvar Alterações';
+        }
+      }
+    }
+
+    // Listener para busca de escolas disponíveis
+    document.addEventListener('DOMContentLoaded', function () {
+      const buscaInput = document.getElementById('buscaEscolasDisponiveis');
+      if (buscaInput) {
+        buscaInput.addEventListener('input', function () {
+          renderizarListaEscolas();
+        });
+      }
+    });
 
     // ========================================
     // VERIFICAÇÃO DE UNICIDADE DO NOME (real-time)

@@ -3,14 +3,14 @@
    Elementos aparecem conforme o usuário rola a página
    ============================================ */
 
-(function() {
+(function () {
   'use strict';
 
   // Configuração do Intersection Observer
   const observerOptions = {
     root: null, // viewport
-    rootMargin: '0px 0px -50px 0px', // Trigger quando elemento está 50px antes de entrar na viewport
-    threshold: 0.1 // Trigger quando 10% do elemento está visível
+    rootMargin: '0px 0px 600px 0px', // Trigger quando elemento está 600px antes de entrar na viewport (super agressivo)
+    threshold: 0 // Trigger assim que 1px aparecer
   };
 
   // Animações disponíveis
@@ -73,7 +73,7 @@
 
     // Remove classe de "não revelado"
     element.classList.remove('scroll-reveal-hidden');
-    
+
     // Aplica estilos finais
     requestAnimationFrame(() => {
       element.style.opacity = anim.final.opacity;
@@ -93,10 +93,10 @@
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const element = entry.target;
-        
+
         // Anima o elemento
         animateElement(element);
-        
+
         // Para elementos que devem animar apenas uma vez, remove do observer
         if (!element.dataset.revealRepeat || element.dataset.revealRepeat === 'false') {
           observer.unobserve(element);
@@ -112,8 +112,8 @@
   function isInInitialViewport(element) {
     const rect = element.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    // Considera elementos que estão visíveis na viewport inicial (primeiros 120% da altura)
-    return rect.top < viewportHeight * 1.2 && rect.bottom > -viewportHeight * 0.2;
+    // Considera elementos que estão visíveis na viewport inicial (primeiros 500% da altura)
+    return rect.top < viewportHeight * 5.0;
   }
 
   // Função para inicializar scroll reveal em elementos
@@ -124,7 +124,7 @@
     elementsToReveal.forEach((element, index) => {
       // Verifica se o elemento está na viewport inicial
       const inInitialViewport = isInInitialViewport(element);
-      
+
       if (inInitialViewport) {
         // Se está na viewport inicial, mostra imediatamente sem animação
         element.style.opacity = '1';
@@ -133,18 +133,19 @@
         element.classList.add('scroll-reveal-visible');
         return; // Não observa este elemento
       }
-      
+
       // Adiciona classe inicial apenas para elementos fora da viewport
       element.classList.add('scroll-reveal-hidden');
-      
+
       // Aplica estilo inicial baseado no tipo de animação
       const animationType = element.dataset.reveal || 'fade-up';
       applyInitialStyle(element, animationType);
 
-      // Adiciona delay escalonado se especificado
+      // Adiciona delay escalonado se especificado (reduzido para mobile)
       const stagger = parseInt(element.dataset.stagger || '0');
       if (stagger > 0) {
-        const delay = index * stagger;
+        // Limita o delay máximo para evitar sensação de lentidão
+        const delay = Math.min(index * stagger, 500);
         element.style.transitionDelay = `${delay}ms`;
       }
 
@@ -162,7 +163,7 @@
 
       // Verifica se está na viewport inicial
       const inInitialViewport = isInInitialViewport(section);
-      
+
       if (inInitialViewport) {
         // Se está na viewport inicial, mostra imediatamente
         section.style.opacity = '1';
@@ -174,14 +175,14 @@
       // Adiciona data-reveal padrão apenas para seções fora da viewport
       section.setAttribute('data-reveal', 'fade-up');
       section.classList.add('scroll-reveal-hidden');
-      
+
       // Aplica estilo inicial
       applyInitialStyle(section, 'fade-up');
-      
+
       // Delay escalonado para seções
       const stagger = 50; // 50ms entre cada seção
       section.style.transitionDelay = `${index * stagger}ms`;
-      
+
       // Observa a seção
       observer.observe(section);
     });
@@ -195,7 +196,7 @@
 
       // Verifica se está na viewport inicial
       const inInitialViewport = isInInitialViewport(card);
-      
+
       if (inInitialViewport) {
         // Se está na viewport inicial, mostra imediatamente
         card.style.opacity = '1';
@@ -229,7 +230,7 @@
 
   // Inicializa quando o DOM estiver pronto
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       // Aguarda um pouco para garantir que elementos dinâmicos foram renderizados
       setTimeout(initScrollReveal, 100);
     });
@@ -240,12 +241,12 @@
 
   // Re-inicializa quando novos elementos são adicionados dinamicamente
   // Útil para elementos carregados via AJAX ou JavaScript
-  const mutationObserver = new MutationObserver(function(mutations) {
+  const mutationObserver = new MutationObserver(function (mutations) {
     let shouldReinit = false;
-    
-    mutations.forEach(function(mutation) {
+
+    mutations.forEach(function (mutation) {
       if (mutation.addedNodes.length > 0) {
-        mutation.addedNodes.forEach(function(node) {
+        mutation.addedNodes.forEach(function (node) {
           if (node.nodeType === 1) { // Element node
             // Verifica se é um elemento relevante ou contém elementos relevantes
             if (node.hasAttribute && node.hasAttribute('data-reveal')) {
@@ -289,7 +290,7 @@
   // Exporta função para uso manual se necessário
   window.scrollReveal = {
     init: initScrollReveal,
-    observe: function(element) {
+    observe: function (element) {
       if (element && !element.hasAttribute('data-reveal')) {
         element.setAttribute('data-reveal', 'fade-up');
       }

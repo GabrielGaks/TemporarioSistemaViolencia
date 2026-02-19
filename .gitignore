@@ -80,3 +80,6 @@ docs/temp/
 deploy/
 *.zip
 *.tar.gz
+
+# Ferramentas de IA
+.claude/

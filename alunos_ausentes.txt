@@ -1,0 +1,35 @@
+ALUNOS PRESENTES EM ALUNOS2.CSV MAS AUSENTES EM ALUNOS1.CSV
+======================================================================
+
+Total de registros ausentes: 28
+
+Nome                                               | Data        
+-----------------------------------------------------------------
+Alexandra Estevam dos Santos                       | 03/07/2025  
+Gustavo Pyerre Rodrigues de Almeida                | 06/10/2025  
+Abiner Silva Conceição                             | 10/09/2025  
+Hadassa Monteiro Almeida Zanetti                   | 10/11/2025  
+Manuela Silva Inacio                               | 10/11/2025  
+Ravi Gomes Braga                                   | 10/12/2025  
+Isis Andrade Dantas Balsano                        | 12/09/2025  
+Daniel Lucas de Oliveira Nascimento                | 12/12/2025  
+Perola Genny Arante De Araujo                      | 14/11/2025  
+Yasmim Luiza Ferreira Boy Alves                    | 16/06/2025  
+Thales Lopes Soares                                | 16/12/2025  
+Nicolly Calisto de Oliveira                        | 17/07/2025  
+Nuany Victoria de Oliveira Nascimento              | 17/12/2025  
+Stela da Pena de Jeseus                            | 18/12/2025  
+Kemilly Silva dos Santos                           | 18/12/2025  
+Sophia Ribeiro Uchoa                               | 22/12/2025  
+Rayane Coutinho Conceição                          | 23/12/2025  
+Riquelme Henrique Pereira de Paula                 | 23/12/2025  
+Wellington Rodrigo dos Santos                      | 23/12/2025  
+Miguel Rodrigues da Silva                          | 24/06/2025  
+Guilherme Ramos Oliveira                           | 25/11/2025  
+Mdleine Francisco Nascimento                       | 28/08/2025  
+Edgard Giurizato Mayer                             | 29/09/2025  
+Nathalia Martins Barbosa                           | 30/09/2025  
+Elisa Otone Guedes                                 | 30/12/2025  
+Lara Sophia Santos Roxo                            | 30/12/2025  
+Lara Araujo Sant Anna                              | 30/12/2025  
+Alice Silva Machado                                | 30/12/2025  

@@ -1,0 +1,285 @@
+/* ============================================
+   DASHBOARD EXECUTIVO - SAAS ENTERPRISE STYLE
+   Refatoração Visual - Hierarquia & Clareza
+   ============================================ */
+
+/* Container Principal */
+.dashboard-saas-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    /* Espaço entre linhas */
+    margin-bottom: 48px;
+}
+
+/* --- LINHA 1: KPIS ESTRATÉGICOS (Primary) --- */
+.kpi-grid-saas {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .kpi-grid-saas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .kpi-grid-saas {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.kpi-card-saas {
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    /* Mais arredondado que cards comuns */
+    padding: 24px;
+    position: relative;
+    transition: all 200ms ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 160px;
+}
+
+.kpi-card-saas:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border-color: #D1D5DB;
+}
+
+/* Tipografia KPI */
+.kpi-label-saas {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6B7280;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kpi-value-saas {
+    font-size: 36px;
+    /* Grande destaque */
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+}
+
+.kpi-subtext-saas {
+    font-size: 13px;
+    color: #6B7280;
+    font-weight: 400;
+}
+
+/* Icon Container */
+.kpi-icon-container {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+/* Variant Styles (Accents) */
+/* Blue (Total) */
+.kpi-card-saas.accent-blue {
+    border-top: 4px solid #2563EB;
+}
+
+.kpi-card-saas.accent-blue .kpi-icon-container {
+    background: #EFF6FF;
+    color: #2563EB;
+}
+
+.kpi-card-saas.accent-blue .kpi-value-saas {
+    color: #1E3A8A;
+}
+
+/* Amber (Top Ocorrência) */
+.kpi-card-saas.accent-amber {
+    border-top: 4px solid #D97706;
+}
+
+.kpi-card-saas.accent-amber .kpi-icon-container {
+    background: #FFFBEB;
+    color: #D97706;
+}
+
+.kpi-card-saas.accent-amber .kpi-value-saas {
+    font-size: 20px;
+    line-height: 1.3;
+    color: #111827;
+}
+
+/* Texto menor para nomes */
+
+/* Purple (Tipo Frequente) */
+.kpi-card-saas.accent-purple {
+    border-top: 4px solid #7C3AED;
+}
+
+.kpi-card-saas.accent-purple .kpi-icon-container {
+    background: #F5F3FF;
+    color: #7C3AED;
+}
+
+.kpi-card-saas.accent-purple .kpi-value-saas {
+    font-size: 20px;
+    line-height: 1.3;
+    color: #111827;
+}
+
+/* Slate/Gray (Tendência) */
+.kpi-card-saas.accent-slate {
+    border-top: 4px solid #64748B;
+}
+
+.kpi-card-saas.accent-slate .kpi-icon-container {
+    background: #F8FAFC;
+    color: #64748B;
+}
+
+/* --- LINHA 2: CONTEXTO ANALÍTICO (Secondary) --- */
+.context-grid-saas {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 24px;
+}
+
+@media (min-width: 1024px) {
+    .context-grid-saas {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.context-card-saas {
+    background: #F9FAFB;
+    /* Fundo levemente cinza para diferenciar */
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+}
+
+.context-header-saas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #E5E7EB;
+    padding-bottom: 12px;
+}
+
+.context-label-saas {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.context-icon-saas {
+    color: #9CA3AF;
+}
+
+.context-body-saas {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+.context-metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.context-metric-label {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.context-metric-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Highlight dentro do contexto */
+.context-highlight {
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 4px;
+}
+
+/* Custom List no Contexto */
+.context-list-container {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.context-list-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.context-list-container::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 4px;
+}
+
+/* --- UTILITIES ESPECÍFICAS PARA TENDÊNCIA --- */
+.trend-indicator-saas {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.trend-up {
+    background: #ECFDF5;
+    color: #059669;
+}
+
+.trend-down {
+    background: #FEF2F2;
+    color: #DC2626;
+}
+
+.trend-neutral {
+    background: #F3F4F6;
+    color: #4B5563;
+}
+
+/* Classes para esconder elementos mantendo acessibilidade/JS */
+.visually-hidden-functionality {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

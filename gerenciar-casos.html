@@ -339,7 +339,7 @@
       border-bottom: none;
     }
 
-    /* Autocomplete Styles */
+    /* Autocomplete Styles - Rich Design from registro-novo-caso.html */
     .autocomplete-wrapper {
       position: relative;
     }
@@ -351,15 +351,24 @@
       border: 1px solid #e5e7eb;
       border-top: none;
       border-radius: 0 0 0.5rem 0.5rem;
-      max-height: 200px;
+      max-height: 250px;
       overflow-y: auto;
       width: 100%;
       z-index: 1000;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
     }
 
     .autocomplete-list.show {
       display: block;
+    }
+
+    .autocomplete-header {
+      font-size: 0.75rem;
+      color: #6b7280;
+      padding: 0.5rem 0.75rem;
+      background-color: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 500;
     }
 
     .autocomplete-item {
@@ -379,10 +388,6 @@
 
     .autocomplete-item:last-child {
       border-bottom: none;
-    }
-
-    .autocomplete-item.active {
-      background-color: #eff6ff;
     }
 
     .autocomplete-badge {
@@ -408,6 +413,7 @@
     .autocomplete-nome {
       font-size: 14px;
       color: #374151;
+      font-weight: 500;
     }
 
     .no-results {
@@ -2430,7 +2436,8 @@
             <span>✖️</span>
             <span>Revisar</span>
           </button>
-          <button id="btnConfirmarEdicao" class="confirm-modal-btn confirm-modal-btn-confirm" onclick="confirmarEdicaoSalvar()">
+          <button id="btnConfirmarEdicao" class="confirm-modal-btn confirm-modal-btn-confirm"
+            onclick="confirmarEdicaoSalvar()">
             <span>💾</span>
             <span>Confirmar e Salvar</span>
           </button>
@@ -3296,7 +3303,7 @@
       style="position: relative !important; margin: auto !important; width: auto !important; max-width: 95vw !important;">
       <!-- Header do Modal -->
       <div
-        class="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-white to-blue-50/30">
+        class="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-5 border-b border-gray-200 bg-white">
         <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3">
           <span class="text-2xl sm:text-3xl">✏️</span>
           <span>Editar Registro</span>
@@ -3348,8 +3355,7 @@
                       Nome da Criança/Estudante <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="edit_criancaEstudante" name="edit_criancaEstudante" required
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
-                      placeholder="Digite o nome completo">
+                      class="input-elegant w-full shadow-sm" placeholder="Digite o nome completo">
                   </div>
 
                   <!-- Data da NT -->
@@ -3358,7 +3364,7 @@
                       Data da Notificação (NT) <span class="text-red-500">*</span>
                     </label>
                     <input type="date" id="edit_dataNT" name="edit_dataNT" required
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                      class="input-elegant w-full shadow-sm">
                   </div>
 
                   <!-- Idade -->
@@ -3367,8 +3373,7 @@
                       Idade <span class="text-red-500">*</span>
                     </label>
                     <input type="number" id="edit_idade" name="edit_idade" min="0" max="120" required
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
-                      placeholder="Ex: 10">
+                      class="input-elegant w-full shadow-sm" placeholder="Ex: 10">
                   </div>
 
                   <!-- Identidade de Gênero -->
@@ -3377,7 +3382,7 @@
                       Identidade de Gênero <span class="text-red-500">*</span>
                     </label>
                     <select id="edit_identidadeGenero" name="edit_identidadeGenero" required
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                      class="select-elegant w-full shadow-sm">
                       <option value="">Selecione...</option>
                       <option value="M">Masculino</option>
                       <option value="F">Feminino</option>
@@ -3391,8 +3396,7 @@
                     <label for="edit_pcdTranstorno" class="block text-sm font-semibold text-gray-700 mb-2">
                       É PCD/tem Transtorno?
                     </label>
-                    <select id="edit_pcdTranstorno" name="edit_pcdTranstorno"
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                    <select id="edit_pcdTranstorno" name="edit_pcdTranstorno" class="select-elegant w-full shadow-sm">
                       <option value="">Selecione...</option>
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
@@ -3414,8 +3418,7 @@
 
                     <!-- Input com autocomplete -->
                     <div class="relative">
-                      <input type="text" id="edit_pcdDetalhes-input"
-                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+                      <input type="text" id="edit_pcdDetalhes-input" class="input-elegant w-full shadow-sm"
                         placeholder="Digite ou selecione um transtorno/deficiência..." autocomplete="off" />
                       <div id="edit_pcdDetalhes-suggestions"
                         class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50 hidden">
@@ -3435,8 +3438,7 @@
                     <label for="edit_racaCor" class="block text-sm font-semibold text-gray-700 mb-2">
                       Raça/Cor
                     </label>
-                    <select id="edit_racaCor" name="edit_racaCor"
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                    <select id="edit_racaCor" name="edit_racaCor" class="select-elegant w-full shadow-sm">
                       <option value="">Selecione...</option>
                       <option value="Branca">Branca</option>
                       <option value="Preta">Preta</option>
@@ -3453,7 +3455,7 @@
                       Orientação Sexual
                     </label>
                     <select id="edit_orientacaoSexual" name="edit_orientacaoSexual"
-                      class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                      class="select-elegant w-full shadow-sm">
                       <option value="">Selecione...</option>
                       <option value="Heterossexual">Heterossexual</option>
                       <option value="Homossexual">Homossexual</option>
@@ -3503,8 +3505,7 @@
 
                       <!-- Input com autocomplete -->
                       <div class="relative">
-                        <input type="text" id="edit_tipoViolencia-input"
-                          class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/60 focus:border-red-500 transition-all duration-200 bg-white shadow-sm"
+                        <input type="text" id="edit_tipoViolencia-input" class="input-elegant w-full shadow-sm"
                           placeholder="Digite para adicionar tipo de violência (ex: Física)" autocomplete="off" />
 
                         <!-- Lista de sugestões -->
@@ -3537,7 +3538,7 @@
                       <!-- Input com autocomplete -->
                       <div class="relative">
                         <input type="text" id="edit_tipoViolenciaInstitucional-input"
-                          class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/60 focus:border-orange-500 transition-all duration-200 bg-white shadow-sm"
+                          class="input-elegant w-full shadow-sm"
                           placeholder="Digite para adicionar tipo de violência institucional (ex: Física, Psicológica)"
                           autocomplete="off" />
 
@@ -3622,7 +3623,7 @@
                         Qual o tipo da instituição de ensino? <span class="text-red-500">*</span>
                       </label>
                       <select id="edit_tipoInstituicao" name="edit_tipoInstituicao" required
-                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-white shadow-sm">
+                        class="select-elegant w-full shadow-sm">
                         <option value="">Selecione o tipo...</option>
                         <option value="CMEI">CMEI - Centro Municipal de Educação Infantil</option>
                         <option value="EMEF">EMEF - Escola Municipal de Ensino Fundamental</option>
@@ -3631,15 +3632,38 @@
 
                     <!-- CMEI/EMEF com Autocomplete -->
                     <div class="md:col-span-2">
-                      <label for="edit_cmeiEmef" class="block text-sm font-semibold text-gray-700 mb-2">
-                        Instituição de Ensino <span class="text-red-500">*</span>
-                      </label>
+                      <!-- CABEÇALHO: Label + Botão Ver Todas -->
+                      <div class="flex items-center justify-between mb-2">
+                        <label for="edit_cmeiEmef" class="block text-sm font-semibold text-gray-700">
+                          Instituição de Ensino <span class="text-red-500">*</span>
+                        </label>
+
+                        <!-- ⭐ BOTÃO VER TODAS - APENAS PARA TÉCNICOS -->
+                        <div id="edit_filtro-escolas-container" class="hidden">
+                          <button type="button" id="edit_btnVerTodasEscolas"
+                            class="btn-elegant btn-primary-elegant text-xs px-3 py-1.5 rounded-full shadow-sm"
+                            title="Alternar entre suas escolas e todas as escolas">
+                            <span id="edit_btnVerTodasIcone">🌐</span>
+                            <span id="edit_btnVerTodasText">Ver Todas</span>
+                          </button>
+                        </div>
+                      </div>
+
                       <div class="autocomplete-wrapper">
                         <input type="text" id="edit_cmeiEmef" name="edit_cmeiEmef" required disabled autocomplete="off"
-                          class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-white shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-500"
+                          class="input-elegant w-full shadow-sm disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-500"
                           placeholder="Primeiro selecione o tipo de instituição">
                         <div class="autocomplete-list" id="edit_autocompleteList"></div>
                       </div>
+
+                      <!-- ⭐ INDICADOR DE FILTRO ATIVO (APENAS TÉCNICOS) -->
+                      <div id="edit_filtroAtivoContainer" class="hidden mt-1.5">
+                        <p id="edit_filtroAtivoIndicador" class="text-xs text-green-600 flex items-center gap-1">
+                          <span>✓</span>
+                          <span id="edit_filtroAtivoTexto">Mostrando suas escolas atribuídas</span>
+                        </p>
+                      </div>
+
                       <p class="text-xs text-gray-500 mt-1.5">Digite para filtrar as instituições disponíveis</p>
                     </div>
 
@@ -3649,7 +3673,7 @@
                         Região <span class="text-red-500">*</span>
                       </label>
                       <input type="text" id="edit_regiao-display" readonly
-                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed shadow-sm"
+                        class="input-elegant w-full bg-gray-100 text-gray-600 cursor-not-allowed shadow-sm"
                         placeholder="Selecione uma escola primeiro">
                       <!-- Campo hidden para envio ao backend -->
                       <input type="hidden" id="edit_regiao" name="edit_regiao" required>
@@ -3664,7 +3688,7 @@
                         Responsável pelo Registro <span class="text-red-500">*</span>
                       </label>
                       <input type="text" id="edit_responsavelRegistro" name="edit_responsavelRegistro" required readonly
-                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-all duration-200 bg-gray-50 shadow-sm cursor-not-allowed disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-600"
+                        class="input-elegant w-full bg-gray-50 shadow-sm cursor-not-allowed disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-600"
                         placeholder="Nome do profissional que está registrando">
                       <p class="text-xs text-gray-500 mt-1">Campo não pode ser alterado para evitar conflitos de
                         auditoria</p>
@@ -5633,6 +5657,9 @@ URL atual: ${APPS_SCRIPT_URL || 'undefined'}
     // ========================================
     // SISTEMA DE AUTOCOMPLETE CMEI/EMEF (EDIÇÃO)
     // ========================================
+    // ========================================
+    // SISTEMA DE AUTOCOMPLETE CMEI/EMEF (EDIÇÃO)
+    // ========================================
     function removerAcentosEdit(texto) {
       return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
@@ -5647,9 +5674,14 @@ URL atual: ${APPS_SCRIPT_URL || 'undefined'}
         const sigla = inst.sigla || gerarSiglaEdit(inst.nomeOriginal);
         const siglaNormalizada = removerAcentosEdit(sigla.toLowerCase());
 
+        // Busca por palavras no nome
         const palavras = termoLower.split(' ').filter(p => p.length > 0);
         const matchPorPalavras = palavras.every(palavra => nomeNormalizado.includes(palavra));
+
+        // Busca pela sigla (sem espaços)
         const matchPorSigla = siglaNormalizada.includes(termoSemEspacos);
+
+        // Busca pela sigla com caracteres consecutivos (ex: "ACM" encontra "Ana Chaves Mendes")
         const matchPorIniciaisConsecutivas = siglaNormalizada.startsWith(termoSemEspacos);
 
         return matchPorPalavras || matchPorSigla || matchPorIniciaisConsecutivas;
@@ -5658,46 +5690,98 @@ URL atual: ${APPS_SCRIPT_URL || 'undefined'}
 
     function renderizarSugestoesEdit(resultados) {
       const autocompleteList = document.getElementById('edit_autocompleteList');
+      autocompleteList.innerHTML = '';
 
       if (resultados.length === 0) {
-        autocompleteList.classList.remove('show');
+        autocompleteList.innerHTML = '<div class="no-results">🔍 Nenhuma instituição encontrada</div>';
+        autocompleteList.classList.add('show');
         return;
       }
 
-      autocompleteList.innerHTML = resultados
-        .slice(0, 10)
-        .map(inst => `
-          <div class="autocomplete-item" data-value="${inst.nomeOriginal}">
-            ${inst.nomeOriginal}
-          </div>
-        `).join('');
+      // Mostra todas as escolas, sem limite de exibicao
+      const totalResultados = resultados.length;
+
+      if (totalResultados > 5) {
+        const header = document.createElement('div');
+        header.className = 'autocomplete-header';
+        header.innerHTML = `📋 ${totalResultados} escola${totalResultados > 1 ? 's' : ''} disponíve${totalResultados > 1 ? 'is' : 'l'} - digite para filtrar`;
+        autocompleteList.appendChild(header);
+      }
+
+      resultados.forEach((inst, index) => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+
+        // Badge do tipo
+        const badge = document.createElement('span');
+        badge.className = `autocomplete-badge ${inst.tipo.toLowerCase()}`;
+        badge.textContent = inst.tipo;
+
+        // Container para nome e sigla
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'flex flex-col';
+
+        // Nome sem a redundância da sigla
+        const nomeSemTipo = inst.nomeOriginal.replace(inst.tipo + ' ', '');
+        const nomeSpan = document.createElement('span');
+        nomeSpan.className = 'autocomplete-nome';
+        nomeSpan.textContent = nomeSemTipo;
+
+        // Sigla (menor e em cinza)
+        const siglaSpan = document.createElement('span');
+        siglaSpan.className = 'text-xs text-gray-500 mt-0.5';
+        siglaSpan.textContent = inst.sigla ? `Sigla: ${inst.sigla}` : '';
+
+        infoContainer.appendChild(nomeSpan);
+        infoContainer.appendChild(siglaSpan);
+
+        item.appendChild(badge);
+        item.appendChild(infoContainer);
+
+        // Evento de clique
+        item.addEventListener('click', function () {
+          selecionarInstituicaoEdit(inst);
+        });
+
+        autocompleteList.appendChild(item);
+      });
 
       autocompleteList.classList.add('show');
+    }
 
-      autocompleteList.querySelectorAll('.autocomplete-item').forEach(item => {
-        item.addEventListener('click', function () {
-          const nomeEscola = this.getAttribute('data-value');
-          document.getElementById('edit_cmeiEmef').value = nomeEscola;
-          autocompleteList.classList.remove('show');
+    // Função separada para selecionar a instituição na edição
+    function selecionarInstituicaoEdit(inst) {
+      const cmeiEmefInput = document.getElementById('edit_cmeiEmef');
+      const autocompleteList = document.getElementById('edit_autocompleteList');
 
-          // ====== AUTO-PREENCHIMENTO DE REGIÃO ======
-          if (window.NAVMEscolasTecnico) {
-            const regiao = window.NAVMEscolasTecnico.getRegiaoEscola(nomeEscola);
-            const regiaoDisplay = document.getElementById('edit_regiao-display');
-            const regiaoHidden = document.getElementById('edit_regiao');
+      // Define o valor completo original no campo
+      cmeiEmefInput.value = inst.nomeOriginal;
 
-            if (regiao) {
-              if (regiaoDisplay) regiaoDisplay.value = regiao;
-              if (regiaoHidden) regiaoHidden.value = regiao;
-              console.log('[Escolas Edit] Região preenchida automaticamente:', regiao);
-            } else {
-              if (regiaoDisplay) regiaoDisplay.value = '';
-              if (regiaoHidden) regiaoHidden.value = '';
-              console.warn('[Escolas Edit] Região não encontrada para:', nomeEscola);
-            }
-          }
-        });
-      });
+      // Fecha a lista
+      autocompleteList.classList.remove('show');
+
+      // ====== AUTO-PREENCHIMENTO DE REGIÃO ======
+      // Prioriza a região que vem do banco de dados (inst.regiao = school_region)
+      let regiao = inst.regiao || '';
+
+      // Fallback: busca região via módulo caso inst.regiao esteja vazio
+      if (!regiao && window.NAVMEscolasTecnico) {
+        regiao = window.NAVMEscolasTecnico.getRegiaoEscola(inst.nomeOriginal) || '';
+        if (regiao) console.log('[Escolas Edit] Região obtida via fallback (getRegiaoEscola):', regiao);
+      }
+
+      const regiaoDisplay = document.getElementById('edit_regiao-display');
+      const regiaoHidden = document.getElementById('edit_regiao');
+
+      if (regiao) {
+        if (regiaoDisplay) regiaoDisplay.value = regiao;
+        if (regiaoHidden) regiaoHidden.value = regiao;
+        console.log('[Escolas Edit] Região preenchida automaticamente:', regiao);
+      } else {
+        if (regiaoDisplay) regiaoDisplay.value = '';
+        if (regiaoHidden) regiaoHidden.value = '';
+        console.warn('[Escolas Edit] Região não encontrada para:', inst.nomeOriginal);
+      }
     }
 
     function atualizarSelecaoVisualEdit(items) {
@@ -5711,12 +5795,250 @@ URL atual: ${APPS_SCRIPT_URL || 'undefined'}
       });
     }
 
+    // ==========================================
+    // SISTEMA DE FILTRO DE ESCOLAS (EDIÇÃO)
+    // ==========================================
+    let edit_escolasDisponiveis = []; // Array de escolas carregadas (filtradas ou todas)
+    let edit_mostrandoTodasEscolas = false; // Estado do toggle
+
+    /**
+     * Inicializa o filtro de escolas para o modal de edição
+     */
+    async function inicializarFiltroEscolasEdit() {
+      const userEmail = sessionStorage.getItem('userEmail');
+      const userRole = sessionStorage.getItem('userRole');
+      const userName = sessionStorage.getItem('userName'); // PRIORIDADE: usar nome
+
+      console.log('[Escolas Edit] Inicializando filtro de escolas...');
+      console.log('[Escolas Edit] Nome:', userName, '| Email:', userEmail, '| Role:', userRole);
+
+      // Verifica se o módulo está disponível
+      if (!window.NAVMEscolasTecnico) {
+        console.warn('[Escolas Edit] Modulo NAVMEscolasTecnico não carregado. Usando lista padrão.');
+        return;
+      }
+
+      // Feedback visual: carregando
+      mostrarStatusEscolasEdit('Carregando escolas...', 'loading');
+
+      // RESET IMPORTANTE: Sempre começa mostrando apenas as do técnico (se for técnico)
+      // Mas se já estivesse mostrando todas (ex: reabriu modal), preserva? 
+      // Não, melhor resetar para o padrão "minhas escolas" ao abrir o modal,
+      // a menos que o usuário explicitamente mude.
+      // edit_mostrandoTodasEscolas = false; // Opcional, já é o default
+
+      // Carrega escolas do usuário (ASSÍNCRONO) - PRIORIZA NOME sobre EMAIL
+      edit_escolasDisponiveis = await window.NAVMEscolasTecnico.getEscolasUsuario(
+        userEmail,
+        userRole,
+        edit_mostrandoTodasEscolas,
+        userName
+      );
+
+      console.log('[Escolas Edit] Total de escolas disponíveis:', edit_escolasDisponiveis.length);
+
+      // Feedback visual: resultado
+      if (edit_escolasDisponiveis.length > 0) {
+        mostrarStatusEscolasEdit(edit_escolasDisponiveis.length + ' escolas carregadas', 'success');
+      } else {
+        mostrarStatusEscolasEdit('Nenhuma escola encontrada', 'error');
+      }
+
+      // Verifica se é técnico para mostrar botão "Ver Todas"
+      const isTecnico = userRole === 'tecnico';
+
+      if (isTecnico) {
+        const filtroContainer = document.getElementById('edit_filtro-escolas-container');
+        const filtroAtivoContainer = document.getElementById('edit_filtroAtivoContainer');
+
+        // MOSTRA OS ELEMENTOS APENAS PARA TÉCNICOS
+        if (filtroContainer) filtroContainer.classList.remove('hidden');
+        if (filtroAtivoContainer) filtroAtivoContainer.classList.remove('hidden');
+
+        // Identifica o técnico - PRIORIZA NOME sobre EMAIL
+        let tecnico = null;
+        if (userName) {
+          tecnico = window.NAVMEscolasTecnico.identificarTecnicoPorNome(userName);
+        }
+        if (!tecnico && userEmail) {
+          tecnico = window.NAVMEscolasTecnico.identificarTecnico(userEmail);
+        }
+
+        if (tecnico) {
+          console.log('[Escolas Edit] Técnico identificado:', tecnico);
+          atualizarIndicadorFiltroEdit();
+        } else {
+          console.warn('[Escolas Edit] Técnico não identificado. Nome:', userName, '| Email:', userEmail);
+        }
+      } else {
+        // Se não for técnico, esconde os controles (caso tenham ficado visíveis)
+        const filtroContainer = document.getElementById('edit_filtro-escolas-container');
+        const filtroAtivoContainer = document.getElementById('edit_filtroAtivoContainer');
+        if (filtroContainer) filtroContainer.classList.add('hidden');
+        if (filtroAtivoContainer) filtroAtivoContainer.classList.add('hidden');
+      }
+
+      // Configura evento do botão "Ver Todas" (remove listener anterior para não duplicar, se possível, ou usa onclick direto no HTML ou check de flag)
+      // Como a função é chamada ao abrir modal, ideal é garantir que o listener não acumule.
+      // Mas o botão está no HTML estático, então o listener deve ser adicionado apenas UMA VEZ na inicialização da página?
+      // O 'inicializarFiltroEscolasEdit' pode ser chamado múltiplas vezes.
+      // Melhor mover o addEventListener para fora ou verificar.
+      const btnVerTodas = document.getElementById('edit_btnVerTodasEscolas');
+      if (btnVerTodas) {
+        // Remove anterior para garantir
+        btnVerTodas.removeEventListener('click', toggleVerTodasEscolasEdit);
+        btnVerTodas.addEventListener('click', toggleVerTodasEscolasEdit);
+      }
+
+      // Atualiza a UI do botão baseada no estado atual
+      atualizarInterfaceBotaoEdit();
+    }
+
+    /**
+     * Alterna entre ver todas as escolas e apenas as do técnico
+     */
+    async function toggleVerTodasEscolasEdit() {
+      edit_mostrandoTodasEscolas = !edit_mostrandoTodasEscolas;
+
+      const userEmail = sessionStorage.getItem('userEmail');
+      const userRole = sessionStorage.getItem('userRole');
+      const userName = sessionStorage.getItem('userName');
+
+      // Feedback visual
+      mostrarStatusEscolasEdit(
+        edit_mostrandoTodasEscolas ? 'Carregando todas as escolas...' : 'Carregando suas escolas...',
+        'loading'
+      );
+
+      // Recarrega escolas com o novo estado (ASSÍNCRONO)
+      edit_escolasDisponiveis = await window.NAVMEscolasTecnico.getEscolasUsuario(
+        userEmail,
+        userRole,
+        edit_mostrandoTodasEscolas,
+        userName
+      );
+
+      // Feedback visual: resultado
+      mostrarStatusEscolasEdit(
+        edit_escolasDisponiveis.length + ' escolas ' + (edit_mostrandoTodasEscolas ? 'totais' : 'atribuídas'),
+        'success'
+      );
+
+      // Atualiza UI do botão
+      atualizarInterfaceBotaoEdit();
+
+      // Limpa campo de escola e região (comportamento padrão de filtro)
+      // Mas na edição, cuidado se o usuário clicou sem querer.
+      // O requisito diz "Mesma lógica". Lá limpa.
+      const cmeiEmefInput = document.getElementById('edit_cmeiEmef');
+      const regiaoDisplay = document.getElementById('edit_regiao-display');
+      const regiaoHidden = document.getElementById('edit_regiao');
+
+      if (cmeiEmefInput) cmeiEmefInput.value = '';
+      if (regiaoDisplay) regiaoDisplay.value = '';
+      if (regiaoHidden) regiaoHidden.value = '';
+
+      // Re-filtra instituições se um tipo já estiver selecionado
+      // update: edit_tipoInstituicaoSelecionado é a variável usada no closure de configurarEventosInstituicaoEdit
+      // precisamos acessá-la ou garantir que edit_instituicoesFiltradas seja atualizada corretamente
+      const selectTipo = document.getElementById('edit_tipoInstituicao');
+      if (selectTipo && selectTipo.value) {
+        // Re-executa o filtro
+        // Como edit_instituicoesFiltradas é global (ou escopo superior), podemos atualizar
+        if (edit_escolasDisponiveis.length > 0) {
+          edit_instituicoesFiltradas = edit_escolasDisponiveis.filter(inst => inst.tipo === selectTipo.value);
+          // Siglas
+          edit_instituicoesFiltradas.forEach(inst => {
+            if (!inst.sigla) inst.sigla = gerarSiglaEdit(inst.nomeOriginal);
+          });
+          // Se o campo de texto estiver focado, atualiza sugestões?
+          // Simule input vazio para recarregar lista se tiver foco
+          if (document.activeElement === cmeiEmefInput) {
+            renderizarSugestoesEdit(edit_instituicoesFiltradas);
+          }
+        }
+      }
+
+      // Atualiza indicador DEPOIS de re-filtrar
+      atualizarIndicadorFiltroEdit();
+
+      console.log('[Escolas Edit] Toggle Ver Todas:', edit_mostrandoTodasEscolas, '| Total filtrado:', edit_instituicoesFiltradas.length);
+    }
+
+    function atualizarInterfaceBotaoEdit() {
+      const btnTexto = document.getElementById('edit_btnVerTodasText');
+      const btnIcone = document.getElementById('edit_btnVerTodasIcone');
+
+      if (edit_mostrandoTodasEscolas) {
+        if (btnTexto) btnTexto.textContent = 'Minhas Escolas';
+        if (btnIcone) btnIcone.textContent = '👤';
+      } else {
+        if (btnTexto) btnTexto.textContent = 'Ver Todas';
+        if (btnIcone) btnIcone.textContent = '🌐';
+      }
+    }
+
+    function atualizarIndicadorFiltroEdit() {
+      const indicador = document.getElementById('edit_filtroAtivoIndicador');
+      const texto = document.getElementById('edit_filtroAtivoTexto');
+
+      if (!indicador || !texto) return;
+
+      // Usa a quantidade filtrada por tipo se houver tipo selecionado
+      const tipoSelect = document.getElementById('edit_tipoInstituicao');
+      const temTipo = tipoSelect && tipoSelect.value;
+
+      const quantidadeExibida = temTipo && edit_instituicoesFiltradas.length > 0
+        ? edit_instituicoesFiltradas.length
+        : edit_escolasDisponiveis.length;
+
+      const tipoTexto = temTipo ? ` (${tipoSelect.value})` : '';
+
+      if (edit_mostrandoTodasEscolas) {
+        indicador.className = 'text-xs text-orange-600 flex items-center gap-1';
+        texto.textContent = `Mostrando todas as ${quantidadeExibida} escolas${tipoTexto}`;
+      } else {
+        indicador.className = 'text-xs text-green-600 flex items-center gap-1';
+        texto.textContent = `Mostrando suas ${quantidadeExibida} escolas atribuídas${tipoTexto}`;
+      }
+    }
+
+    function mostrarStatusEscolasEdit(mensagem, tipo) {
+      // Simplificado: apenas log ou status pequeno, já que não temos o elemento de status criado no HTML do plano
+      // O plano mencionou "mostrarStatusEscolasEdit (opcional)" e "Feedback visual (Recomendado)"
+      // Vamos tentar usar o autocomplete-wrapper para inserir msn se não existir
+      const wrapper = document.querySelector('#edit_cmeiEmef')?.closest('.autocomplete-wrapper');
+      if (!wrapper) return;
+
+      let statusEl = document.getElementById('edit_escolasStatusFeedback');
+      if (!statusEl) {
+        statusEl = document.createElement('p');
+        statusEl.id = 'edit_escolasStatusFeedback';
+        statusEl.className = 'text-xs mt-1 transition-opacity duration-300';
+        wrapper.parentElement.insertBefore(statusEl, wrapper.nextSibling); // Insere DEPOIS do wrapper
+      }
+
+      if (tipo === 'loading') {
+        statusEl.textContent = '⏳ ' + mensagem;
+        statusEl.className = 'text-xs mt-1 text-blue-600';
+      } else if (tipo === 'success') {
+        statusEl.textContent = '✅ ' + mensagem;
+        statusEl.className = 'text-xs mt-1 text-green-600';
+      } else if (tipo === 'error') {
+        statusEl.textContent = '❌ ' + mensagem;
+        statusEl.className = 'text-xs mt-1 text-red-600';
+      }
+
+      statusEl.style.opacity = '1';
+      setTimeout(() => { statusEl.style.opacity = '0'; }, 3000);
+    }
+
     function configurarEventosInstituicaoEdit() {
       const tipoInstituicaoSelect = document.getElementById('edit_tipoInstituicao');
       const cmeiEmefInput = document.getElementById('edit_cmeiEmef');
       const autocompleteList = document.getElementById('edit_autocompleteList');
 
-      tipoInstituicaoSelect.addEventListener('change', function () {
+      tipoInstituicaoSelect.addEventListener('change', async function () {
         edit_tipoInstituicaoSelecionado = this.value;
 
         // CRÍTICO: Não limpa o campo se estamos carregando dados de edição
@@ -5734,14 +6056,26 @@ URL atual: ${APPS_SCRIPT_URL || 'undefined'}
 
           // Usa módulo de escolas por técnico se disponível (fallback para lista local)
           if (window.NAVMEscolasTecnico) {
-            const userEmail = sessionStorage.getItem('userEmail');
-            const userRole = sessionStorage.getItem('userRole');
-            const todasEscolas = window.NAVMEscolasTecnico.getEscolasUsuario(userEmail, userRole, true); // Sempre todas para edição
-            edit_instituicoesFiltradas = todasEscolas.filter(inst => inst.tipo === edit_tipoInstituicaoSelecionado);
-            // Garante que todas as escolas tenham sigla
-            edit_instituicoesFiltradas.forEach(inst => {
-              if (!inst.sigla) inst.sigla = gerarSiglaEdit(inst.nomeOriginal);
-            });
+            // Se a lista de escolas disponíveis ainda estiver vazia (primeiro acesso), inicializa
+            if (edit_escolasDisponiveis.length === 0) {
+              await inicializarFiltroEscolasEdit();
+            }
+
+            if (Array.isArray(edit_escolasDisponiveis)) {
+              // Filtra da lista global já carregada (que respeita o toggle "minhas/todas")
+              edit_instituicoesFiltradas = edit_escolasDisponiveis.filter(inst => inst.tipo === edit_tipoInstituicaoSelecionado);
+
+              // Garante que todas as escolas tenham sigla
+              edit_instituicoesFiltradas.forEach(inst => {
+                if (!inst.sigla) inst.sigla = gerarSiglaEdit(inst.nomeOriginal);
+              });
+
+              // ATUALIZA O INDICADOR DE FILTRO (Quantidade muda por tipo)
+              atualizarIndicadorFiltroEdit();
+            } else {
+              console.error('[Escolas Edit] Erro: edit_escolasDisponiveis não é um array');
+              edit_instituicoesFiltradas = [];
+            }
           } else {
             edit_instituicoesFiltradas = instituicoes.filter(inst => inst.tipo === edit_tipoInstituicaoSelecionado);
           }
@@ -5763,12 +6097,26 @@ URL atual: ${APPS_SCRIPT_URL || 'undefined'}
         edit_indiceSelecionado = -1;
 
         if (termo.length === 0) {
-          autocompleteList.classList.remove('show');
+          // Se vazio, mostra TODAS as escolas (comportamento rico)
+          renderizarSugestoesEdit(edit_instituicoesFiltradas);
           return;
         }
 
         const resultados = filtrarInstituicoesEdit(termo);
         renderizarSugestoesEdit(resultados);
+      });
+
+      // EVENTO: Focus no campo mostra lista
+      cmeiEmefInput.addEventListener('focus', function () {
+        if (edit_instituicoesFiltradas.length > 0) {
+          const termo = this.value.trim();
+          if (termo.length === 0) {
+            renderizarSugestoesEdit(edit_instituicoesFiltradas);
+          } else {
+            const resultados = filtrarInstituicoesEdit(termo);
+            renderizarSugestoesEdit(resultados);
+          }
+        }
       });
 
       cmeiEmefInput.addEventListener('keydown', function (e) {
@@ -7703,7 +8051,22 @@ Zilda Andrade,ZA`;
     // ========================================
     // ABRIR MODAL DE EDIÇÃO
     // ========================================
-    function abrirEdicao(linha) {
+    /**
+     * Gera sigla para a escola (ex: CMEI Maria da Penha -> MP)
+     */
+    function gerarSiglaEdit(nome) {
+      if (!nome) return '';
+      return nome.replace(/^(CMEI|EMEF)\s+/i, '')
+        .split(/\s+/)
+        .map(w => w[0])
+        .join('')
+        .toUpperCase();
+    }
+
+    async function abrirEdicao(linha) {
+      // Inicializa filtro de escolas se necessário (comportamento de técnico)
+      await inicializarFiltroEscolasEdit();
+
       // Armazena a página atual antes de abrir a edição
       paginaAntesEdicao = paginaAtual;
       console.log('[gerenciar] Página atual armazenada:', paginaAntesEdicao);
@@ -7928,7 +8291,21 @@ Zilda Andrade,ZA`;
 
         // Habilita o campo e filtra instituições
         edit_tipoInstituicaoSelecionado = tipoDetectado;
-        edit_instituicoesFiltradas = instituicoes.filter(inst => inst.tipo === tipoDetectado);
+
+        // Usa lógica avançada de escolas se disponível
+        if (window.NAVMEscolasTecnico && edit_escolasDisponiveis.length > 0) {
+          edit_instituicoesFiltradas = edit_escolasDisponiveis.filter(inst => inst.tipo === tipoDetectado);
+
+          // Garante siglas
+          edit_instituicoesFiltradas.forEach(inst => {
+            if (!inst.sigla) inst.sigla = gerarSiglaEdit(inst.nomeOriginal);
+          });
+
+          atualizarIndicadorFiltroEdit();
+        } else {
+          // Fallback
+          edit_instituicoesFiltradas = instituicoes.filter(inst => inst.tipo === tipoDetectado);
+        }
         document.getElementById('edit_cmeiEmef').disabled = false;
         document.getElementById('edit_cmeiEmef').placeholder = 'Digite para buscar...';
 
@@ -12551,19 +12928,15 @@ Zilda Andrade,ZA`;
     });
   </script>
 
+  <!-- Inicialização de Eventos de Edição -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Configura listeners para os componentes do modal de edição
+      if (typeof configurarEventosInstituicaoEdit === 'function') configurarEventosInstituicaoEdit();
+      if (typeof configurarEventosTipoViolenciaEdit === 'function') configurarEventosTipoViolenciaEdit();
+      if (typeof configurarEventosTipoViolenciaInstitucionalEdit === 'function') configurarEventosTipoViolenciaInstitucionalEdit();
+    });
+  </script>
 </body>
-
-<!-- Intro.js JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
-<!-- Onboarding Module -->
-<script src="assets/js/utils/onboarding.js"></script>
-<!-- Initialize Onboarding -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    if (window.NAAMOnboarding) {
-      window.NAAMOnboarding.init('gerenciar-casos');
-    }
-  });
-</script>
 
 </html>
